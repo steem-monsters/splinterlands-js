@@ -4,6 +4,8 @@ var splinterlands = (function() {
 	let _settings = {};
 	let _cards = [];
 	let _use_keychain = false;
+	let _transactions = {};
+	let _collection = [];
 
 	async function init(config) { 
 		_config = config;
@@ -13,7 +15,7 @@ var splinterlands = (function() {
 		setInterval(load_settings, 60 * 1000);
 
 		// Load the card details
-		await load_cards();
+		_cards = await api('/cards/get_details');
 	}
 
 	function api(url, data) {
@@ -41,8 +43,6 @@ var splinterlands = (function() {
 
 		_settings = response;
 	}
-
-	async function load_cards() { _cards = await api('/cards/get_details'); }
 
 	async function login(username, key) {
 		if(!username) {
@@ -192,7 +192,6 @@ var splinterlands = (function() {
 		}
 	}
 
-	let _transactions = {};
 	function check_tx(sm_id) {
 		return new Promise(resolve => {
 			_transactions[sm_id] = { resolve: resolve };
@@ -215,8 +214,43 @@ var splinterlands = (function() {
 		}
 	}
 
+	async function load_collection(player) {
+		if(!player && _player)
+			player = _player.name;
+
+		_collection = await api(`/cards/collection/${player}`);
+		return _collection;
+	}
+
+	function group_collection(collection) {
+		let grouped = [];
+
+		// Group the cards in the collection by card_detail_id, edition, and gold foil
+		_cards.forEach(details => {
+			details.editions.split(',').forEach(edition => {
+				grouped.push(Object.assign({
+					gold: false,
+					edition: parseInt(edition),
+					cards: collection.filter(o => o.card_detail_id = details.id && o.gold == false && o.edition == parseInt(edition))
+				}, details));
+
+				grouped.push(Object.assign({
+					gold: true,
+					edition: parseInt(edition),
+					cards: collection.filter(o => o.card_detail_id = details.id && o.gold == true && o.edition == parseInt(edition))
+				}, details));
+			});
+		});
+
+		return grouped;
+	}
+
+	function get_battle_summoners(inactive_splinters, allowed_cards, ruleset, match_type, player_rating) {
+
+	}
+
 	return { 
-		init, api, login, send_tx,
+		init, api, login, send_tx, load_collection, group_collection,
 		get_settings: () => _settings, 
 		get_cards: () => _cards,
 		get_player: () => _player,
