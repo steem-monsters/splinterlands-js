@@ -1,0 +1,19 @@
+<html>
+	<head>
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+		<script src="splinterlands.js"></script>
+		<script src="utils.js"></script>
+		<script src="socket.js"></script>
+		<script type="text/javascript">
+			$(() =>	setTimeout(init, 500));
+
+			async function init() {
+				await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
+				await splinterlands.login('yabapmatt');
+			}
+		</script>
+	</head>
+	<body>
+
+	</body>
+</html>
