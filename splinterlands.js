@@ -18,6 +18,8 @@ var splinterlands = (function() {
 		_cards = await api('/cards/get_details');
 	}
 
+	function get_card(card_detail_id) { return _cards.find(c => c.id == card_detail_id) }
+
 	function api(url, data) {
 		return new Promise((resolve, reject) => {
 			if (data == null || data == undefined) data = {};
@@ -218,39 +220,113 @@ var splinterlands = (function() {
 		if(!player && _player)
 			player = _player.name;
 
-		_collection = await api(`/cards/collection/${player}`);
+		_collection = (await api(`/cards/collection/${player}`)).cards;
 		return _collection;
 	}
 
-	function group_collection(collection) {
+	function group_collection(collection, id_only) {
+		if(!collection)
+			collection = _collection;
+
 		let grouped = [];
 
 		// Group the cards in the collection by card_detail_id, edition, and gold foil
 		_cards.forEach(details => {
-			details.editions.split(',').forEach(edition => {
-				grouped.push(Object.assign({
-					gold: false,
-					edition: parseInt(edition),
-					cards: collection.filter(o => o.card_detail_id = details.id && o.gold == false && o.edition == parseInt(edition))
-				}, details));
+			if(id_only) {
+				grouped.push(Object.assign({ cards: collection.filter(o => o.card_detail_id == details.id) }, details));	 
+			} else {
+				details.editions.split(',').forEach(edition => {
+					grouped.push(Object.assign({
+						gold: false,
+						edition: parseInt(edition),
+						cards: collection.filter(o => o.card_detail_id == details.id && o.gold == false && o.edition == parseInt(edition))
+					}, details));
 
-				grouped.push(Object.assign({
-					gold: true,
-					edition: parseInt(edition),
-					cards: collection.filter(o => o.card_detail_id = details.id && o.gold == true && o.edition == parseInt(edition))
-				}, details));
-			});
+					grouped.push(Object.assign({
+						gold: true,
+						edition: parseInt(edition),
+						cards: collection.filter(o => o.card_detail_id == details.id && o.gold == true && o.edition == parseInt(edition))
+					}, details));
+				});
+			}
 		});
 
 		return grouped;
 	}
 
-	function get_battle_summoners(inactive_splinters, allowed_cards, ruleset, match_type, player_rating) {
+	function get_battle_summoners(inactive_splinters, allowed_cards, ruleset, match_type, rating_level) {
+		return group_collection(_collection, true).filter(d => d.type == 'Summoner' && d.cards.length > 0).map(d => {
+			// Check if the splinter is inactive for this battle
+			if(inactive_splinters.includes(d.color))
+				return null;
 
+			// Check if it's an allowed card
+			if(['no_legendaries', 'no_legendary_summoners'].includes(allowed_cards) && d.rarity == 4)
+				return null;
+
+			// Check if it is allowed but the current ruleset
+			if(ruleset == 'Little League' && d.stats.mana > 4)
+				return null;
+
+			let card = d.cards.find(o => 
+				(allowed_cards != 'gold_only' || o.gold) && 
+				(allowed_cards != 'alpha_only' || o.edition == 0) &&
+				(match_type != 'Ranked' || splinterlands.utils.is_playable(o)) && 
+				(!o.delegated_to || o.delegated_to == _player.name));
+
+			if(card) {
+				card = Object.assign({}, card);
+				card.level = splinterlands.utils.get_summoner_level(rating_level, card);
+			}
+
+			return card;
+		}).filter(c => c);
+	}
+
+	function get_battle_monsters(inactive_splinters, allowed_cards, ruleset, match_type, rating_level, summoner_card, ally_color) {
+		var summoner_details = get_card(summoner_card.card_detail_id);
+
+		return group_collection(_collection, true)
+			.filter(d => d.type == 'Monster' && d.cards.length > 0 && (d.color == summoner_details.color || d.color == 'Gray' || (summoner_details.color == 'Gold' && d.color == ally_color)))
+			.map(d => {
+				// Check if it's an allowed card
+				if((ruleset == 'Lost Legendaries' || allowed_cards == 'no_legendaries') && d.rarity == 4)
+					return;
+
+				if(ruleset == 'Rise of the Commons' && d.rarity > 2)
+					return;
+
+				if(ruleset == 'Taking Sides' && d.color == 'Gray')
+					return;
+
+				if(ruleset == 'Little League' && d.stats.mana[0] > 4)
+					return;
+
+				let card = d.cards.find(o => 
+					(allowed_cards != 'gold_only' || o.gold) && 
+					(allowed_cards != 'alpha_only' || o.edition == 0) &&
+					(match_type != 'Ranked' || splinterlands.utils.is_playable(o)) && 
+					(!o.delegated_to || o.delegated_to == _player.name));
+
+				if(card) {
+					card.capped_level = splinterlands.utils.get_monster_level(rating_level, summoner_card, card);
+
+					if(ruleset == 'Up Close & Personal' && d.stats.attack[card.capped_level - 1] == 0)
+						return;
+
+					if(ruleset == 'Keep Your Distance' && d.stats.attack[card.capped_level - 1] > 0)
+						return;
+
+					if(ruleset == 'Broken Arrows' && d.stats.ranged[card.capped_level - 1] > 0)
+						return;
+				}
+
+				return card;
+			}).filter(c => c);
 	}
 
 	return { 
-		init, api, login, send_tx, load_collection, group_collection,
+		init, api, login, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card,
 		get_settings: () => _settings, 
 		get_cards: () => _cards,
 		get_player: () => _player,
