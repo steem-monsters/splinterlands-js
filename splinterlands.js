@@ -3,12 +3,25 @@ var splinterlands = (function() {
 	let _player = null;
 	let _settings = {};
 	let _cards = [];
+	let _market = [];
 	let _use_keychain = false;
 	let _transactions = {};
 	let _collection = [];
+	let _browser_id = null;
+	let _session_id = null;
 
 	async function init(config) { 
 		_config = config;
+
+		// Load the browser id and create a new session id
+		_browser_id = localStorage.getItem('splinterlands:browser_id');
+		_session_id = 'sid_' + splinterlands.utils.randomStr(20);
+
+		// Create a new browser id if one is not already set
+		if(!_browser_id) {
+			_browser_id = 'bid_' + splinterlands.utils.randomStr(20);
+			localStorage.setItem('splinterlands:browser_id', _browser_id);
+		}
 
 		// Load the game settings
 		await load_settings();
@@ -16,6 +29,9 @@ var splinterlands = (function() {
 
 		// Load the card details
 		_cards = await api('/cards/get_details');
+
+		// Load market data
+		await load_market();
 	}
 
 	function get_card(card_detail_id) { return _cards.find(c => c.id == card_detail_id) }
@@ -36,6 +52,19 @@ var splinterlands = (function() {
 		});
 	}
 
+	async function log_event(event_name, data) {
+		return await api('/players/event', {
+			browser_id: _browser_id,
+			session_id: _session_id,
+			event_name: event_name,
+			page: '',
+			user_agent: window.navigator.userAgent,
+			browser_language: window.navigator.language,
+			site_language: localStorage.getItem('splinterlands:locale'),
+			data: JSON.stringify(data)
+		});
+	}
+
 	async function load_settings() {
 		let response = await api('/settings');
 
@@ -44,6 +73,19 @@ var splinterlands = (function() {
 		}
 
 		_settings = response;
+	}
+
+	async function load_balances() {
+		_player.balances = await api('/players/balances');
+		return _player.balances;
+	}
+
+	async function get_balance(token, refresh) {
+		if(!_player.balances || refresh)
+			await load_balances();
+
+		let balance = _player.balances.find(b => b.token == token);
+		return balance ? parseFloat(balance.balance) : 0;
 	}
 
 	async function login(username, key) {
@@ -112,6 +154,12 @@ var splinterlands = (function() {
 		// Start the websocket connection
 		splinterlands.socket.connect(_config.ws_url, _player.name, _player.token);
 
+		// Load the player's card collection
+		load_collection();
+
+		// Load the player's token balances
+		load_balances();
+
 		return _player;
 	}
 
@@ -140,7 +188,7 @@ var splinterlands = (function() {
 		let data_str = JSON.stringify(data);
 
 		if(data_str.length > 2000) {
-			// TODO: Log this
+			log_event('tx_length_exceeded', { type: id });
 			return { success: false, error: 'Max custom_json data length exceeded.' };
 		}
 
@@ -155,7 +203,7 @@ var splinterlands = (function() {
 					type: 'broadcast',
 					success: response.success, 
 					trx_id: response.success ? response.result.id : null,
-					error: response.success ? null : ((typeof response.error == 'string') ? response.error : response.error.message)
+					error: response.success ? null : ((typeof response.error == 'string') ? response.error : JSON.stringify(response.error))
 				})
 			}));
 		} else {
@@ -164,7 +212,7 @@ var splinterlands = (function() {
 					type: 'broadcast',
 					success: (response && response.id),
 					trx_id: (response && response.id) ? response.id : null,
-					error: err ? err.message : null
+					error: err ? JSON.stringify(err) : null
 				});
 			}));
 		}
@@ -184,13 +232,25 @@ var splinterlands = (function() {
 			if(result.error == 'user_cancel')
 				return result;
 			else if(result.error.indexOf('Please wait to transact') >= 0) {
-				// TODO: The account is out of Resource Credits, request an SP delegation
+				// The account is out of Resource Credits, request an SP delegation
+				let delegation_result = await api('/players/delegation');
+
+				if(delegation_result && delegation_result.success) {
+					// If the delegation succeeded, retry the transaction after 3 seconds
+					await splinterlands.utils.timeout(3000);
+					return await send_tx(id, display_name, data, retries + 1);
+				} else {
+				 	log_event('delegation_request_failed', { operation: id, error: result.error });
+					return "Oops, it looks like you don't have enough Resource Credits to transact on the Steem blockchain. Please contact us on Discord for help! Error: " + result.error;
+				}
 			} else if(retries < 2) {
 				// Retry the transaction after 3 seconds
 				await splinterlands.utils.timeout(3000);
 				return await send_tx(id, display_name, data, retries + 1);
-			} else
+			} else {
+				log_event('custom_json_failed', { response: JSON.stringify(result) });
 				return result;
+			}
 		}
 	}
 
@@ -222,6 +282,11 @@ var splinterlands = (function() {
 
 		_collection = (await api(`/cards/collection/${player}`)).cards;
 		return _collection;
+	}
+
+	async function load_market() {
+		_market = await api('/market/for_sale_grouped');
+		return _market;
 	}
 
 	function group_collection(collection, id_only) {
@@ -326,10 +391,11 @@ var splinterlands = (function() {
 	}
 
 	return { 
-		init, api, login, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card,
+		init, api, login, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card, get_balance, log_event, load_balances, load_market,
 		get_settings: () => _settings, 
 		get_cards: () => _cards,
 		get_player: () => _player,
+		get_market: () => _market,
 		get_transaction: (sm_id) => _transactions[sm_id]
 	};
 })();
