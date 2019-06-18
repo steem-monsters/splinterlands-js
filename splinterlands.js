@@ -34,7 +34,9 @@ var splinterlands = (function() {
 		await load_market();
 	}
 
-	function get_card(card_detail_id) { return _cards.find(c => c.id == card_detail_id) }
+	function get_card_details(card_detail_id) { 
+		return card_detail_id ? _cards.find(c => c.id == card_detail_id) : _cards;
+	}
 
 	function api(url, data) {
 		return new Promise((resolve, reject) => {
@@ -280,7 +282,7 @@ var splinterlands = (function() {
 		if(!player && _player)
 			player = _player.name;
 
-		_collection = (await api(`/cards/collection/${player}`)).cards;
+		_collection = (await api(`/cards/collection/${player}`)).cards.map(c => new splinterlands.Card(c));
 		return _collection;
 	}
 
@@ -349,7 +351,7 @@ var splinterlands = (function() {
 	}
 
 	function get_battle_monsters(inactive_splinters, allowed_cards, ruleset, match_type, rating_level, summoner_card, ally_color) {
-		var summoner_details = get_card(summoner_card.card_detail_id);
+		var summoner_details = get_card_details(summoner_card.card_detail_id);
 
 		return group_collection(_collection, true)
 			.filter(d => d.type == 'Monster' && d.cards.length > 0 && (d.color == summoner_details.color || d.color == 'Gray' || (summoner_details.color == 'Gold' && d.color == ally_color)))
@@ -391,11 +393,12 @@ var splinterlands = (function() {
 	}
 
 	return { 
-		init, api, login, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card, get_balance, log_event, load_balances, load_market,
-		get_settings: () => _settings, 
-		get_cards: () => _cards,
+		init, api, login, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
+		get_balance, log_event, load_balances, load_market,
+		get_settings: () => _settings,
 		get_player: () => _player,
 		get_market: () => _market,
+		get_collection: () => _collection,
 		get_transaction: (sm_id) => _transactions[sm_id]
 	};
 })();
