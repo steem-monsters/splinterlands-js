@@ -57,7 +57,7 @@ window.splinterlands.socket = (function() {
 		console.log(e);
 
 		if(splinterlands.get_player())
-			setTimeout(() => _Connect(_url, splinterlands.get_player().name, splinterlands.get_player().token), 1000);
+			setTimeout(() => connect(_url, splinterlands.get_player().name, splinterlands.get_player().token), 1000);
 	}
 
 	function send(message) { _ws.send(JSON.stringify(message)); }

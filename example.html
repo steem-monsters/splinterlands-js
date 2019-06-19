@@ -9,6 +9,10 @@
 				await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
 				await splinterlands.login('yabapmatt');
 			}
+
+			window.addEventListener('splinterlands:version_change', e => {
+				alert(`New Version - ${e.detail}!`);
+			}, false);
 		</script>
 	</head>
 	<body>

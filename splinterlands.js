@@ -72,6 +72,7 @@ var splinterlands = (function() {
 
 		if(_settings.version && _settings.version != response.version) {
 			// Dispatch new version event
+			window.dispatchEvent(new CustomEvent('splinterlands:version_change', { detail: response.version }));
 		}
 
 		_settings = response;
@@ -350,7 +351,7 @@ var splinterlands = (function() {
 		}).filter(c => c);
 	}
 
-	function get_battle_monsters(inactive_splinters, allowed_cards, ruleset, match_type, rating_level, summoner_card, ally_color) {
+	function get_battle_monsters(allowed_cards, ruleset, match_type, rating_level, summoner_card, ally_color) {
 		var summoner_details = get_card_details(summoner_card.card_detail_id);
 
 		return group_collection(_collection, true)
