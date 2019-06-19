@@ -5,7 +5,7 @@
   "main": "splinterlands.js",
   "scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"minify": "uglifyjs splinterlands.js utils.js socket.js card.js -c -o splinterlands.min.js"
+		"minify": "uglifyjs splinterlands.js utils.js socket.js card.js ops.js -c -o splinterlands.min.js"
   },
   "repository": {
     "type": "git",
