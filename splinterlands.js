@@ -125,7 +125,7 @@ var splinterlands = (function() {
 		}
 
 		// Get the encrypted access token from the server
-		var response = await api('/players/login', { name: username, ref: localStorage.getItem('splinterlands:ref') });
+		let response = await api('/players/login', { name: username, ref: localStorage.getItem('splinterlands:ref') });
 
 		if(!response || response.error)
 			return { success: false, error: 'An unknown error occurred trying to log in.' };
@@ -134,7 +134,7 @@ var splinterlands = (function() {
 
 		if(_use_keychain) {
 			// Request that the keychain extension decrypt the token
-			var keychain_response = await new Promise(resolve => steem_keychain.requestVerifyKey(username, response.token, 'Posting', r => resolve(r)));
+			let keychain_response = await new Promise(resolve => steem_keychain.requestVerifyKey(username, response.token, 'Posting', r => resolve(r)));
 
 			if(!keychain_response || !keychain_response.success)
 				return { success: false, error: `The login attempt for account @${username} was unsuccessful.` };
@@ -169,34 +169,18 @@ var splinterlands = (function() {
 	async function send_tx(id, display_name, data, retries) {
 		if(!retries) retries = 0;
 
-		if(!id.startsWith('sm_'))
-			id = `sm_${id}`;
+		id = splinterlands.utils.format_tx_id(id);
 
-		// Add dev mode prefix if specified in settings
-		if(_settings.test_mode && !id.startsWith(_settings.prefix))
-			id = `${_settings.prefix}${id}`;
-
-		if(!data)
-			data = {};
-
-		data.app = `steemmonsters/${_settings.version}`;
-
-		// Generate a random ID for this transaction so we can look it up later
-		data.sm_id = splinterlands.utils.randomStr(10);
-
-		// Append the prefix to the app name if in test mode
-		if(_settings.test_mode)
-			data.app = `${_settings.prefix}${data.app}`;
+		try { data = splinterlands.utils.format_tx_data(data); }
+		catch(err) {
+			log_event('tx_length_exceeded', { type: id });
+			return { success: false, error: err.toString() };
+		}
 
 		let data_str = JSON.stringify(data);
 
-		if(data_str.length > 2000) {
-			log_event('tx_length_exceeded', { type: id });
-			return { success: false, error: 'Max custom_json data length exceeded.' };
-		}
-
 		// Start waiting for the transaction to be picked up by the server immediately
-		var check_tx_promise = check_tx(data.sm_id);
+		let check_tx_promise = check_tx(data.sm_id);
 
 		let broadcast_promise = null;
 
@@ -220,7 +204,7 @@ var splinterlands = (function() {
 			}));
 		}
 
-		var result = await Promise.race([check_tx_promise, broadcast_promise]);
+		let result = await Promise.race([check_tx_promise, broadcast_promise]);
 
 		// Check if the transaction was broadcast and picked up by the server before we got the result from the broadcast back
 		if(result.type != 'broadcast')
@@ -257,21 +241,61 @@ var splinterlands = (function() {
 		}
 	}
 
-	function check_tx(sm_id) {
+	async function send_payment(to, amount, currency, id, data) {
+		id = splinterlands.utils.format_tx_id(id);
+
+		try { data = splinterlands.utils.format_tx_data(data); }
+		catch(err) {
+			log_event('tx_length_exceeded', { type: id });
+			return { success: false, error: err.toString() };
+		}
+
+		let token = splinterlands.utils.get_token(currency);
+		let memo = JSON.stringify([id, data]);
+
+		switch(token.type) {
+			case 'steem':
+				if(_use_keychain) {
+					var result = await new Promise(resolve => steem_keychain.requestTransfer(_player.name, to, parseFloat(amount).toFixed(3), memo, currency, response => resolve(response)));
+
+					if(!result.success)
+						return { success: false, error: result.error };
+				} else {
+					let sc_url = `https://v2.steemconnect.com/sign/transfer?to=${to}&amount=${parseFloat(amount).toFixed(3)}%20${currency}&memo=${encodeURIComponent(memo)}`;
+					splinterlands.utils.popup_center(sc_url, `${currency} Payment`, 500, 560);
+				}
+				break;
+			case 'steem_engine':
+				var result = await splinterlands.utils.steem_engine_transfer(to, currency, amount, memo);
+
+				if(!result.success)
+						return { success: false, error: result.error };
+				break;
+			case 'tron':
+				break;
+			case 'internal':
+				return await splinterlands.ops.token_transfer(to, amount, data);
+		}
+
+		// Start waiting for the transaction to be picked up by the server
+		return await check_tx(data.sm_id, 120 * 1000);
+	}
+
+	function check_tx(sm_id, timeout) {
 		return new Promise(resolve => {
 			_transactions[sm_id] = { resolve: resolve };
 			
 			_transactions[sm_id].timeout = setTimeout(() => {
 				if(_transactions[sm_id] && _transactions[sm_id].status != 'complete')
-					resolve({ success: false, error: 'Your transaction could not be found. This may be an issue with the Steem Monsters server. Please try refreshing the site to see if the transaction went through.' });
+					resolve({ success: false, error: 'Your transaction could not be found. This may be an issue with the game server. Please try refreshing the site to see if the transaction went through.' });
 
 				delete _transactions[sm_id];
-			}, 30 * 1000);
+			}, (timeout || 30) * 1000);
 		});
 	}
 
 	function clear_pending_tx(sm_id) {
-		var tx = _transactions[sm_id];
+		let tx = _transactions[sm_id];
 
 		if(tx) {
 			clearTimeout(tx.timeout);
@@ -352,7 +376,7 @@ var splinterlands = (function() {
 	}
 
 	function get_battle_monsters(allowed_cards, ruleset, match_type, rating_level, summoner_card, ally_color) {
-		var summoner_details = get_card_details(summoner_card.card_detail_id);
+		let summoner_details = get_card_details(summoner_card.card_detail_id);
 
 		return group_collection(_collection, true)
 			.filter(d => d.type == 'Monster' && d.cards.length > 0 && (d.color == summoner_details.color || d.color == 'Gray' || (summoner_details.color == 'Gold' && d.color == ally_color)))
@@ -400,6 +424,7 @@ var splinterlands = (function() {
 		get_player: () => _player,
 		get_market: () => _market,
 		get_collection: () => _collection,
-		get_transaction: (sm_id) => _transactions[sm_id]
+		get_transaction: (sm_id) => _transactions[sm_id],
+		use_keychain: () => _use_keychain
 	};
 })();

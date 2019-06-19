@@ -14,6 +14,10 @@ window.splinterlands.ops = (function() {
 		return await splinterlands.send_tx('burn_cards', 'Convert to DEC', { cards: card_ids });
 	}
 
+	async function convert_cards(card_ids) {
+		return await splinterlands.send_tx('convert_cards', 'Convert to Beta', { cards: card_ids });
+	}
+
 	async function add_wallet(type, address) {
 		return await splinterlands.send_tx('add_wallet', 'Link External Wallet', { type, address });
 	}
@@ -47,11 +51,8 @@ window.splinterlands.ops = (function() {
 		return await splinterlands.send_tx('find_match', 'Find Match', { match_type, opponent, settings });
 	}
 
-	async function submit_team(trx_id, summoner, monsters, match_type) {
-		let secret = splinterlands.utils.randomStr(10);
+	async function submit_team(trx_id, summoner, monsters, match_type, secret) {
 		let team_hash = md5(`${summoner},${monsters.join()},${secret}`);
-		let team = { summoner: summoner, monsters: monsters, secret: secret };
-
 		let data = { trx_id, team_hash };
 
 		// If it's not a tournament battle, submit and reveal the team together unless the player specifies otherwise
@@ -66,9 +67,46 @@ window.splinterlands.ops = (function() {
 		return await splinterlands.send_tx('submit_team', 'Submit Team', data);
 	}
 
+	async function team_reveal(trx_id, summoner, monsters, secret) {
+		return await splinterlands.send_tx('team_reveal', 'Team Reveal', { trx_id, summoner, monsters, secret });
+	}
+
+	async function cancel_match() {
+		return await splinterlands.send_tx('cancel_match', 'Cancel Match');
+	}
+
+	async function surrender(battle_queue_id) {
+		return await splinterlands.send_tx('surrender', 'Surrender', { battle_queue_id });
+	}
+
+	async function claim_quest_rewards(quest_id) {
+		return await splinterlands.send_tx('claim_reward', 'Claim Reward', { type: 'quest', quest_id });
+	}
+
+	async function claim_season_rewards(season) {
+		return await splinterlands.send_tx('claim_reward', 'Claim Reward', { type: 'league_season', season });
+	}
+
+	async function start_quest() {
+		return await splinterlands.send_tx('start_quest', 'Start Quest', { type: 'daily' });
+	}
+
+	async function refresh_quest() {
+		return await splinterlands.send_tx('refresh_quest', 'Start Quest', { type: 'daily' });
+	}
+
+	async function accept_challenge(id) {
+		return await splinterlands.send_tx('accept_challenge', 'Accept Challenge', { id });
+	}
+
+	async function decline_challenge(id) {
+		return await splinterlands.send_tx('decline_challenge', 'Decline Challenge', { id });
+	}
+
 	return {
 		combine_cards,
 		combine_all,
+		convert_cards,
 		burn_cards,
 		add_wallet,
 		gift_cards,
@@ -76,6 +114,15 @@ window.splinterlands.ops = (function() {
 		sell_cards,
 		cancel_sell,
 		find_match,
-		submit_team
+		submit_team,
+		team_reveal,
+		cancel_match,
+		surrender,
+		claim_quest_rewards,
+		claim_season_rewards,
+		start_quest,
+		refresh_quest,
+		accept_challenge,
+		decline_challenge
 	};
 })();
