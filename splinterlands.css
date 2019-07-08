@@ -45,12 +45,8 @@
 }
 
 .sl-name-bg img {
-  width: 165px;
-  height: 26px;
-}
-
-.sl-name-bg-gold {
-  left: 17px;
+  width: 100%;
+  height: 100%;
 }
 
 /* Card name backgrounds for alpha edition cards */
@@ -76,12 +72,12 @@
   top: 65%;
   width: 81%;
   height: 9%;
-  padding: 0 0 0 5px;
+  padding: 0 0 0 0.31em;
 }
 
 .sl-foil-gold .sl-name-text {
 	width: 80%;
-	text-shadow: 0 0 6px black;
+	text-shadow: 0 0 0.33em black;
 }
 
 .sl-beta .sl-name-text {
@@ -96,7 +92,7 @@
 
 .sl-card-level {
   position: absolute;
-  top: 74%;
+  top: 73.6%;
   background-color: #4a4a4a;
   width: 81%;
   left: 9.5%;
@@ -105,23 +101,21 @@
 
 .sl-foil-gold .sl-card-level {
   z-index: 100;
-  width: 161px;
-  left: 19px;
 }
 
 .sl-beta .sl-card-level {
   top: 78%;
-  border-radius: 3px;
+  border-radius: 0.2em;
   background-color: black;
 }
 
 .sl-card-level-bar {
   background: linear-gradient(to right, #0c3809, #7afe6f);
-  height: 6px;
+  height: 100%;
 }
 
 .sl-beta .sl-card-level-bar {
-  border-radius: 3px;
+  border-radius: 0.2em;
 }
 
 /* End Card Level Progress Bar */
