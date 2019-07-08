@@ -3,6 +3,11 @@
   src: url(https://steemmonsters.s3.amazonaws.com/website/fonts/ruba_oblique-webfont.woff);
 }
 
+@font-face {
+  font-family: nanami-heavy;
+  src: url(https://steemmonsters.s3.amazonaws.com/website/fonts/nanami-heavyoblique-webfont.woff);
+}
+
 .sl-rel-pos {
   position: relative;
   height: 0;
@@ -35,6 +40,8 @@
 } 
 
 /* End Large Size Cards (300 x 420 px) */
+
+/* Start Card Name */
 
 .sl-name-bg {
   position: absolute;
@@ -88,6 +95,8 @@
 .sl-name-text .sl-xs { font-size: 0.8em; }
 .sl-name-text .sl-xxs { font-size: 0.8em; }
 
+/* End Card Name */
+
 /* Start Card Level Progress Bar */
 
 .sl-card-level {
@@ -119,3 +128,94 @@
 }
 
 /* End Card Level Progress Bar */
+
+/* Start Card Stats */
+
+.sl-stat-mana img {
+  width: 25%;
+}
+
+.sl-stat-magic img,
+.sl-stat-ranged img,
+.sl-stat-attack img,
+.sl-stat-armor img,
+.sl-stat-health img,
+.sl-stat-speed img {
+  width: 100%;
+}
+
+.sl-stat-magic,
+.sl-stat-ranged,
+.sl-stat-attack,
+.sl-stat-armor,
+.sl-stat-health {
+  position: absolute;
+  width: 26%;
+}
+
+.sl-stat-speed {
+  position: absolute;
+  width: 21.5%;
+}
+
+.sl-stat-text-mana {
+  position: absolute;
+  top: 1.7%;
+  width: 22%;
+  text-align: center;
+  color: white;
+  font-size: 2em;
+  font-family: nanami-heavy;
+  -webkit-text-stroke: 1.5px black;
+  text-shadow: 2px 2px black;
+}
+
+.sl-stat-health {
+  top: 47%;
+  left: 78.5%;
+}
+
+.sl-stat-armor {
+  top: 30%;
+  left: 78.5%;
+}
+
+.sl-stat-speed {
+  top: 47%;
+  left: -3%;
+}
+
+.sl-stat-attack {
+  top: 30%;
+  left: -6%;
+}
+
+.sl-stat-ranged {
+  top: 30%;
+  left: -6%;
+}
+
+.sl-stat-magic {
+  top: 30%;
+  left: -6%;
+}
+
+.sl-second-attack {
+  top: 13%;
+}
+
+.sl-stat-text {
+  position: absolute;
+  top: 15%;
+  color: white;
+  font-size: 1.6em;
+  width: 92%;
+  text-align: center;
+  font-family: nanami-heavy;
+  -webkit-text-stroke: 1.5px black;
+  text-shadow: 2px 2px black;
+}
+
+.sl-stat-speed .sl-stat-text {
+  left: -7%;
+}

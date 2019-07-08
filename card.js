@@ -1,7 +1,10 @@
 splinterlands.Card = class {
 	constructor(data) {
 		Object.keys(data).forEach(k => this[k] = data[k]);
-		this.details = splinterlands.get_card_details(this.card_detail_id);
+    this.details = splinterlands.get_card_details(this.card_detail_id);
+    
+    if(!this.level)
+      this.level = 1;
 	}
 
 	get bcx() {
@@ -221,10 +224,55 @@ splinterlands.Card = class {
     stats_container.appendChild(bar);
 
     // Card stats
+    let mana = document.createElement('div');
+    mana.setAttribute('class', 'sl-stat-mana');
+
+    let mana_img = document.createElement('img');
+    mana_img.setAttribute('src', 'https://s3.amazonaws.com/steemmonsters/website/stats/stat_bg_mana.png');
+    mana.appendChild(mana_img);
+
+    let mana_text = document.createElement('div');
+    mana_text.setAttribute('class', 'sl-stat-text-mana');
+    mana_text.innerText = this.stats.mana;
+    mana.appendChild(mana_text);
+    stats_container.appendChild(mana);
+
+    if(this.details.type == 'Monster') {
+      stats_container.appendChild(this.render_stat('health'));
+      stats_container.appendChild(this.render_stat('speed'));
+
+      if(this.stats.attack > 0)
+        stats_container.appendChild(this.render_stat('attack'));
+
+      if(this.stats.ranged > 0)
+        stats_container.appendChild(this.render_stat('ranged', this.stats.attack > 0));
+
+      if(this.stats.magic > 0)
+        stats_container.appendChild(this.render_stat('magic', this.stats.attack > 0 || this.stats.ranged > 0));
+
+      if(this.stats.armor > 0)
+        stats_container.appendChild(this.render_stat('armor'));
+    }
 
     rel_container.appendChild(stats_container);
     element.appendChild(rel_container);
     return element;
+  }
+
+  render_stat(stat, is_second) {
+    let stat_element = document.createElement('div');
+    stat_element.setAttribute('class', `sl-stat-${stat} ${is_second ? 'sl-second-attack' : ''}`);
+
+    let img = document.createElement('img');
+    img.setAttribute('src', `https://s3.amazonaws.com/steemmonsters/website/stats/${stat}.png`);
+    stat_element.appendChild(img);
+
+    let text = document.createElement('div');
+    text.setAttribute('class', 'sl-stat-text');
+    text.innerText = this.stats[stat];
+    stat_element.appendChild(text);
+    
+    return stat_element;
   }
 
   get_image_url() {
