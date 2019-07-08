@@ -150,7 +150,11 @@ window.splinterlands.utils = (function() {
 		}
 
 		return { success: true };
-	}
+  }
+  
+  function get_edition_str(edition) {
+    return ['Alpha', 'Beta', 'Promo', 'Reward'][edition];
+  }
 
 	return { 
 		randomStr, 
@@ -166,6 +170,7 @@ window.splinterlands.utils = (function() {
 		format_tx_id,
 		format_tx_data,
 		popup_center,
-		steem_engine_transfer
+    steem_engine_transfer,
+    get_edition_str
 	 };
 })();

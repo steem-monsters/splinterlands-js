@@ -1,14 +1,22 @@
 <html>
 	<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 		<script src="splinterlands.min.js"></script>
 		<script type="text/javascript">
 			$(() =>	setTimeout(init, 500));
 
 			async function init() {
-				await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
-				await splinterlands.login('yabapmatt');
-			}
+        await splinterlands.init({ api_url: 'https://steemmonsters.com', ws_url: 'wss://ws.steemmonsters.io' });
+        await savedLogin();
+      }
+      
+      async function savedLogin() {
+        let login_response = await splinterlands.login();
+
+        if(!login_response.error)
+          onLogin(login_response);
+      }
 
 			window.addEventListener('splinterlands:version_change', e => {
 				alert(`New Version - ${e.detail}!`);
@@ -16,6 +24,105 @@
 		</script>
 	</head>
 	<body>
+    <div class="container">
+      <div id="div_login" class="py-3">
+        <input type="text" id="username" placeholder="account name"/>
+        <button id="btn_login_keychain">Log In With Keychain</button>
+        <br/>
+        <div id="div_pwd_login" style="display: none;">
+          <input type="password" id="password" />
+          <button id="btn_login_pwd">Log In With Password</button>
+        </div>
+        <label><input type="checkbox" id="chk_pwd_login"/> Log in with password</label><br/>
+      </div>
 
+      <div id="div_game" style="display: none;">
+        <div class="py-3">
+          Logged in as: @<span id="span_username"></span>
+          <button id="btn_logout">Log Out</button>
+        </div>
+
+        <div class="py-1">
+          <h5>Balances:</h5>
+          <div>DEC: <span id="span_balance_dec"></span></div>
+          <div>BETA: <span id="span_balance_beta"></span></div>
+          <div>ALPHA: <span id="span_balance_alpha"></span></div>
+          <div>ORB: <span id="span_balance_orb"></span></div>
+        </div>
+      </div>
+
+      <div class="py-1">
+        <table id="tbl_collection" class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Edition</th>
+              <th>Foil</th>
+              <th>Level</th>
+              <th>Num Cards</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      function onLogin(player) {
+        $('#div_login').hide();
+        $('#div_game').show();
+        $('#span_username').text(player.name);
+
+        ['DEC', 'BETA', 'ALPHA', 'ORB'].forEach(async token => {
+          let balance = await splinterlands.get_balance(token);
+          $(`#span_balance_${token.toLowerCase()}`).text(balance);
+        });
+
+        showCollection();
+      }
+
+      function showCollection() {
+        let tbody = $('#tbl_collection tbody');
+
+        splinterlands.group_collection().forEach(card => {
+          let row = $('<tr>');
+
+          row.append(`<td>${card.name}</td>`);
+          row.append(`<td>${splinterlands.utils.get_edition_str(card.edition)}</td>`);
+          row.append(`<td>${card.gold ? 'Gold' : 'Regular'}</td>`);
+          row.append(`<td>${card.cards.length > 0 ? card.cards[0].level : '--'}</td>`);
+          row.append(`<td>${card.cards.length}</td>`);
+
+          tbody.append(row);
+        });
+      }
+
+      $('#btn_login_keychain').click(async () => {
+        let login_response = await splinterlands.login($('#username').val());
+
+        if(login_response.error) {
+          alert(`Error logging in: ${login_response.error}`);
+          return;
+        }
+
+        onLogin(login_response);
+      });
+
+      $('#chk_pwd_login').click(() => {
+        if($('#chk_pwd_login').prop('checked')) {
+          $('#div_pwd_login').show();
+          $('#btn_login_keychain').hide();
+        } else {
+          $('#div_pwd_login').hide();
+          $('#btn_login_keychain').show();
+        }
+      });
+
+      $('#btn_logout').click(() => { 
+        splinterlands.logout();
+        $('#div_login').show();
+        $('#div_game').hide();
+      });
+    </script>
 	</body>
 </html>

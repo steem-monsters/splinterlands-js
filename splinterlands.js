@@ -158,13 +158,21 @@ var splinterlands = (function() {
 		splinterlands.socket.connect(_config.ws_url, _player.name, _player.token);
 
 		// Load the player's card collection
-		load_collection();
+		await load_collection();
 
 		// Load the player's token balances
-		load_balances();
+		await load_balances();
 
 		return _player;
-	}
+  }
+  
+  function logout() {
+    localStorage.removeItem('splinterlands:username');
+    localStorage.removeItem('splinterlands:key');
+    _player = null;
+    _collection = null;
+		splinterlands.socket.close();
+  }
 
 	async function send_tx(id, display_name, data, retries) {
 		if(!retries) retries = 0;
@@ -418,8 +426,8 @@ var splinterlands = (function() {
 	}
 
 	return { 
-		init, api, login, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
-		get_balance, log_event, load_balances, load_market,
+		init, api, login, logout, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
+		get_balance, log_event, load_balances, load_market, send_payment,
 		get_settings: () => _settings,
 		get_player: () => _player,
 		get_market: () => _market,
