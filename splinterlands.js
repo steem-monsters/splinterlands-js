@@ -333,20 +333,34 @@ var splinterlands = (function() {
 		// Group the cards in the collection by card_detail_id, edition, and gold foil
 		_cards.forEach(details => {
 			if(id_only) {
-				grouped.push(Object.assign({ cards: collection.filter(o => o.card_detail_id == details.id) }, details));	 
+				grouped.push(Object.assign({ card_detail_id: details.id, cards: collection.filter(o => o.card_detail_id == details.id) }, details));	 
 			} else {
 				details.editions.split(',').forEach(edition => {
-					grouped.push(Object.assign({
-						gold: false,
-						edition: parseInt(edition),
-						cards: collection.filter(o => o.card_detail_id == details.id && o.gold == false && o.edition == parseInt(edition))
-					}, details));
+          let reg_cards = collection.filter(o => o.card_detail_id == details.id && o.gold == false && o.edition == parseInt(edition));
 
-					grouped.push(Object.assign({
-						gold: true,
-						edition: parseInt(edition),
-						cards: collection.filter(o => o.card_detail_id == details.id && o.gold == true && o.edition == parseInt(edition))
-					}, details));
+          if(reg_cards.length > 0) {
+            grouped.push(new splinterlands.Card(Object.assign({ cards: reg_cards }, reg_cards[0])));
+          } else {
+            grouped.push(new splinterlands.Card({
+              gold: false,
+              card_detail_id: details.id,
+              edition: parseInt(edition),
+              cards: reg_cards
+            }));
+          }
+
+          let gold_cards = collection.filter(o => o.card_detail_id == details.id && o.gold == true && o.edition == parseInt(edition));
+
+          if(gold_cards.length > 0) {
+            grouped.push(new splinterlands.Card(Object.assign({ cards: gold_cards }, gold_cards[0])));
+          } else {
+            grouped.push(new splinterlands.Card({
+              gold: true,
+              card_detail_id: details.id,
+              edition: parseInt(edition),
+              cards: gold_cards
+            }));
+          }
 				});
 			}
 		});

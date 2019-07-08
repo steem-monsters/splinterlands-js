@@ -2,6 +2,9 @@ if(!window.splinterlands)
 	window.splinterlands = {};
 
 window.splinterlands.utils = (function() {
+  BETA_CARD_URL = 'https://s3.amazonaws.com/steemmonsters/cards_beta/';
+  ALPHA_CARD_URL = 'https://s3.amazonaws.com/steemmonsters/cards_v2.2/';
+
 	function randomStr(length) {
     var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
         retVal = "";

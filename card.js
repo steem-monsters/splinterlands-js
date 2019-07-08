@@ -129,5 +129,52 @@ splinterlands.Card = class {
 
 		this._value = price_per_bcx * this.bcx;
 		return this._value;
-	}
+  }
+  
+  render(size) {
+    let element = document.createElement('div');
+    element.setAttribute('class', 'sl-card');
+    element.setAttribute('card_id', this.id);
+    element.setAttribute('card_details_id', this.details.id);
+    element.setAttribute('gold', this.gold);
+    element.setAttribute('edition', this.edition);
+
+    let img = document.createElement('img');
+    img.setAttribute('src', this.get_image_url());
+    img.setAttribute('class', 'sl-card-img');
+    element.appendChild(img);
+
+    let name = document.createElement('div');
+    name.setAttribute('class', 'sl-rel-pos');
+
+    let name_bg = document.createElement('div');
+    name_bg.setAttribute('class', `sl-name-bg ${this.gold ? 'sl-name-bg-gold' : 'sl-name-bg-' + this.details.color.toLowerCase()}`);
+
+    let name_text = document.createElement('div');
+    name_text.setAttribute('class', 'sl-name-text');
+
+    let name_text_text = document.createElement('div');
+    name_text_text.setAttribute('class', 'sl-name-text-text');
+    name_text_text.innerText = this.details.name;
+    name_text.appendChild(name_text_text);
+
+    let name_text_lvl = document.createElement('div');
+    name_text_lvl.setAttribute('class', 'sl-name-text-lvl');
+    name_text_lvl.innerText = `★ ${this.level || 1}`;
+    name_text.appendChild(name_text_lvl);
+
+    name.appendChild(name_bg);
+    name.appendChild(name_text);
+    element.appendChild(name);
+
+    return element;
+  }
+
+  get_image_url() {
+		return ((this.edition == 1 || this.edition == 3) ? BETA_CARD_URL : ALPHA_CARD_URL) +
+			(this.skin ? this.skin + '/' : '') +
+			encodeURIComponent(this.details.name) +
+			(this.gold ? '_gold' : '') +
+			'.png';
+  }
 }

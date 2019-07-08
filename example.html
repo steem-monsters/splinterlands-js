@@ -1,6 +1,8 @@
 <html>
 	<head>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="splinterlands.css" />
+
 		<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 		<script src="splinterlands.min.js"></script>
 		<script type="text/javascript">
@@ -60,6 +62,7 @@
               <th>Foil</th>
               <th>Level</th>
               <th>Num Cards</th>
+              <th></th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -87,11 +90,15 @@
         splinterlands.group_collection().forEach(card => {
           let row = $('<tr>');
 
-          row.append(`<td>${card.name}</td>`);
+          row.append(`<td>${card.details.name}</td>`);
           row.append(`<td>${splinterlands.utils.get_edition_str(card.edition)}</td>`);
           row.append(`<td>${card.gold ? 'Gold' : 'Regular'}</td>`);
-          row.append(`<td>${card.cards.length > 0 ? card.cards[0].level : '--'}</td>`);
+          row.append(`<td>${card.level || '--'}</td>`);
           row.append(`<td>${card.cards.length}</td>`);
+
+          let img_td = $('<td></td>');
+          img_td.append(card.render());
+          row.append(img_td);
 
           tbody.append(row);
         });

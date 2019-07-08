@@ -1,0 +1,41 @@
+.sl-rel-pos {
+  position: relative;
+  height: 0;
+  width: 0;
+}
+
+.sl-name-bg {
+  position: absolute;
+  width: 162px;
+  left: 19px;
+  top: -97px;
+  height: 25px;
+}
+
+.sl-name-bg-gold {
+  left: 17px;
+}
+
+.sl-name-bg-red {
+  background: linear-gradient(#4a0603, #f45f3c);
+}
+
+.sl-name-bg-blue {
+  background: linear-gradient(#002e68, #0089f5);
+}
+
+.sl-name-bg-green {
+  background: linear-gradient(#013401, #00a30e);
+}
+
+.sl-name-bg-white {
+  background: linear-gradient(#1e1e1e, #7b7b7b);
+}
+
+.sl-name-bg-black {
+  background: linear-gradient(#310159, #8330e8);
+}
+
+.sl-name-bg-gold {
+  background: linear-gradient(#331f54, #8368b0);
+}
