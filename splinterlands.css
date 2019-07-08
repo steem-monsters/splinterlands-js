@@ -1,41 +1,127 @@
+@font-face {
+  font-family: ruba;
+  src: url(https://steemmonsters.s3.amazonaws.com/website/fonts/ruba_oblique-webfont.woff);
+}
+
 .sl-rel-pos {
   position: relative;
   height: 0;
   width: 0;
 }
 
+.sl-stats-container {
+  width: 200px;
+  height: 280px;
+  top: -280px;
+  position: absolute;
+  font-size: 16px;
+}
+
+.sl-card img.sl-card-img {
+  width: 200px;
+} 
+
+/* Start Large Size Cards (300 x 420 px) */
+
+.sl-card.sl-lg .sl-stats-container {
+  width: 300px;
+  height: 420px;
+  top: -420px;
+  font-size: 25px;
+}
+
+.sl-card.sl-lg img.sl-card-img {
+  width: 300px;
+} 
+
+/* End Large Size Cards (300 x 420 px) */
+
 .sl-name-bg {
   position: absolute;
-  width: 162px;
-  left: 19px;
-  top: -97px;
-  height: 25px;
+  width: 81.2%;
+  left: 9.5%;
+  top: 65.4%;
+  height: 9%;
+}
+
+.sl-name-bg img {
+  width: 165px;
+  height: 26px;
 }
 
 .sl-name-bg-gold {
   left: 17px;
 }
 
-.sl-name-bg-red {
-  background: linear-gradient(#4a0603, #f45f3c);
+/* Card name backgrounds for alpha edition cards */
+.sl-name-bg-red { background: linear-gradient(#4a0603, #f45f3c); }
+.sl-name-bg-blue { background: linear-gradient(#002e68, #0089f5); }
+.sl-name-bg-green { background: linear-gradient(#013401, #00a30e); }
+.sl-name-bg-white { background: linear-gradient(#1e1e1e, #7b7b7b); }
+.sl-name-bg-black { background: linear-gradient(#310159, #8330e8); }
+.sl-name-bg-gold { background: linear-gradient(#331f54, #8368b0); }
+
+/* Hide name background for beta edition cards */
+.sl-beta .sl-name-bg { background: transparent; }
+
+.sl-name-text {
+  font-family: ruba;
+  display: grid;
+  grid-template-columns: 80% 20%;
+  align-items: center;
+  color: white;
+  font-size: 1em;
+  position: absolute;
+  left: 9.5%;
+  top: 65%;
+  width: 81%;
+  height: 9%;
+  padding: 0 0 0 5px;
 }
 
-.sl-name-bg-blue {
-  background: linear-gradient(#002e68, #0089f5);
+.sl-foil-gold .sl-name-text {
+	width: 80%;
+	text-shadow: 0 0 6px black;
 }
 
-.sl-name-bg-green {
-  background: linear-gradient(#013401, #00a30e);
+.sl-beta .sl-name-text {
+  top: 68%;
 }
 
-.sl-name-bg-white {
-  background: linear-gradient(#1e1e1e, #7b7b7b);
+.sl-name-text .sl-sm { font-size: 0.9em; }
+.sl-name-text .sl-xs { font-size: 0.8em; }
+.sl-name-text .sl-xxs { font-size: 0.8em; }
+
+/* Start Card Level Progress Bar */
+
+.sl-card-level {
+  position: absolute;
+  top: 74%;
+  background-color: #4a4a4a;
+  width: 81%;
+  left: 9.5%;
+  height: 2.15%;
 }
 
-.sl-name-bg-black {
-  background: linear-gradient(#310159, #8330e8);
+.sl-foil-gold .sl-card-level {
+  z-index: 100;
+  width: 161px;
+  left: 19px;
 }
 
-.sl-name-bg-gold {
-  background: linear-gradient(#331f54, #8368b0);
+.sl-beta .sl-card-level {
+  top: 78%;
+  border-radius: 3px;
+  background-color: black;
 }
+
+.sl-card-level-bar {
+  background: linear-gradient(to right, #0c3809, #7afe6f);
+  height: 6px;
+}
+
+.sl-beta .sl-card-level-bar {
+  border-radius: 3px;
+}
+
+/* End Card Level Progress Bar */

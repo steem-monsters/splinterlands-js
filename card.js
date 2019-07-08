@@ -20,7 +20,35 @@ splinterlands.Card = class {
 		this._base_xp = splinterlands.get_settings()[xp_property][this.details.rarity - 1];
 
 		return this._base_xp;
-	}
+  }
+  
+  get next_level_progress() {
+    if(this._next_level_progress)
+      return this._next_level_progress;
+
+    if(this.level >= this.max_level) {
+      this._next_level_progress = { current: 0, total: 0, progress: 100 };
+      return this._next_level_progress;
+    }
+
+    if(!this.level || isNaN(this.level) || this.level <= 0) {
+      this._next_level_progress = { current: 0, total: 1, progress: 0 };
+      return this._next_level_progress;
+    }
+
+    let bcx = this.gold ? this.bcx : Math.max(this.bcx - 1, 0);
+    let xp_levels = splinterlands.get_settings().xp_levels[this.details.rarity - 1];
+    let next_lvl_bcx = Math.ceil(xp_levels[this.level - 1] / this.base_xp);
+    let cur_lvl_bcx = this.level <= 1 ? 0 : Math.ceil(xp_levels[this.level - 2] / this.base_xp);
+
+    this._next_level_progress = { 
+      current: bcx - cur_lvl_bcx, 
+      total: next_lvl_bcx - cur_lvl_bcx, 
+      progress: (bcx - cur_lvl_bcx) / (next_lvl_bcx - cur_lvl_bcx) * 100
+    };
+
+    return this._next_level_progress;
+  }
 
 	get dec() {	
 		if(this._dec)
@@ -130,10 +158,13 @@ splinterlands.Card = class {
 		this._value = price_per_bcx * this.bcx;
 		return this._value;
   }
+
+  get is_alpha() { return this.edition == 0 || (this.edition == 2 && this.details.id < 100); }
+  get max_level() { return 10 - (this.details.rarity - 1) * 2; }
   
   render(size) {
     let element = document.createElement('div');
-    element.setAttribute('class', 'sl-card');
+    element.setAttribute('class', `sl-card sl-${size || 'med'} sl-${this.is_alpha ? 'alpha' : 'beta'} sl-foil-${this.gold ? 'gold' : 'reg'}`);
     element.setAttribute('card_id', this.id);
     element.setAttribute('card_details_id', this.details.id);
     element.setAttribute('gold', this.gold);
@@ -144,29 +175,55 @@ splinterlands.Card = class {
     img.setAttribute('class', 'sl-card-img');
     element.appendChild(img);
 
-    let name = document.createElement('div');
-    name.setAttribute('class', 'sl-rel-pos');
+    let rel_container = document.createElement('div');
+    rel_container.setAttribute('class', 'sl-rel-pos');
 
+    let stats_container = document.createElement('div');
+    stats_container.setAttribute('class', 'sl-stats-container');
+
+    // Card name & level
     let name_bg = document.createElement('div');
     name_bg.setAttribute('class', `sl-name-bg ${this.gold ? 'sl-name-bg-gold' : 'sl-name-bg-' + this.details.color.toLowerCase()}`);
+
+    if(this.gold && this.is_alpha) {
+      let name_bg_img = document.createElement('img');
+      name_bg_img.setAttribute('src', 'https://s3.amazonaws.com/steemmonsters/website/gold_name_bg.png');
+      name_bg.appendChild(name_bg_img);
+    }
 
     let name_text = document.createElement('div');
     name_text.setAttribute('class', 'sl-name-text');
 
+    let name_text_size = (this.details.name.length >= 19) ? 'xxs' : ((this.details.name.length >= 17) ? 'xs' : ((this.details.name.length >= 14) ? 'sm' : 'm'));
+
     let name_text_text = document.createElement('div');
-    name_text_text.setAttribute('class', 'sl-name-text-text');
+    name_text_text.setAttribute('class', `sl-name-text-text sl-${name_text_size}`);
     name_text_text.innerText = this.details.name;
     name_text.appendChild(name_text_text);
 
     let name_text_lvl = document.createElement('div');
-    name_text_lvl.setAttribute('class', 'sl-name-text-lvl');
+    name_text_lvl.setAttribute('class', `sl-name-text-lvl ${this.level >= 10 ? 'sl-sm' : ''}`);
     name_text_lvl.innerText = `★ ${this.level || 1}`;
     name_text.appendChild(name_text_lvl);
 
-    name.appendChild(name_bg);
-    name.appendChild(name_text);
-    element.appendChild(name);
+    stats_container.appendChild(name_bg);
+    stats_container.appendChild(name_text);
 
+    // Card XP bar
+    let bar = document.createElement('div');
+    bar.setAttribute('class', 'sl-card-level');
+
+    let progress = document.createElement('div');
+    progress.setAttribute('class', 'sl-card-level-bar');
+    progress.setAttribute('style', `width: ${this.next_level_progress.progress.toFixed()}%;`)
+
+    bar.appendChild(progress);
+    stats_container.appendChild(bar);
+
+    // Card stats
+
+    rel_container.appendChild(stats_container);
+    element.appendChild(rel_container);
     return element;
   }
 
