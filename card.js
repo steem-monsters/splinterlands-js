@@ -235,31 +235,48 @@ splinterlands.Card = class {
     mana_text.setAttribute('class', 'sl-stat-text-mana');
     mana_text.innerText = this.stats.mana;
     mana.appendChild(mana_text);
-    stats_container.appendChild(mana);
+		stats_container.appendChild(mana);
+		
+		let container = stats_container;
 
-    if(this.details.type == 'Monster') {
-      stats_container.appendChild(this.render_stat('health'));
-      stats_container.appendChild(this.render_stat('speed'));
+    if(this.details.type == 'Summoner') {
+			container = document.createElement('div');
+			container.setAttribute('class', 'sl-summoner-stats');
+			stats_container.appendChild(container);
+		}
 
-      if(this.stats.attack > 0)
-        stats_container.appendChild(this.render_stat('attack'));
+		this.render_stat(container, 'health');
+		this.render_stat(container, 'speed');
+		this.render_stat(container, 'attack');
+		this.render_stat(container, 'ranged', this.stats.attack > 0);
+		this.render_stat(container, 'magic', this.stats.attack > 0 || this.stats.ranged > 0);
+		this.render_stat(container, 'armor');
 
-      if(this.stats.ranged > 0)
-        stats_container.appendChild(this.render_stat('ranged', this.stats.attack > 0));
+		// Abilities
+		if(this.stats.abilities.length > 0) {
+			let abilities = document.createElement('div');
+			abilities.setAttribute('class', 'sl-abilities');
+				
+			this.stats.abilities.forEach(ability => {
+				let ab = document.createElement('img');
+				ab.setAttribute('src', `https://s3.amazonaws.com/steemmonsters/website/abilities/ability_${ability.toLowerCase().replace(' ', '-')}.png`);
+				ab.setAttribute('class', 'sl-ability-img');
+				ab.setAttribute('title', ability);
+				abilities.append(ab);
+			});
 
-      if(this.stats.magic > 0)
-        stats_container.appendChild(this.render_stat('magic', this.stats.attack > 0 || this.stats.ranged > 0));
-
-      if(this.stats.armor > 0)
-        stats_container.appendChild(this.render_stat('armor'));
-    }
+			stats_container.appendChild(abilities);
+		}
 
     rel_container.appendChild(stats_container);
     element.appendChild(rel_container);
     return element;
   }
 
-  render_stat(stat, is_second) {
+  render_stat(container, stat, is_second) {
+		if(this.stats[stat] == 0) 
+			return;
+
     let stat_element = document.createElement('div');
     stat_element.setAttribute('class', `sl-stat-${stat} ${is_second ? 'sl-second-attack' : ''}`);
 
@@ -269,10 +286,10 @@ splinterlands.Card = class {
 
     let text = document.createElement('div');
     text.setAttribute('class', 'sl-stat-text');
-    text.innerText = this.stats[stat];
+    text.innerText = this.details.type == 'Summoner' && this.stats[stat] > 0 ? '+' + this.stats[stat] : this.stats[stat];
     stat_element.appendChild(text);
     
-    return stat_element;
+    container.appendChild(stat_element);
   }
 
   get_image_url() {
