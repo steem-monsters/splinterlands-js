@@ -50,7 +50,19 @@ var splinterlands = (function() {
 				data.username = _player.name;
 			}
 
-			jQuery.getJSON(_config.api_url + url, data, r => resolve(r));
+			//jQuery.getJSON(_config.api_url + url, data, r => resolve(r));
+
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', _config.api_url + url + '?' + splinterlands.utils.param(data));
+			xhr.onload = function() {
+					if (xhr.status === 200) {
+							resolve(splinterlands.utils.try_parse(xhr.responseText));
+					}
+					else {
+							reject('Request failed.  Returned status of ' + xhr.status);
+					}
+			};
+			xhr.send();
 		});
 	}
 
@@ -91,6 +103,16 @@ var splinterlands = (function() {
 		return balance ? parseFloat(balance.balance) : 0;
 	}
 
+	function has_saved_login() {
+		let username = localStorage.getItem('splinterlands:username');
+
+		if(!username)
+			return null;
+
+		let key = localStorage.getItem('splinterlands:key');
+		return { username, use_keychain: !key };
+	}
+
 	async function login(username, key) {
 		if(!username) {
 			username = localStorage.getItem('splinterlands:username');
@@ -111,6 +133,8 @@ var splinterlands = (function() {
 		if(_use_keychain && !window.steem_keychain)
 			return { success: false, error: 'Missing private posting key.' };
 
+		let params = { name: username, ref: localStorage.getItem('splinterlands:ref') };
+
 		if(!_use_keychain) {
 			if(key.startsWith('STM'))
 				return { success: false, error: 'This appears to be a public key. You must use your private posting key to log in.' };
@@ -122,13 +146,16 @@ var splinterlands = (function() {
 			// Check that the key is a valid private key.
 			try { steem.auth.wifToPublic(key); }
 			catch (err) { return { success: false, error: `Invalid password or private posting key for account @${username}` }; }
+
+			params.ts = Date.now();
+			params.sig = eosjs_ecc.sign(username + params.ts, key);
 		}
 
 		// Get the encrypted access token from the server
-		let response = await api('/players/login', { name: username, ref: localStorage.getItem('splinterlands:ref') });
+		let response = await api('/players/login', params);
 
 		if(!response || response.error)
-			return { success: false, error: 'An unknown error occurred trying to log in.' };
+			return { success: false, error: 'Login Error: ' + response.error };
 
 		let token = null;
 
@@ -141,9 +168,7 @@ var splinterlands = (function() {
 
 			token = keychain_response.result.startsWith('#') ? keychain_response.result.substr(1) : keychain_response.result;
 		} else {
-			// Try to decrypt the token using the supplied private key
-			try { token = window.decodeMemo(key, response.token).substr(1); } 
-			catch (err) { return { success: false, error: 'Invalid password or private posting key for account @' + username, }; }
+			token = response.token;
 		}
 
 		_player = response;
@@ -442,7 +467,7 @@ var splinterlands = (function() {
 
 	return { 
 		init, api, login, logout, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
-		get_balance, log_event, load_balances, load_market, send_payment,
+		get_balance, log_event, load_balances, load_market, send_payment, has_saved_login,
 		get_settings: () => _settings,
 		get_player: () => _player,
 		get_market: () => _market,

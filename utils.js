@@ -157,7 +157,29 @@ window.splinterlands.utils = (function() {
   
   function get_edition_str(edition) {
     return ['Alpha', 'Beta', 'Promo', 'Reward'][edition];
-  }
+	}
+	
+	function param(object) {
+    var encodedString = '';
+    for (var prop in object) {
+        if (object.hasOwnProperty(prop)) {
+            if (encodedString.length > 0) {
+                encodedString += '&';
+            }
+            encodedString += encodeURI(prop + '=' + object[prop]);
+        }
+    }
+    return encodedString;
+	}
+
+	function try_parse(json) {
+		try {
+			return JSON.parse(json);
+		} catch(err) {
+			console.log('Error trying to parse JSON: ' + json);
+			return null;
+		}
+	}
 
 	return { 
 		randomStr, 
@@ -174,6 +196,8 @@ window.splinterlands.utils = (function() {
 		format_tx_data,
 		popup_center,
     steem_engine_transfer,
-    get_edition_str
+		get_edition_str,
+		param,
+		try_parse
 	 };
 })();

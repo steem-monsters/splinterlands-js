@@ -1,5 +1,11 @@
 # Client-Side JS SDK for Splinterlands
 
+### CDN URL
+
+```
+<script src="https://cdn.jsdelivr.net/gh/steem-monsters/splinterlands-js@master/splinterlands.min.js"></script>
+```
+
 ### Init
 
 Initializes the SDK with the API server URL and WebSocket server URL.

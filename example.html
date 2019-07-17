@@ -9,8 +9,17 @@
 			$(() =>	setTimeout(init, 500));
 
 			async function init() {
-        await splinterlands.init({ api_url: 'https://testnet.steemmonsters.io', ws_url: 'wss://sm-ws.mrosen.com' });
-        await savedLogin();
+				await splinterlands.init({ api_url: 'https://testnet.steemmonsters.io', ws_url: 'wss://sm-ws.mrosen.com' });
+
+				if(splinterlands.has_saved_login())
+					savedLogin();
+				
+				// If the steem keychain browser extension is not present, show the password login option
+				if(!window.steem_keychain) {
+					$('#chk_pwd_login').prop('checked', true);
+					$('#div_pwd_login').show();
+          $('#btn_login_keychain').hide();
+				}
       }
       
       async function savedLogin() {
@@ -106,6 +115,17 @@
 
       $('#btn_login_keychain').click(async () => {
         let login_response = await splinterlands.login($('#username').val());
+
+        if(login_response.error) {
+          alert(`Error logging in: ${login_response.error}`);
+          return;
+        }
+
+        onLogin(login_response);
+			});
+			
+			$('#btn_login_pwd').click(async () => {
+        let login_response = await splinterlands.login($('#username').val(), $('#password').val());
 
         if(login_response.error) {
           alert(`Error logging in: ${login_response.error}`);
