@@ -5,7 +5,7 @@
   "main": "splinterlands.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "minify": "uglifyjs libraries/eosjs-ecc.min.js libraries/steem.min.js splinterlands.js utils.js socket.js card.js ops.js -c -o splinterlands.min.js"
+    "minify": "uglifycss src/splinterlands.css > dist/splinterlands.min.css && uglifyjs libraries/eosjs-ecc.min.js libraries/steem.min.js src/splinterlands.js src/utils.js src/socket.js src/card.js src/ops.js -c -o dist/splinterlands.min.js"
   },
   "repository": {
     "type": "git",
@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/steem-monsters/splinterlands-js#readme",
   "dependencies": {
-    "uglify-es": "^3.3.9"
+    "uglify-es": "^3.3.9",
+    "uglifycss": "0.0.29"
   }
 }

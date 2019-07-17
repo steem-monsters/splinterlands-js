@@ -50,17 +50,13 @@ var splinterlands = (function() {
 				data.username = _player.name;
 			}
 
-			//jQuery.getJSON(_config.api_url + url, data, r => resolve(r));
-
 			var xhr = new XMLHttpRequest();
 			xhr.open('GET', _config.api_url + url + '?' + splinterlands.utils.param(data));
 			xhr.onload = function() {
-					if (xhr.status === 200) {
-							resolve(splinterlands.utils.try_parse(xhr.responseText));
-					}
-					else {
-							reject('Request failed.  Returned status of ' + xhr.status);
-					}
+				if (xhr.status === 200)
+					resolve(splinterlands.utils.try_parse(xhr.responseText));
+				else
+					reject('Request failed.  Returned status of ' + xhr.status);
 			};
 			xhr.send();
 		});
