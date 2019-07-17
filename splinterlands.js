@@ -161,7 +161,8 @@ var splinterlands = (function() {
 		await load_collection();
 
 		// Load the player's token balances
-		await load_balances();
+		if(!_player.balances)
+			await load_balances();
 
 		return _player;
   }
