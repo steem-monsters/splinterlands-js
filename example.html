@@ -65,8 +65,9 @@
 					
 					<div style="text-align: center; width: 300px;">
 						<h5>League:</h5>
-						<img id="img_league" src="" style="height: 100px;" />
+						<img id="img_league" src="" style="height: 75px;" />
 						<div id="league_name"></div>
+						<div id="season_ends"></div>
 					</div>
 
 					<div>
@@ -110,6 +111,8 @@
 				$('#img_league').attr('src', player.league.image);
 				$('#league_name').text(player.league.name);
 
+				setInterval(() => $('#season_ends').text(`Season ends in: ${countdownStr(new Date(splinterlands.get_settings().season.ends).getTime() - Date.now(), true)}`), 1000);
+
 				if(player.quest.can_start)
 					$('#btn_start_quest').show();
 				
@@ -122,7 +125,7 @@
 
 					$('#quest_info').html(`${player.quest.details.name}<br/>${player.quest.details.objective}<br/>Progress: ${player.quest.completed_items} / ${player.quest.total_items}`);
 				} else if(player.quest.next > 0) {
-					setInterval(() => updateQuestDate(player.quest.next), 1000);
+					setInterval(() => $("#quest_info").text(`Quest available in: ${countdownStr(player.quest.next)}`), 1000);
 				}
 
         showCollection();
@@ -141,7 +144,7 @@
           row.append(`<td>${card.cards.length}</td>`);
 
           let img_td = $('<td></td>');
-          img_td.append(card.render());
+          img_td.append(card.render('sm'));
           row.append(img_td);
 
           tbody.append(row);
@@ -185,21 +188,25 @@
         $('#div_login').show();
         $('#div_game').hide();
 			});
-			
-			function updateQuestDate(ts) {
-				var time_str = '';
-
-				if(ts > 0) {
-					time_str += padLeft(Math.floor((ts % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)), 2, '0') + ':';
-					time_str += padLeft(Math.floor((ts % (60 * 60 * 1000)) / 60000), 2, '0') + ':';
-					time_str += padLeft(Math.floor((ts % 60000) / 1000), 2, '0');
-					$("#quest_info").text(`Quest available in: ${time_str}`);
-				}
-			}
 
 			function padLeft(nr, n, str) {
 				if (String(nr).length > n) return String(nr);
 				return Array(n - String(nr).length + 1).join(str || '0') + nr;
+			}
+
+			function countdownStr(ts, days) {
+				if(ts <= 0)
+					return '00:00:00' + (days ? ':00' : '');
+
+				let time_str = '';
+
+				if(days)
+					time_str += padLeft(Math.floor(ts / (24 * 60 * 60 * 1000)), 2, '0') + ':';
+
+				time_str += padLeft(Math.floor((ts % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)), 2, '0') + ':';
+				time_str += padLeft(Math.floor((ts % (60 * 60 * 1000)) / 60000), 2, '0') + ':';
+				time_str += padLeft(Math.floor((ts % 60000) / 1000), 2, '0');
+				return time_str;
 			}
     </script>
 	</body>

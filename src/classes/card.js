@@ -174,7 +174,7 @@ splinterlands.Card = class {
     element.setAttribute('edition', this.edition);
 
     let img = document.createElement('img');
-    img.setAttribute('src', this.get_image_url());
+    img.setAttribute('src', this.image_url);
     img.setAttribute('class', 'sl-card-img');
     element.appendChild(img);
 
@@ -292,7 +292,7 @@ splinterlands.Card = class {
     container.appendChild(stat_element);
   }
 
-  get_image_url() {
+  get image_url() {
 		return ((this.edition == 1 || this.edition == 3) ? BETA_CARD_URL : ALPHA_CARD_URL) +
 			(this.skin ? this.skin + '/' : '') +
 			encodeURIComponent(this.details.name) +

@@ -41,6 +41,22 @@
 
 /* End Large Size Cards (300 x 420 px) */
 
+/* Start Small Size Cards (300 x 420 px) */
+
+.sl-card.sl-sm .sl-stats-container {
+  width: 150px;
+  height: 210px;
+  top: -210px;
+  font-size: 12px;
+}
+
+.sl-card.sl-sm img.sl-card-img {
+  width: 150px;
+} 
+
+/* End Small Size Cards (300 x 420 px) */
+
+
 /* Start Card Name */
 
 .sl-name-bg {
