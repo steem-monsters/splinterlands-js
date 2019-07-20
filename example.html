@@ -9,7 +9,8 @@
 			$(() =>	setTimeout(init, 500));
 
 			async function init() {
-				await splinterlands.init({ api_url: 'https://testnet.steemmonsters.io', ws_url: 'wss://sm-ws.mrosen.com' });
+				//await splinterlands.init({ api_url: 'https://testnet.steemmonsters.io', ws_url: 'wss://sm-ws.mrosen.com' });
+				await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
 
 				if(splinterlands.has_saved_login())
 					savedLogin();
@@ -53,13 +54,29 @@
           <button id="btn_logout">Log Out</button>
         </div>
 
-        <div class="py-1">
-          <h5>Balances:</h5>
-          <div>DEC: <span id="span_balance_dec"></span></div>
-          <div>BETA: <span id="span_balance_beta"></span></div>
-          <div>ALPHA: <span id="span_balance_alpha"></span></div>
-          <div>ORB: <span id="span_balance_orb"></span></div>
-        </div>
+				<div style="display: flex">
+					<div class="py-1">
+						<h5>Balances:</h5>
+						<div>DEC: <span id="span_balance_dec"></span></div>
+						<div>BETA: <span id="span_balance_beta"></span></div>
+						<div>ALPHA: <span id="span_balance_alpha"></span></div>
+						<div>ORB: <span id="span_balance_orb"></span></div>
+					</div>
+					
+					<div style="text-align: center; width: 300px;">
+						<h5>League:</h5>
+						<img id="img_league" src="" style="height: 100px;" />
+						<div id="league_name"></div>
+					</div>
+
+					<div>
+						<h5>Quest:</h5>
+						<div id="quest_info"></div>
+						<button id="btn_claim_quest_rewards" style="display: none;">CLAIM REWARDS</button>
+						<button id="btn_start_quest" style="display: none;">START QUEST</button>
+						<button id="btn_refresh_quest" style="display: none;">NEW QUEST</button>
+					</div>
+				</div>
       </div>
 
       <div class="py-1">
@@ -88,7 +105,25 @@
         ['DEC', 'BETA', 'ALPHA', 'ORB'].forEach(async token => {
           let balance = await splinterlands.get_balance(token);
           $(`#span_balance_${token.toLowerCase()}`).text(balance);
-        });
+				});
+				
+				$('#img_league').attr('src', player.league.image);
+				$('#league_name').text(player.league.name);
+
+				if(player.quest.can_start)
+					$('#btn_start_quest').show();
+				
+				if(player.quest.can_refresh)
+					$('#btn_refresh_quest').show();
+
+				if(!player.quest.claimed)	{
+					if(player.quest.completed)
+						$('#btn_claim_quest_rewards').show();
+
+					$('#quest_info').html(`${player.quest.details.name}<br/>${player.quest.details.objective}<br/>Progress: ${player.quest.completed_items} / ${player.quest.total_items}`);
+				} else if(player.quest.next > 0) {
+					setInterval(() => updateQuestDate(player.quest.next), 1000);
+				}
 
         showCollection();
       }
@@ -149,7 +184,23 @@
         splinterlands.logout();
         $('#div_login').show();
         $('#div_game').hide();
-      });
+			});
+			
+			function updateQuestDate(ts) {
+				var time_str = '';
+
+				if(ts > 0) {
+					time_str += padLeft(Math.floor((ts % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)), 2, '0') + ':';
+					time_str += padLeft(Math.floor((ts % (60 * 60 * 1000)) / 60000), 2, '0') + ':';
+					time_str += padLeft(Math.floor((ts % 60000) / 1000), 2, '0');
+					$("#quest_info").text(`Quest available in: ${time_str}`);
+				}
+			}
+
+			function padLeft(nr, n, str) {
+				if (String(nr).length > n) return String(nr);
+				return Array(n - String(nr).length + 1).join(str || '0') + nr;
+			}
     </script>
 	</body>
 </html>

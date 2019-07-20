@@ -92,7 +92,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function refresh_quest() {
-		return await splinterlands.send_tx('refresh_quest', 'Start Quest', { type: 'daily' });
+		return await splinterlands.send_tx('refresh_quest', 'New Quest', { type: 'daily' });
 	}
 
 	async function accept_challenge(id) {

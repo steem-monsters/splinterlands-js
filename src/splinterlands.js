@@ -168,6 +168,8 @@ var splinterlands = (function() {
 		}
 
 		_player = response;
+		_player.league = new splinterlands.League(_player.rating);
+		_player.quest = new splinterlands.Quest(_player.quest || {});
 		_player.token = token;
 
 		localStorage.setItem('splinterlands:username', username);

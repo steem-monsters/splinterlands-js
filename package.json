@@ -1,11 +1,11 @@
 {
   "name": "splinterlands-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Splinterlands JavaScript Client Library",
   "main": "splinterlands.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "minify": "uglifycss src/splinterlands.css > dist/splinterlands.min.css && uglifyjs libraries/eosjs-ecc.min.js libraries/steem.min.js src/splinterlands.js src/utils.js src/socket.js src/card.js src/ops.js -c -o dist/splinterlands.min.js"
+    "minify": "uglifycss src/splinterlands.css > dist/splinterlands.min.css && uglifyjs libraries/eosjs-ecc.min.js libraries/steem.min.js src/splinterlands.js src/utils.js src/socket.js src/classes/card.js src/classes/league.js src/classes/quest.js src/ops.js -c -o dist/splinterlands.min.js"
   },
   "repository": {
     "type": "git",

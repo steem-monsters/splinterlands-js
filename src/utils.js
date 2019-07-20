@@ -20,34 +20,6 @@ window.splinterlands.utils = (function() {
 		return Math.max(Math.floor((Date.now() - splinterlands.get_settings().timestamp) / 3000), 0) + splinterlands.get_settings().last_block;
 	}
 
-	function get_league(rating) {
-		if(rating < 100)
-			return 0;
-
-		if(rating >= 4700)
-			return 15;
-
-		if(rating >= 4200)
-			return 14;
-
-		if(rating >= 3700)
-			return 13;
-
-		return Math.min(parseInt((rating - 100) / 300) + 1, 15);
-	}
-
-	function get_league_level(rating) {
-		return Math.max(Math.min(Math.floor((get_league(rating) - 1) / 3) + 1, 4), 0);
-	}
-
-	function get_league_name(rating) {
-		var num = get_league(rating);
-
-		var name = num < 4 ? 'Bronze' : (num < 7 ? 'Silver' : (num < 10 ? 'Gold' : (num < 13 ? 'Diamond' : 'Champion')));
-		var tier = (num - 1) % 3;
-		return name + ' ' + (tier == 0 ? 'III' : (tier == 1 ? 'II' : 'I'));
-	}
-
 	function get_summoner_level(rating_level, card) {
 		var rarity = splinterlands.get_card_details(card.card_detail_id).rarity;
 		var max_level = 10 - (rarity - 1) * 2;
@@ -184,10 +156,7 @@ window.splinterlands.utils = (function() {
 	return { 
 		randomStr, 
 		timeout, 
-		get_cur_block_num, 
-		get_league, 
-		get_league_level, 
-		get_league_name, 
+		get_cur_block_num,
 		get_summoner_level, 
 		get_monster_level, 
 		get_ecr, 
