@@ -88,11 +88,29 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function start_quest() {
-		return await splinterlands.send_tx('start_quest', 'Start Quest', { type: 'daily' });
+		let result = await splinterlands.send_tx('start_quest', 'Start Quest', { type: 'daily' });
+		
+		// If successful, update the current player's quest info
+		if(result && result.trx_info && result.trx_info.success) {
+			let new_quest = new splinterlands.Quest(splinterlands.utils.try_parse(result.trx_info.result));
+			splinterlands.get_player().quest = new_quest;
+			return { success: true, quest: new_quest };
+		}
+
+		return result;
 	}
 
 	async function refresh_quest() {
-		return await splinterlands.send_tx('refresh_quest', 'New Quest', { type: 'daily' });
+		let result = await splinterlands.send_tx('refresh_quest', 'New Quest', { type: 'daily' });
+
+		// If successful, update the current player's quest info
+		if(result && result.trx_info && result.trx_info.success) {
+			let new_quest = new splinterlands.Quest(splinterlands.utils.try_parse(result.trx_info.result));
+			splinterlands.get_player().quest = new_quest;
+			return { success: true, quest: new_quest };
+		}
+
+		return result;
 	}
 
 	async function accept_challenge(id) {

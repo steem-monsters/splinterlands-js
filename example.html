@@ -24,16 +24,34 @@
       }
       
       async function savedLogin() {
+				ShowLoading();
+
         let login_response = await splinterlands.login();
 
         if(!login_response.error)
-          onLogin(login_response);
+					onLogin(login_response);
+					
+				HideLoading();
       }
 
 			window.addEventListener('splinterlands:version_change', e => {
 				alert(`New Version - ${e.detail}!`);
 			}, false);
 		</script>
+
+		<style type="text/css">
+			.modal-backdrop.in {
+				opacity: 0.8;
+			}
+
+			.loading {
+				position: fixed;
+				width: 200px;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+		</style>
 	</head>
 	<body>
     <div class="container">
@@ -113,21 +131,7 @@
 
 				setInterval(() => $('#season_ends').text(`Season ends in: ${countdownStr(new Date(splinterlands.get_settings().season.ends).getTime() - Date.now(), true)}`), 1000);
 
-				if(player.quest.can_start)
-					$('#btn_start_quest').show();
-				
-				if(player.quest.can_refresh)
-					$('#btn_refresh_quest').show();
-
-				if(!player.quest.claimed)	{
-					if(player.quest.completed)
-						$('#btn_claim_quest_rewards').show();
-
-					$('#quest_info').html(`${player.quest.details.name}<br/>${player.quest.details.objective}<br/>Progress: ${player.quest.completed_items} / ${player.quest.total_items}`);
-				} else if(player.quest.next > 0) {
-					setInterval(() => $("#quest_info").text(`Quest available in: ${countdownStr(player.quest.next)}`), 1000);
-				}
-
+				showQuestInfo(player.quest);
         showCollection();
       }
 
@@ -152,7 +156,9 @@
       }
 
       $('#btn_login_keychain').click(async () => {
-        let login_response = await splinterlands.login($('#username').val());
+				ShowLoading();
+				let login_response = await splinterlands.login($('#username').val());
+				HideLoading();
 
         if(login_response.error) {
           alert(`Error logging in: ${login_response.error}`);
@@ -163,7 +169,9 @@
 			});
 			
 			$('#btn_login_pwd').click(async () => {
-        let login_response = await splinterlands.login($('#username').val(), $('#password').val());
+				ShowLoading();
+				let login_response = await splinterlands.login($('#username').val(), $('#password').val());
+				HideLoading();
 
         if(login_response.error) {
           alert(`Error logging in: ${login_response.error}`);
@@ -186,8 +194,63 @@
       $('#btn_logout').click(() => { 
         splinterlands.logout();
         $('#div_login').show();
-        $('#div_game').hide();
+				$('#div_game').hide();
+				clearInterval(quest_interval);
 			});
+
+			$('#btn_refresh_quest').click(async () => {
+				ShowLoading();
+				let result = await splinterlands.ops.refresh_quest();
+				console.log(result);
+
+				if(result && result.quest) {
+					clearInterval(quest_interval);
+					showQuestInfo(result.quest);
+				}
+					
+				HideLoading();
+			});
+
+			$('#btn_start_quest').click(async () => {
+				ShowLoading();
+				let result = await splinterlands.ops.start_quest();
+				console.log(result);
+
+				if(result && result.quest) {
+					clearInterval(quest_interval);
+					showQuestInfo(result.quest);
+				}
+					
+				HideLoading();
+			});
+
+			$('#btn_claim_quest_rewards').click(() => splinterlands.get_player().quest.claim_rewards());
+
+			var quest_interval = -1;
+			function showQuestInfo(quest) {
+				console.log(quest);
+
+				$('#quest_info').empty();
+				$('#btn_start_quest').hide();
+				$('#btn_refresh_quest').hide();
+				$('#btn_claim_quest_rewards').hide();
+
+				if(quest.can_start)
+					$('#btn_start_quest').show();
+				
+				if(quest.can_refresh)
+					$('#btn_refresh_quest').show();
+
+				if(!quest.claimed)	{
+					if(quest.completed)
+						$('#btn_claim_quest_rewards').show();
+
+					if(quest.details)
+						$('#quest_info').html(`${quest.details.name}<br/>${quest.details.objective}<br/>Progress: ${quest.completed_items} / ${quest.total_items}`);
+				} else if(quest.next > 0) {
+					quest_interval = setInterval(() => $("#quest_info").text(`Quest available in: ${countdownStr(quest.next)}`), 1000);
+				}
+			}
 
 			function padLeft(nr, n, str) {
 				if (String(nr).length > n) return String(nr);
@@ -208,6 +271,13 @@
 				time_str += padLeft(Math.floor((ts % 60000) / 1000), 2, '0');
 				return time_str;
 			}
+
+			function ShowLoading() {
+				let loading = $('<div class="modal-backdrop fade in loading-backdrop"><img src="https://s3.amazonaws.com/steemmonsters/website/loading.gif" class="loading" /></div>');
+				loading.appendTo('body');
+			}
+
+			function HideLoading() { $('.loading-backdrop').remove(); }
     </script>
 	</body>
 </html>

@@ -153,6 +153,20 @@ window.splinterlands.utils = (function() {
 		}
 	}
 
+	async function validate_acct_name(name) {
+		let error = steem.utils.validateAccountName(name);
+
+		if(error)
+			return { available: false, error };
+
+		let existing_account = await steem.api.getAccountsAsync([name]);
+
+		if(existing_account && existing_account.length > 0)
+			return { available: false, error: 'That account name is already taken.' };
+
+		return { available: true };
+	}
+
 	return { 
 		randomStr, 
 		timeout, 
@@ -167,6 +181,7 @@ window.splinterlands.utils = (function() {
     steem_engine_transfer,
 		get_edition_str,
 		param,
-		try_parse
+		try_parse,
+		validate_acct_name
 	 };
 })();
