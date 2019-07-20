@@ -45,9 +45,9 @@ splinterlands.Card = class {
     let cur_lvl_bcx = this.level <= 1 ? 0 : Math.ceil(xp_levels[this.level - 2] / this.base_xp);
 
     this._next_level_progress = { 
-      current: bcx - cur_lvl_bcx, 
+      current: bcx - cur_lvl_bcx || 0, 
       total: next_lvl_bcx - cur_lvl_bcx, 
-      progress: (bcx - cur_lvl_bcx) / (next_lvl_bcx - cur_lvl_bcx) * 100
+      progress: ((bcx - cur_lvl_bcx) || 0) / (next_lvl_bcx - cur_lvl_bcx) * 100
     };
 
     return this._next_level_progress;
