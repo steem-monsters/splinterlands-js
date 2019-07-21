@@ -130,6 +130,7 @@ var splinterlands = (function() {
 			try { steem.auth.wifToPublic(key); }
 			catch (err) { return { success: false, error: `Invalid password or private posting key for account @${username}` }; }
 
+			// Sign the login request using the provided private key
 			params.ts = Date.now();
 			params.sig = eosjs_ecc.sign(username + params.ts, key);
 		}
@@ -140,8 +141,6 @@ var splinterlands = (function() {
 		if(!response || response.error)
 			return { success: false, error: 'Login Error: ' + response.error };
 
-		let token = null;
-
 		if(_use_keychain) {
 			// Request that the keychain extension decrypt the token
 			let keychain_response = await new Promise(resolve => steem_keychain.requestVerifyKey(username, response.token, 'Posting', r => resolve(r)));
@@ -149,13 +148,10 @@ var splinterlands = (function() {
 			if(!keychain_response || !keychain_response.success)
 				return { success: false, error: `The login attempt for account @${username} was unsuccessful.` };
 
-			token = keychain_response.result.startsWith('#') ? keychain_response.result.substr(1) : keychain_response.result;
-		} else {
-			token = response.token;
+			response.token = keychain_response.result.startsWith('#') ? keychain_response.result.substr(1) : keychain_response.result;
 		}
 
 		_player = new splinterlands.Player(response);
-		_player.token = token;
 
 		localStorage.setItem('splinterlands:username', username);
 

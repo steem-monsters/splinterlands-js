@@ -18,4 +18,8 @@ splinterlands.Player = class {
 		let balance = this.balances.find(b => b.token == token);
 		return balance ? parseFloat(balance.balance) : 0;
 	}
+
+	get ecr() {
+		return Math.min((isNaN(parseInt(this.capture_rate)) ? 10000 : this.capture_rate) + (splinterlands.get_settings().last_block - this.last_reward_block) * splinterlands.get_settings().dec.ecr_regen_rate, 10000);
+	}
 }
