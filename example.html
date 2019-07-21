@@ -122,7 +122,7 @@
         $('#span_username').text(player.name);
 
         ['DEC', 'BETA', 'ALPHA', 'ORB'].forEach(async token => {
-          let balance = await splinterlands.get_balance(token);
+          let balance = await player.get_balance(token);
           $(`#span_balance_${token.toLowerCase()}`).text(balance);
 				});
 				
@@ -203,10 +203,8 @@
 				let result = await splinterlands.ops.refresh_quest();
 				console.log(result);
 
-				if(result && result.quest) {
-					clearInterval(quest_interval);
+				if(result && result.quest)
 					showQuestInfo(result.quest);
-				}
 					
 				HideLoading();
 			});
@@ -216,19 +214,28 @@
 				let result = await splinterlands.ops.start_quest();
 				console.log(result);
 
-				if(result && result.quest) {
-					clearInterval(quest_interval);
+				if(result && result.quest)
 					showQuestInfo(result.quest);
-				}
 					
 				HideLoading();
 			});
 
-			$('#btn_claim_quest_rewards').click(() => splinterlands.get_player().quest.claim_rewards());
+			$('#btn_claim_quest_rewards').click(async () => {
+				ShowLoading();
+				let result = await splinterlands.get_player().quest.claim_rewards();
+				console.log(result);
+
+				// TODO: Show cards
+
+				if(result && result.quest)
+					showQuestInfo(result.quest);
+
+				HideLoading();
+			});
 
 			var quest_interval = -1;
 			function showQuestInfo(quest) {
-				console.log(quest);
+				clearInterval(quest_interval);
 
 				$('#quest_info').empty();
 				$('#btn_start_quest').hide();

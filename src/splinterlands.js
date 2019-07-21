@@ -86,19 +86,6 @@ var splinterlands = (function() {
 		_settings = response;
 	}
 
-	async function load_balances() {
-		_player.balances = await api('/players/balances');
-		return _player.balances;
-	}
-
-	async function get_balance(token, refresh) {
-		if(!_player.balances || refresh)
-			await load_balances();
-
-		let balance = _player.balances.find(b => b.token == token);
-		return balance ? parseFloat(balance.balance) : 0;
-	}
-
 	function has_saved_login() {
 		let username = localStorage.getItem('splinterlands:username');
 
@@ -167,9 +154,7 @@ var splinterlands = (function() {
 			token = response.token;
 		}
 
-		_player = response;
-		_player.league = new splinterlands.League(_player.rating);
-		_player.quest = new splinterlands.Quest(_player.quest || {});
+		_player = new splinterlands.Player(response);
 		_player.token = token;
 
 		localStorage.setItem('splinterlands:username', username);
@@ -177,15 +162,12 @@ var splinterlands = (function() {
 		if(!_use_keychain)
 			localStorage.setItem('splinterlands:key', key);
 
-		// Start the websocket connection
-		splinterlands.socket.connect(_config.ws_url, _player.name, _player.token);
+		// Start the websocket connection if one is specified
+		if(_config.ws_url)
+			splinterlands.socket.connect(_config.ws_url, _player.name, _player.token);
 
 		// Load the player's card collection
 		await load_collection();
-
-		// Load the player's token balances
-		if(!_player.balances)
-			await load_balances();
 
 		return _player;
   }
@@ -465,7 +447,7 @@ var splinterlands = (function() {
 
 	return { 
 		init, api, login, logout, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
-		get_balance, log_event, load_balances, load_market, send_payment, has_saved_login,
+		log_event, load_market, send_payment, has_saved_login,
 		get_settings: () => _settings,
 		get_player: () => _player,
 		get_market: () => _market,

@@ -79,17 +79,52 @@ window.splinterlands.ops = (function() {
 		return await splinterlands.send_tx('surrender', 'Surrender', { battle_queue_id });
 	}
 
-	async function claim_quest_rewards(quest_id) {
-		return await splinterlands.send_tx('claim_reward', 'Claim Reward', { type: 'quest', quest_id });
+	async function claim_season_rewards(season) {
+		let result = await splinterlands.send_tx('claim_reward', 'Claim Reward', { type: 'league_season', season });
+
+		// If there is any type of error, just return the result object
+		if(!result || !result.trx_info || !result.trx_info.success || result.error)
+			return result;
+
+		// TODO: Update player's card collection?
+
+		let card_data = splinterlands.utils.try_parse(result.trx_info.result);
+
+		if(!card_data)
+			return card_data;
+
+		return { cards: card_data.map(c => new splinterlands.Card(c)) };
 	}
 
-	async function claim_season_rewards(season) {
-		return await splinterlands.send_tx('claim_reward', 'Claim Reward', { type: 'league_season', season });
+	async function claim_quest_rewards(quest_id) {
+		let result = await splinterlands.send_tx('claim_reward', 'Claim Reward', { type: 'quest', quest_id });
+
+		// If there is any type of error, just return the result object
+		if(!result || !result.trx_info || !result.trx_info.success || result.error)
+			return result;
+
+		// TODO: Update player's card collection?
+
+		// Update current player's quest info
+		let quests = await splinterlands.api('/players/quests');
+
+		if(quests && quests.length > 0)
+			splinterlands.get_player().quest = new splinterlands.Quest(quests[0]);
+
+		let card_data = splinterlands.utils.try_parse(result.trx_info.result);
+
+		if(!card_data)
+			return card_data;
+
+		return { 
+			cards: card_data.map(c => new splinterlands.Card(c)), 
+			quest: splinterlands.get_player().quest 
+		};
 	}
 
 	async function start_quest() {
 		let result = await splinterlands.send_tx('start_quest', 'Start Quest', { type: 'daily' });
-		
+
 		// If successful, update the current player's quest info
 		if(result && result.trx_info && result.trx_info.success) {
 			let new_quest = new splinterlands.Quest(splinterlands.utils.try_parse(result.trx_info.result));
