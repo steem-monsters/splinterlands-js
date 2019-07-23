@@ -457,19 +457,33 @@ var splinterlands = (function() {
 			}).filter(c => c);
 	}
 
-	async function create_account(username, email, password) {
+	async function create_account(username, email, password, is_test) {
 		// Start a new purchase
-		let purchase = await api('/purchases/start', { player: '', type: 'starter_pack', qty: 1, currency: 'STEEM' });
+		let purchase = await api('/purchases/start', { player: is_test ? '$TEST' : '', type: 'starter_pack', qty: 1, currency: 'STEEM' });
 
 		// Generate a key pair based on the email and password
 		let password_pub_key = steem.auth.getPrivateKeys(email, password).ownerPubkey;
 
-		await api('/players/create_email', { 
+		let params = { 
 			purchase_id: purchase.uid,
 			name: username, 
 			email: email, 
 			password_pub_key: password_pub_key
-		});
+		};
+
+		let response = await api('/players/create_email', params);
+		return response && response.success ? params : response;
+	}
+
+	async function redeem_promo_code(code, purchase_id) {
+		let response = await api('/purchases/start_code', { code, purchase_id });
+
+		if(!response || response.error)
+			return response;
+
+		// TODO: Poll for completion of the purchase
+
+		return response;
 	}
 
 	async function check_promo_code(code) {
@@ -478,7 +492,7 @@ var splinterlands = (function() {
 
 	return { 
 		init, api, login, logout, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
-		log_event, load_market, send_payment, has_saved_login, create_account, email_login, check_promo_code,
+		log_event, load_market, send_payment, has_saved_login, create_account, email_login, check_promo_code, redeem_promo_code,
 		get_settings: () => _settings,
 		get_player: () => _player,
 		get_market: () => _market,
