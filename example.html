@@ -9,8 +9,8 @@
 			$(() =>	setTimeout(init, 500));
 
 			async function init() {
-				await splinterlands.init({ api_url: 'https://testnet.steemmonsters.io', ws_url: 'wss://sm-ws.mrosen.com' });
-				//await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
+				//await splinterlands.init({ api_url: 'https://testnet.steemmonsters.io', ws_url: 'wss://sm-ws.mrosen.com' });
+				await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
 
 				if(splinterlands.has_saved_login())
 					savedLogin();
@@ -256,7 +256,7 @@
 						$('#btn_claim_quest_rewards').show();
 
 					if(quest.details)
-						$('#quest_info').html(`${quest.details.name}<br/>${quest.details.objective}<br/>Progress: ${quest.completed_items} / ${quest.total_items}`);
+						$('#quest_info').html(`${quest.details.name}<br/>${quest.details.objective_short}<br/>Progress: ${quest.completed_items} / ${quest.total_items}`);
 				} else if(quest.next > 0) {
 					quest_interval = setInterval(() => $("#quest_info").text(`Quest available in: ${countdownStr(quest.next)}`), 1000);
 				}

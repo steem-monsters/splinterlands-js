@@ -96,6 +96,22 @@ var splinterlands = (function() {
 		return { username, use_keychain: !key };
 	}
 
+	async function email_login(email, password) {
+		let params = { email };
+		let password_key = steem.auth.getPrivateKeys(email, password).owner;
+
+		// Sign the login request using the private key generated from the email and password combination
+		params.ts = Date.now();
+		params.sig = eosjs_ecc.sign(email + params.ts, password_key);
+
+		let response = await api('/players/login_email', params);
+
+		if(response.error)
+			return response;
+
+		return await login(response.username, response.posting_key);
+	}
+
 	async function login(username, key) {
 		if(!username) {
 			username = localStorage.getItem('splinterlands:username');
@@ -441,9 +457,28 @@ var splinterlands = (function() {
 			}).filter(c => c);
 	}
 
+	async function create_account(username, email, password) {
+		// Start a new purchase
+		let purchase = await api('/purchases/start', { player: '', type: 'starter_pack', qty: 1, currency: 'STEEM' });
+
+		// Generate a key pair based on the email and password
+		let password_pub_key = steem.auth.getPrivateKeys(email, password).ownerPubkey;
+
+		await api('/players/create_email', { 
+			purchase_id: purchase.uid,
+			name: username, 
+			email: email, 
+			password_pub_key: password_pub_key
+		});
+	}
+
+	async function check_promo_code(code) {
+		return await api('/purchases/check_code', { code });
+	}
+
 	return { 
 		init, api, login, logout, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
-		log_event, load_market, send_payment, has_saved_login,
+		log_event, load_market, send_payment, has_saved_login, create_account, email_login, check_promo_code,
 		get_settings: () => _settings,
 		get_player: () => _player,
 		get_market: () => _market,
