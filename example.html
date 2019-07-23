@@ -9,8 +9,8 @@
 			$(() =>	setTimeout(init, 500));
 
 			async function init() {
-				//await splinterlands.init({ api_url: 'https://testnet.steemmonsters.io', ws_url: 'wss://sm-ws.mrosen.com' });
-				await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
+				await splinterlands.init({ api_url: 'https://testnet.steemmonsters.io', ws_url: 'wss://sm-ws.mrosen.com' });
+				//await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
 
 				if(splinterlands.has_saved_login())
 					savedLogin();
@@ -68,7 +68,9 @@
 
       <div id="div_game" style="display: none;">
         <div class="py-3">
-          Logged in as: @<span id="span_username"></span>
+					Logged in as: 
+					<img id="player_profile_img" style="height: 30px; width: 30px; border-radius: 15px;" />
+					@<span id="span_username"></span>
           <button id="btn_logout">Log Out</button>
         </div>
 
@@ -119,7 +121,8 @@
       function onLogin(player) {
         $('#div_login').hide();
         $('#div_game').show();
-        $('#span_username').text(player.name);
+				$('#span_username').text(player.name);
+				$('#player_profile_img').attr('src', player.profile_image);
 
         ['DEC', 'BETA', 'ALPHA', 'ORB'].forEach(async token => {
           let balance = await player.get_balance(token);
