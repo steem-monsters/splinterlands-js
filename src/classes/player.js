@@ -4,6 +4,9 @@ splinterlands.Player = class {
 
     this.league = new splinterlands.League(data.rating);
 		this.quest = new splinterlands.Quest(data.quest || {});
+
+		if(data.guild)
+			this.guild = new splinterlands.Guild(data.guild);
 	}
 
 	async load_balances() {
