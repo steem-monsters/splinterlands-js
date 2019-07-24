@@ -457,7 +457,7 @@ var splinterlands = (function() {
 			}).filter(c => c);
 	}
 
-	async function create_account(username, email, password, is_test) {
+	async function create_account_email(username, email, password, is_test) {
 		// Start a new purchase
 		let purchase = await api('/purchases/start', { player: is_test ? '$TEST' : '', type: 'starter_pack', qty: 1, currency: 'STEEM' });
 
@@ -472,6 +472,10 @@ var splinterlands = (function() {
 		};
 
 		let response = await api('/players/create_email', params);
+
+		if(response && response.success)
+			splinterlands.socket.connect(_config.ws_url, username, null, true);
+
 		return response && response.success ? params : response;
 	}
 
@@ -481,9 +485,8 @@ var splinterlands = (function() {
 		if(!response || response.error)
 			return response;
 
-		// TODO: Poll for completion of the purchase
-
-		return response;
+		// Wait for completion of the purchase
+		return await check_tx(purchase_id);
 	}
 
 	async function check_promo_code(code) {
@@ -492,7 +495,7 @@ var splinterlands = (function() {
 
 	return { 
 		init, api, login, logout, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
-		log_event, load_market, send_payment, has_saved_login, create_account, email_login, check_promo_code, redeem_promo_code,
+		log_event, load_market, send_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code,
 		get_settings: () => _settings,
 		get_player: () => _player,
 		get_market: () => _market,

@@ -8,6 +8,10 @@ window.splinterlands.socket = (function() {
 	let _session_id = null;
 
 	function connect(url, player, token, new_account) {
+		// Make sure we don't already have an open connection
+		if(_ws && _ws.readyState == 1)
+			return;
+
 		if(!_session_id)
 			_session_id = splinterlands.utils.randomStr(10);
 
@@ -65,7 +69,16 @@ window.splinterlands.socket = (function() {
 
 	let _message_handlers = {
 		transaction_complete: function(data) {
-			var trx = splinterlands.get_transaction(data.sm_id);
+			let trx = splinterlands.get_transaction(data.sm_id);
+
+			if(trx) {
+				clearTimeout(trx.timeout);
+				trx.resolve(data);
+			}
+		},
+
+		purchase_complete: function(data) {
+			let trx = splinterlands.get_transaction(data.uid);
 
 			if(trx) {
 				clearTimeout(trx.timeout);
