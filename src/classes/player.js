@@ -10,7 +10,7 @@ splinterlands.Player = class {
 	}
 
 	async load_balances() {
-		this.balances = await api('/players/balances');
+		this.balances = await splinterlands.api('/players/balances');
 		return this.balances;
 	}
 
