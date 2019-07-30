@@ -56,6 +56,20 @@
 
 /* End Small Size Cards (300 x 420 px) */
 
+/* Start XS Size Cards (300 x 420 px) */
+
+.sl-card.sl-xs .sl-stats-container {
+  width: 100px;
+  height: 140px;
+  top: -140px;
+  font-size: 8px;
+}
+
+.sl-card.sl-xs img.sl-card-img {
+  width: 100px;
+} 
+
+/* End XS Size Cards (300 x 420 px) */
 
 /* Start Card Name */
 
