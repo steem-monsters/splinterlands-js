@@ -28,7 +28,7 @@ var splinterlands = (function() {
 		setInterval(load_settings, 60 * 1000);
 
 		// Load the card details
-		_cards = await api('/cards/get_details');
+		_cards = (await api('/cards/get_details')).map(c => new splinterlands.CardDetails(c));
 
 		// Load market data
 		await load_market();
