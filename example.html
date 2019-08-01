@@ -191,7 +191,7 @@
           row.append(`<td>${splinterlands.utils.get_edition_str(card.edition)}</td>`);
           row.append(`<td>${card.gold ? 'Gold' : 'Regular'}</td>`);
           row.append(`<td>${card.level || '--'}</td>`);
-          row.append(`<td>${card.cards.length}</td>`);
+          row.append(`<td>${card.owned.length}</td>`);
 
           let img_td = $('<td></td>');
           img_td.append(card.render('xs'));
@@ -228,7 +228,7 @@
 				let tbody = $('#tbl_card_details tbody');
 				tbody.empty();
 
-				card.cards.forEach(c => {
+				card.owned.forEach(c => {
 					let row = $('<tr>');
 
 					row.append(`<td><input type="checkbox"/></td>`);

@@ -371,32 +371,32 @@ var splinterlands = (function() {
 		// Group the cards in the collection by card_detail_id, edition, and gold foil
 		_cards.forEach(details => {
 			if(id_only) {
-				grouped.push(Object.assign({ card_detail_id: details.id, cards: collection.filter(o => o.card_detail_id == details.id) }, details));	 
+				grouped.push(Object.assign({ card_detail_id: details.id, owned: collection.filter(o => o.card_detail_id == details.id) }, details));	 
 			} else {
 				details.available_editions.forEach(edition => {
           let reg_cards = collection.filter(o => o.card_detail_id == details.id && o.gold == false && o.edition == parseInt(edition));
 
           if(reg_cards.length > 0) {
-            grouped.push(new splinterlands.Card(Object.assign({ cards: reg_cards }, reg_cards[0])));
+            grouped.push(new splinterlands.Card(Object.assign({ owned: reg_cards }, reg_cards[0])));
           } else {
             grouped.push(new splinterlands.Card({
               gold: false,
               card_detail_id: details.id,
               edition: parseInt(edition),
-              cards: reg_cards
+              owned: reg_cards
             }));
           }
 
           let gold_cards = collection.filter(o => o.card_detail_id == details.id && o.gold == true && o.edition == parseInt(edition));
 
           if(gold_cards.length > 0) {
-            grouped.push(new splinterlands.Card(Object.assign({ cards: gold_cards }, gold_cards[0])));
+            grouped.push(new splinterlands.Card(Object.assign({ owned: gold_cards }, gold_cards[0])));
           } else {
             grouped.push(new splinterlands.Card({
               gold: true,
               card_detail_id: details.id,
               edition: parseInt(edition),
-              cards: gold_cards
+              owned: gold_cards
             }));
           }
 				});
@@ -414,7 +414,7 @@ var splinterlands = (function() {
 	}
 
 	function get_battle_summoners(inactive_splinters, allowed_cards, ruleset, match_type, rating_level) {
-		return group_collection(_collection, true).filter(d => d.type == 'Summoner' && d.cards.length > 0).map(d => {
+		return group_collection(_collection, true).filter(d => d.type == 'Summoner' && d.owned.length > 0).map(d => {
 			// Check if the splinter is inactive for this battle
 			if(inactive_splinters.includes(d.color))
 				return null;
@@ -427,7 +427,7 @@ var splinterlands = (function() {
 			if(ruleset == 'Little League' && d.stats.mana > 4)
 				return null;
 
-			let card = d.cards.find(o => 
+			let card = d.owned.find(o => 
 				(allowed_cards != 'gold_only' || o.gold) && 
 				(allowed_cards != 'alpha_only' || o.edition == 0) &&
 				(match_type != 'Ranked' || splinterlands.utils.is_playable(o)) && 
@@ -446,7 +446,7 @@ var splinterlands = (function() {
 		let summoner_details = get_card_details(summoner_card.card_detail_id);
 
 		return group_collection(_collection, true)
-			.filter(d => d.type == 'Monster' && d.cards.length > 0 && (d.color == summoner_details.color || d.color == 'Gray' || (summoner_details.color == 'Gold' && d.color == ally_color)))
+			.filter(d => d.type == 'Monster' && d.owned.length > 0 && (d.color == summoner_details.color || d.color == 'Gray' || (summoner_details.color == 'Gold' && d.color == ally_color)))
 			.map(d => {
 				// Check if it's an allowed card
 				if((ruleset == 'Lost Legendaries' || allowed_cards == 'no_legendaries') && d.rarity == 4)
@@ -461,7 +461,7 @@ var splinterlands = (function() {
 				if(ruleset == 'Little League' && d.stats.mana[0] > 4)
 					return;
 
-				let card = d.cards.find(o => 
+				let card = d.owned.find(o => 
 					(allowed_cards != 'gold_only' || o.gold) && 
 					(allowed_cards != 'alpha_only' || o.edition == 0) &&
 					(match_type != 'Ranked' || splinterlands.utils.is_playable(o)) && 
