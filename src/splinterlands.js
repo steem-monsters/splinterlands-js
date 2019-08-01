@@ -343,7 +343,9 @@ var splinterlands = (function() {
 	}
 
 	async function load_market_cards(card_detail_id, gold, edition) {
-		return await api('/market/for_sale_by_card', { card_detail_id, gold, edition });
+		let cards = await api('/market/for_sale_by_card', { card_detail_id, gold, edition });
+		cards = cards.map(c => new splinterlands.Card(c));
+		return cards;
 	}
 
 	let _lore = {};

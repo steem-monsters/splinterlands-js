@@ -118,17 +118,44 @@
 				<div id="card_details" style="display: none; margin-top: 20px;">
 					<button id="btn_back">&lt; Back</button>
 					<div id="card_list" style="display: flex; justify-content: space-evenly; margin: 20px;"></div>
-					<table id="tbl_card_details" class="table">
-						<thead>
-							<th></th>
-							<th>Lvl</th>
-							<th>BCX</th>
-							<th>Next Lvl</th>
-							<th>DEC</th>
-							<th>Status</th>
-						</thead>
-						<tbody></tbody>
-					</table>
+
+					<div style="margin: 20px;">
+						<button id="btn_details_cards" onclick="showDetailsDiv('cards');">CARDS</button>
+						<button id="btn_details_market" onclick="showDetailsDiv('market');">MARKET</button>
+						<button id="btn_details_stats" onclick="showDetailsDiv('stats');">STATS</button>
+						<button id="btn_details_lore" onclick="showDetailsDiv('lore');">LORE</button>
+					</div>
+
+					<div id="div_details_cards" class="div-details">
+						<table id="tbl_card_details" class="table">
+							<thead>
+								<th></th>
+								<th>Lvl</th>
+								<th>BCX</th>
+								<th>Next Lvl</th>
+								<th>DEC</th>
+								<th>Status</th>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+
+					<div id="div_details_market" class="div-details" style="display: none;">
+						<table id="tbl_market_details" class="table">
+							<thead>
+								<th></th>
+								<th>Price</th>
+								<th>LVL</th>
+								<th>BCX</th>
+								<th>$ / BCX</th>
+								<th>Status</th>
+								<th>Card ID</th>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+
+					<div id="div_details_lore" class="div-details"></div>
 				</div>
       </div>
     </div>
@@ -176,7 +203,14 @@
         });
 			}
 			
-			function showCardDetails(card) {
+			function showDetailsDiv(type) {
+				$('.div-details').hide();
+				$(`#div_details_${type}`).show();
+			}
+
+			async function showCardDetails(card) {
+				showDetailsDiv('cards');
+
 				$('#tbl_collection').hide();
 				$('#card_details').show();
 				$('#card_list').empty();
@@ -200,12 +234,39 @@
 					row.append(`<td><input type="checkbox"/></td>`);
 					row.append(`<td>${c.level}</td>`);
 					row.append(`<td>${c.bcx}</td>`);
-					row.append(`<td>${c.next_level_progress.current} / ${c.next_level_progress.total}</td>`);
+
+					if(c.next_level_progress.total <= 0)
+						row.append(`<td>MAX</td>`);
+					else
+						row.append(`<td>${c.next_level_progress.current} / ${c.next_level_progress.total}</td>`);
+
 					row.append(`<td>${c.dec}</td>`);
 					row.append(`<td></td>`);
 
 					tbody.append(row);
 				});
+
+				card.market_cards().then(r => {
+					let tbody = $('#tbl_market_details tbody');
+					tbody.empty();
+				
+					r.forEach(c => {
+						let row = $('<tr>');
+
+						row.append(`<td><input type="checkbox"/></td>`);
+						row.append(`<td>$${parseFloat(c.buy_price).toFixed(2)}</td>`);
+						row.append(`<td>${c.bcx}</td>`);
+						row.append(`<td>${c.level}</td>`);
+						row.append(`<td>$${(parseFloat(c.buy_price) / c.bcx).toFixed(3)}</td>`);
+						row.append(`<td></td>`);
+						row.append(`<td>${c.uid}</td>`);
+
+						tbody.append(row);
+					});
+				});
+
+				$('#div_details_lore').empty();
+				$('#div_details_lore').text(await card.lore());
 			}
 
       $('#btn_login_keychain').click(async () => {
