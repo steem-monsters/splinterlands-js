@@ -4,6 +4,7 @@ splinterlands.CardDetails = class {
 	}
 
 	get splinter() { return this.splinter_mapping[this.color]; }
+	get available_editions() { return this.editions.split(',').map(e => parseInt(e)); }
 
 	get splinter_mapping() {
 		return {

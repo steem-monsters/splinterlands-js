@@ -160,7 +160,16 @@ splinterlands.Card = class {
 
 		this._value = price_per_bcx * this.bcx;
 		return this._value;
-  }
+	}
+	
+	get cooldown() {
+		if(!this.last_transferred_block || !this.last_used_block)
+			return 0;
+
+		var last_block = splinterlands.utils.get_cur_block_num();
+		if(this.last_transferred_block > last_block - splinterlands.get_settings().transfer_cooldown_blocks && this.last_used_block > last_block - splinterlands.get_settings().transfer_cooldown_blocks)
+			return (splinterlands.get_settings().transfer_cooldown_blocks - (last_block - this.last_used_block)) * 3;
+	}
 
   get is_alpha() { return this.edition == 0 || (this.edition == 2 && this.details.id < 100); }
   get max_level() { return 10 - (this.details.rarity - 1) * 2; }
@@ -298,5 +307,8 @@ splinterlands.Card = class {
 			encodeURIComponent(this.details.name) +
 			(this.gold ? '_gold' : '') +
 			'.png';
-  }
+	}
+	
+	async lore() { return await splinterlands.load_card_lore(this.card_detail_id); }
+	async market_cards() { return await splinterlands.load_market_cards(this.card_detail_id, this.gold, this.edition); }
 }

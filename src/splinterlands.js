@@ -342,7 +342,25 @@ var splinterlands = (function() {
 		return _market;
 	}
 
+	async function load_market_cards(card_detail_id, gold, edition) {
+		return await api('/market/for_sale_by_card', { card_detail_id, gold, edition });
+	}
+
+	let _lore = {};
+	async function load_card_lore(card_detail_id) {
+		if(!_lore[card_detail_id])
+			_lore[card_detail_id] = (await api('/cards/lore', { card_detail_id })).text;
+
+		return _lore[card_detail_id];
+	}
+
+	let _collection_grouped = null;
 	function group_collection(collection, id_only) {
+		if(!collection && _collection_grouped && !id_only)
+			return _collection_grouped;
+
+		let save = !collection && !id_only;
+			
 		if(!collection)
 			collection = _collection;
 
@@ -353,7 +371,7 @@ var splinterlands = (function() {
 			if(id_only) {
 				grouped.push(Object.assign({ card_detail_id: details.id, cards: collection.filter(o => o.card_detail_id == details.id) }, details));	 
 			} else {
-				details.editions.split(',').forEach(edition => {
+				details.available_editions.forEach(edition => {
           let reg_cards = collection.filter(o => o.card_detail_id == details.id && o.gold == false && o.edition == parseInt(edition));
 
           if(reg_cards.length > 0) {
@@ -383,7 +401,14 @@ var splinterlands = (function() {
 			}
 		});
 
+		if(save)
+			_collection_grouped = grouped;
+
 		return grouped;
+	}
+
+	function group_collection_by_card(card_detail_id) {
+		return group_collection().filter(c => c.card_detail_id == card_detail_id);
 	}
 
 	function get_battle_summoners(inactive_splinters, allowed_cards, ruleset, match_type, rating_level) {
@@ -496,6 +521,7 @@ var splinterlands = (function() {
 	return { 
 		init, api, login, logout, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
 		log_event, load_market, send_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code,
+		load_market_cards, load_card_lore, group_collection_by_card,
 		get_settings: () => _settings,
 		get_player: () => _player,
 		get_market: () => _market,

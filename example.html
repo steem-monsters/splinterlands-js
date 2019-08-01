@@ -113,7 +113,13 @@
             </tr>
           </thead>
           <tbody></tbody>
-        </table>
+				</table>
+				
+				<div id="card_details" style="display: none; margin-top: 20px;">
+					<button id="btn_back">&lt; Back</button>
+					<div id="card_list" style="display: flex; justify-content: space-evenly;">
+					</div>
+				</div>
       </div>
     </div>
 
@@ -151,8 +157,18 @@
           row.append(`<td>${card.cards.length}</td>`);
 
           let img_td = $('<td></td>');
-          img_td.append(card.render('sm'));
-          row.append(img_td);
+          img_td.append(card.render('xs'));
+					row.append(img_td);
+					
+					row.click(() => {
+						$('#tbl_collection').hide();
+						$('#card_details').show();
+						$('#card_list').empty();
+
+						splinterlands.group_collection_by_card(card.card_detail_id).forEach(c => {
+							$('#card_list').append(c.render());
+						});
+					});
 
           tbody.append(row);
         });
@@ -288,6 +304,11 @@
 			}
 
 			function HideLoading() { $('.loading-backdrop').remove(); }
+
+			$('#btn_back').click(() => {
+				$('#tbl_collection').show();
+				$('#card_details').hide();
+			});
     </script>
 	</body>
 </html>
