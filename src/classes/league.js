@@ -62,4 +62,16 @@ splinterlands.League = class {
 	get progress() {
 		return +((this.rating - this.min_rating) / (this.max_rating - this.min_rating) * 100).toFixed(2);
 	}
+
+	get rating_reset() {
+		return this.id >= 10 ? 1900 + (this.id - 10) * 300 : Math.max((this.id - 1) * 200, 0);
+	}
+
+	get level_limits() {
+		return [1,2,3,4].map(l => Math.max(Math.round((10 - (l - 1) * 2) / 4 * this.level), 1));
+	}
+
+	get season_rewards() {
+		return parseInt(splinterlands.get_settings().season.reward_packs[this.id]);
+	}
 }
