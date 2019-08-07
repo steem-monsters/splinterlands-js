@@ -4,6 +4,7 @@ var splinterlands = (function() {
 	let _settings = {};
 	let _cards = [];
 	let _market = [];
+	let _potions = [];
 	let _use_keychain = false;
 	let _transactions = {};
 	let _collection = [];
@@ -342,6 +343,13 @@ var splinterlands = (function() {
 		return _market;
 	}
 
+	async function get_potions() {
+		if(_potions.length == 0)
+			_potions = (await api('/purchases/items')).map(p => new splinterlands.Potion(p));
+
+		return _potions;
+	}
+
 	async function load_market_cards(card_detail_id, gold, edition) {
 		let cards = await api('/market/for_sale_by_card', { card_detail_id, gold, edition });
 		cards = cards.map(c => new splinterlands.Card(c));
@@ -520,10 +528,17 @@ var splinterlands = (function() {
 		return await api('/purchases/check_code', { code });
 	}
 
+	async function get_available_packs(edition) {
+		try {
+			let packs = (await api('/purchases/stats')).packs;
+			return packs.find(p => p.edition == edition).available;
+		} catch(err) { return 0; }
+	}
+
 	return { 
 		init, api, login, logout, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
 		log_event, load_market, send_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code,
-		load_market_cards, load_card_lore, group_collection_by_card,
+		load_market_cards, load_card_lore, group_collection_by_card, get_available_packs, get_potions,
 		get_settings: () => _settings,
 		get_player: () => _player,
 		get_market: () => _market,
