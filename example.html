@@ -312,7 +312,7 @@
 					let row = $('<tr>');
 
 					row.append(`<td>${i+1}</td>`);
-					row.append(`<td>${card.cards_to_level(i+1) < 0 ? 'N/A' : card.cards_to_level(i+1)}</td>`);
+					row.append(`<td>${card.cards_to_level(i+1) == 0 ? 'N/A' : card.cards_to_level(i+1)}</td>`);
 					row.append(`<td>${card.details.stats[attack_types[0]][i]}</td>`);
 
 					if(attack_types.length > 1)

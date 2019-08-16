@@ -58,7 +58,7 @@ splinterlands.Card = class {
 		let xp_levels = splinterlands.get_settings().xp_levels[this.details.rarity - 1];
 
 		return this.gold ? 
-			(level <= gold_na[this.details.rarity - 1] ? -1 : Math.ceil(xp_levels[level - 2] / this.base_xp)) : 
+			(level <= gold_na[this.details.rarity - 1] ? 0 : Math.ceil(xp_levels[level - 2] / this.base_xp)) : 
 			(level == 1 ? 1 : Math.ceil(xp_levels[level - 2] / this.base_xp) + 1);
 	}
 
