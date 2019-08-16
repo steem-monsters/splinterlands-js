@@ -51,6 +51,14 @@
 				left: 50%;
 				transform: translate(-50%, -50%);
 			}
+
+			#tbl_stats_details th img {
+				width: 40px;
+			}
+
+			#tbl_stats_details td img {
+				height: 30px;
+			}
 		</style>
 	</head>
 	<body>
@@ -150,6 +158,22 @@
 								<th>$ / BCX</th>
 								<th>Status</th>
 								<th>Card ID</th>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+
+					<div id="div_details_stats" class="div-details" style="display: none;">
+						<table id="tbl_stats_details" class="table">
+							<thead>
+								<th>Lvl</th>
+								<th>Cards</th>
+								<th id="th_atk"></th>
+								<th id="th_atk2" style="display: none;"></th>
+								<th><img src="https://s3.amazonaws.com/steemmonsters/website/stats/speed.png"/></th>
+								<th><img src="https://s3.amazonaws.com/steemmonsters/website/stats/defense.png"/></th>
+								<th><img src="https://s3.amazonaws.com/steemmonsters/website/stats/health.png"/></th>
+								<th>Abilities</th>
 							</thead>
 							<tbody></tbody>
 						</table>
@@ -264,6 +288,49 @@
 						tbody.append(row);
 					});
 				});
+
+				let attack_types = card.details.attack_types;
+
+				if(attack_types.length == 0)
+					attack_types.push('melee');
+
+				$('#th_atk').empty();
+				$('#th_atk').append(`<img src="${splinterlands.utils.get_stat_image(attack_types[0])}"/>`);
+
+				if(attack_types.length > 1) {
+					$('#th_atk2').show();
+					$('#th_atk2').append(`<img src="${splinterlands.utils.get_stat_image(attack_types[1])}"/>`);
+				} else {
+					$('#th_atk2').hide();
+					$('#th_atk2').empty();
+				}
+
+				tbody = $('#tbl_stats_details tbody');
+				tbody.empty();
+
+				for(let i = 0; i < card.max_level; i++) {
+					let row = $('<tr>');
+
+					row.append(`<td>${i+1}</td>`);
+					row.append(`<td>${card.cards_to_level(i+1) < 0 ? 'N/A' : card.cards_to_level(i+1)}</td>`);
+					row.append(`<td>${card.details.stats[attack_types[0]][i]}</td>`);
+
+					if(attack_types.length > 1)
+						row.append(`<td>${card.details.stats[attack_types[1]][i]}</td>`);
+
+					row.append(`<td>${card.details.stats.speed[i]}</td>`);
+					row.append(`<td>${card.details.stats.armor[i]}</td>`);
+					row.append(`<td>${card.details.stats.health[i]}</td>`);
+
+					let abilities = '';
+					card.details.abilities_by_level(i + 1).forEach(ability => {
+						abilities += `<img src="${splinterlands.utils.get_ability_image(ability, true)}"/>`;									
+					});
+
+					row.append(`<td>${abilities}</td>`);
+
+					tbody.append(row);
+				}
 
 				$('#div_details_lore').empty();
 				$('#div_details_lore').text(await card.lore());

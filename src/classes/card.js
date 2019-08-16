@@ -51,7 +51,16 @@ splinterlands.Card = class {
     };
 
     return this._next_level_progress;
-  }
+	}
+	
+	cards_to_level(level) {
+		let gold_na = [3, 2, 2, 1];
+		let xp_levels = splinterlands.get_settings().xp_levels[this.details.rarity - 1];
+
+		return this.gold ? 
+			(level <= gold_na[this.details.rarity - 1] ? -1 : Math.ceil(xp_levels[level - 2] / this.base_xp)) : 
+			(level == 1 ? 1 : Math.ceil(xp_levels[level - 2] / this.base_xp) + 1);
+	}
 
 	get dec() {	
 		if(this._dec)
@@ -268,7 +277,7 @@ splinterlands.Card = class {
 				
 			this.stats.abilities.forEach(ability => {
 				let ab = document.createElement('img');
-				ab.setAttribute('src', `https://s3.amazonaws.com/steemmonsters/website/abilities/ability_${ability.toLowerCase().replace(' ', '-')}.png`);
+				ab.setAttribute('src', splinterlands.utils.get_ability_image(ability));
 				ab.setAttribute('class', 'sl-ability-img');
 				ab.setAttribute('title', ability);
 				abilities.append(ab);

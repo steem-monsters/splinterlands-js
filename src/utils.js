@@ -167,6 +167,22 @@ window.splinterlands.utils = (function() {
 		return { available: true };
 	}
 
+	function get_ability_image(ability, small) {
+		return `https://s3.amazonaws.com/steemmonsters/website/abilities${small ? '/small' : ''}/ability_${ability.toLowerCase().replace(' ', '-')}.png`;
+	}
+
+	function get_stat_image(stat) {
+		stat = stat.toLowerCase();
+
+		if(stat == 'armor')
+			stat = 'defense';
+
+		if(['melee', 'ranged', 'magic'].includes(stat))
+			return `https://s3.amazonaws.com/steemmonsters/website/stats/${stat}-attack.png`;
+		else
+			return `https://s3.amazonaws.com/steemmonsters/website/stats/${stat}.png`;
+	}
+
 	return { 
 		randomStr, 
 		timeout, 
@@ -182,6 +198,8 @@ window.splinterlands.utils = (function() {
 		get_edition_str,
 		param,
 		try_parse,
-		validate_acct_name
+		validate_acct_name,
+		get_ability_image,
+		get_stat_image
 	 };
 })();
