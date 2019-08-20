@@ -8,6 +8,7 @@ splinterlands.CardDetails = class {
 
 	get splinter() { return this.splinter_mapping[this.color]; }
 	get available_editions() { return this.editions.split(',').map(e => parseInt(e)); }
+	get max_level() { return 10 - (this.rarity - 1) * 2; }
 
 	get splinter_mapping() {
 		return {
@@ -37,6 +38,14 @@ splinterlands.CardDetails = class {
 	}
 
 	abilities_by_level(level) {
+		if(this.type != 'Monster')
+			return [];
+
 		return [].concat.apply([], this.stats.abilities.slice(0, level)).filter(a => a != '');
+	}
+
+	level_limit_by_level_rarity(level, rarity) {
+		let max_levels = [10, 8, 6, 4];
+		return Math.round(max_levels[rarity - 1] / this.max_level * level);
 	}
 }

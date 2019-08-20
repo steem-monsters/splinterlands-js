@@ -181,7 +181,7 @@ splinterlands.Card = class {
 	}
 
   get is_alpha() { return this.edition == 0 || (this.edition == 2 && this.details.id < 100); }
-  get max_level() { return 10 - (this.details.rarity - 1) * 2; }
+  get max_level() { return this.details.max_level; }
   
   render(size) {
     let element = document.createElement('div');
