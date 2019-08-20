@@ -79,6 +79,12 @@
 					Logged in as: 
 					<img id="player_profile_img" style="height: 30px; width: 30px; border-radius: 15px;" />
 					@<span id="span_username"></span>
+
+					<div style="display: flex;">
+						<div id="guild_crest"></div>
+						<div id="guild_name"></div>
+					</div>
+
           <button id="btn_logout">Log Out</button>
         </div>
 
@@ -190,6 +196,11 @@
         $('#div_game').show();
 				$('#span_username').text(player.name);
 				$('#player_profile_img').attr('src', player.profile_image);
+
+				if(player.guild) {
+					$('#guild_crest').append(player.guild.render_crest(30));
+					$('#guild_name').text(player.guild.name);
+				}
 
         ['DEC', 'BETA', 'ALPHA', 'ORB'].forEach(async token => {
           let balance = await player.get_balance(token);

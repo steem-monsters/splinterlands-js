@@ -146,7 +146,7 @@ window.splinterlands.utils = (function() {
 
 	function try_parse(json) {
 		try {
-			return JSON.parse(json);
+			return (typeof json == 'string') ? JSON.parse(json) : json;
 		} catch(err) {
 			console.log('Error trying to parse JSON: ' + json);
 			return null;
