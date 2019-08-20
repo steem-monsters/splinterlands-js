@@ -10,16 +10,25 @@ splinterlands.GuildBuilding = class {
 	}
 
 	get to_next_level() {
-		if(this.level == 10)
-			return -1;
+		if(this.level == 10) {
+			return {
+				total: levels[this.level - 1],
+				progress: levels[this.level - 1],
+				remaining: 0
+			};
+		}
 
 		let levels = splinterlands.get_settings().guilds[this.type].levels;
-		let total = 0;
+		let total_to_level = 0;
 
-		for(let i = 0; i < this.level + 1; i++)
-			total += levels[i];
+		for(let i = 0; i < this.level; i++)
+			total_to_level += levels[i];
 
-		return total - this.contributions;
+		return {
+			total: levels[this.level],
+			progress: this.contributions - total_to_level,
+			remaining: total_to_level + levels[this.level] - this.contributions
+		};
 	}
 
 	get symbol() {

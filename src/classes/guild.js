@@ -21,7 +21,7 @@ splinterlands.Guild = class {
 		if(!language)
 			language = '';
 
-		return await splinterlands.api('/guilds/list', { name, membership_type, language });
+		return (await splinterlands.api('/guilds/list', { name, membership_type, language })).map(g => new splinterlands.Guild(g));
 	}
 
 	static async find(id) {
