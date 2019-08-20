@@ -6,7 +6,7 @@ splinterlands.Guild = class {
 		let buildings = splinterlands.utils.try_parse(data.buildings);
 
 		if(buildings)
-			this.buildings = Object.keys(buildings).map(k => new splinterlands.GuildBuilding(k, buildings[k]));
+			this.buildings = Object.keys(buildings).map(k => new splinterlands.GuildBuilding(this.id, k, buildings[k]));
 
 		this.crest = this.data ? this.data.crest : {};
 	}
@@ -34,6 +34,10 @@ splinterlands.Guild = class {
 
 	get_building(type) {
 		return this.buildings.find(b => b.type == type);
+	}
+
+	async get_members() {
+		return await splinterlands.api('/guilds/members', { guild_id: this.id });
 	}
 
 	render_crest(size) {
