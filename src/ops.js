@@ -156,6 +156,14 @@ window.splinterlands.ops = (function() {
 		return await splinterlands.send_tx('decline_challenge', 'Decline Challenge', { id });
 	}
 
+	async function open_pack(edition) {
+		return await splinterlands.send_tx('open_pack', 'Open Pack', { edition });
+	}
+
+	async function open_multi(edition, qty) {
+		return await splinterlands.send_tx('open_all', 'Open Multiple Packs', { edition, qty });
+	}
+
 	return {
 		combine_cards,
 		combine_all,
@@ -176,6 +184,8 @@ window.splinterlands.ops = (function() {
 		start_quest,
 		refresh_quest,
 		accept_challenge,
-		decline_challenge
+		decline_challenge,
+		open_pack,
+		open_multi
 	};
 })();
