@@ -36,6 +36,20 @@ splinterlands.Guild = class {
 		return this.buildings.find(b => b.type == type);
 	}
 
+	get crest_banner_image() {
+		let banners = ['black', 'blue', 'gold', 'green', 'mint', 'orange', 'pink', 'purple', 'red', 'silver', 'teal', 'yellow'];
+		let banner = banners.includes(this.crest.banner) ? this.crest.banner : 'black';
+
+		return `https://steemmonsters.s3.amazonaws.com/website/guilds/banners/bg_banner_${banner}.png`;
+	}
+
+	get crest_decal_image() {
+		let decals = ['axe', 'bolt', 'book', 'globe', 'hand', 'helm', 'shield', 'skull', 'staff', 'sword', 'tree', 'wolf'];
+		let decal = decals.includes(this.crest.decal) ? this.crest.decal : null;
+
+		return `https://steemmonsters.s3.amazonaws.com/website/guilds/decals/img_guild_${decal}.png`;
+	}
+
 	async get_members() {
 		return await splinterlands.api('/guilds/members', { guild_id: this.id });
 	}
