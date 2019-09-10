@@ -186,7 +186,7 @@ splinterlands.Card = class {
   render(size) {
     let element = document.createElement('div');
     element.setAttribute('class', `sl-card sl-${size || 'med'} sl-${this.is_alpha ? 'alpha' : 'beta'} sl-foil-${this.gold ? 'gold' : 'reg'}`);
-    element.setAttribute('card_id', this.id);
+    element.setAttribute('card_id', this.uid);
     element.setAttribute('card_details_id', this.details.id);
     element.setAttribute('gold', this.gold);
     element.setAttribute('edition', this.edition);

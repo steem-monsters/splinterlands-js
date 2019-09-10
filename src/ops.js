@@ -157,7 +157,17 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function open_pack(edition) {
-		return await splinterlands.send_tx('open_pack', 'Open Pack', { edition });
+		let response = await splinterlands.send_tx('open_pack', 'Open Pack', { edition });
+
+		if(!response || response.error || !response.trx_info)
+			return response;
+
+		let result = splinterlands.utils.try_parse(response.trx_info.result);
+
+		if(!result || !result.cards)
+			return { error: 'Error loading cards in pack.' };
+
+		return result.cards.map(c => new splinterlands.Card(c));
 	}
 
 	async function open_multi(edition, qty) {
