@@ -317,6 +317,25 @@ splinterlands.Card = class {
 			(this.gold ? '_gold' : '') +
 			'.png';
 	}
+
+	get image_url_battle() {
+		let edition = (this.edition == 1 || this.edition == 3) ? 1 : 0;
+
+		return BATTLE_CARD_URLS[edition] +
+			(this.skin ? this.skin + '/' : '') +
+			encodeURIComponent(this.details.name) +
+			(this.gold ? '_gold' : '') +
+			'.png';
+	}
+
+	get image_url_battle_mobile() {
+		let edition = (this.edition == 1 || this.edition == 3) ? 1 : 0;
+
+		return BATTLE_CARD_URLS_MOBILE[edition] +
+			encodeURIComponent(this.details.name) +
+			(this.gold ? '_gold' : '') +
+			'.png';
+	}
 	
 	async lore() { return await splinterlands.load_card_lore(this.card_detail_id); }
 	async market_cards() { return await splinterlands.load_market_cards(this.card_detail_id, this.gold, this.edition); }

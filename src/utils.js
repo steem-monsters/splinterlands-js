@@ -3,7 +3,17 @@ if(!window.splinterlands)
 
 window.splinterlands.utils = (function() {
   BETA_CARD_URL = 'https://s3.amazonaws.com/steemmonsters/cards_beta/';
-  ALPHA_CARD_URL = 'https://s3.amazonaws.com/steemmonsters/cards_v2.2/';
+	ALPHA_CARD_URL = 'https://s3.amazonaws.com/steemmonsters/cards_v2.2/';
+	
+	BATTLE_CARD_URLS = [
+		'https://s3.amazonaws.com/steemmonsters/cards_battle_alpha/',
+		'https://s3.amazonaws.com/steemmonsters/cards_battle_beta/'
+	]
+
+	BATTLE_CARD_URLS_MOBILE = [
+		'https://s3.amazonaws.com/steemmonsters/cards_battle_mobile/',
+		'https://s3.amazonaws.com/steemmonsters/cards_battle_mobile/'
+	]
 
 	function randomStr(length) {
     var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
