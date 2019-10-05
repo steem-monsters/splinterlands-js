@@ -329,6 +329,12 @@ splinterlands.Card = class {
 	}
 
 	get image_url_battle_mobile() {
+		if(this.details.type == 'Summoner') {
+			return SUMMONER_CARD_URL_MOBILE + 
+				(this.team_num == 2 ? 'Right/' : 'Left/') + 
+				encodeURIComponent(this.details.name) + '.png';
+		}
+
 		let edition = (this.edition == 1 || this.edition == 3) ? 1 : 0;
 
 		return BATTLE_CARD_URLS_MOBILE[edition] +

@@ -4,6 +4,7 @@ if(!window.splinterlands)
 window.splinterlands.utils = (function() {
   BETA_CARD_URL = 'https://s3.amazonaws.com/steemmonsters/cards_beta/';
 	ALPHA_CARD_URL = 'https://s3.amazonaws.com/steemmonsters/cards_v2.2/';
+	SUMMONER_CARD_URL_MOBILE = 'https://steemmonsters.s3.amazonaws.com/cards_battle_mobile/Summoners/';
 	
 	BATTLE_CARD_URLS = [
 		'https://s3.amazonaws.com/steemmonsters/cards_battle_alpha/',
@@ -13,7 +14,7 @@ window.splinterlands.utils = (function() {
 	BATTLE_CARD_URLS_MOBILE = [
 		'https://s3.amazonaws.com/steemmonsters/cards_battle_mobile/',
 		'https://s3.amazonaws.com/steemmonsters/cards_battle_mobile/'
-	]
+	]	
 
 	function randomStr(length) {
     var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
