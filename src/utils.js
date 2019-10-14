@@ -194,6 +194,86 @@ window.splinterlands.utils = (function() {
 			return `https://s3.amazonaws.com/steemmonsters/website/stats/${stat}.png`;
 	}
 
+	function get_buff(buff) { return buffs[buff]; }
+
+	let buffs = {
+    "Stun": {
+        "ability": "Stun",
+				"pastTense": "Stunned",
+				"effect": "Stunned monsters skip their next turn."
+    },
+    "Enrage": {
+        "ability": "Enrage",
+				"pastTense": "Enraged",
+				"effect": "Enraged monsters get increased speed and attack damage when not at full health."
+    },
+    "Poison": {
+        "ability": "Poison",
+				"pastTense": "Poisoned",
+				"effect": "Poisoned monsters take 2 damage at the start of each round."
+    },
+    "Slow": {
+        "ability": "Slow",
+				"pastTense": "Slowed",
+				"effect": "-1 to SPEED"
+    },
+    "Protected": {
+        "ability": "Protect",
+				"pastTense": "Protected",
+				"effect": "+2 to ARMOR"
+    },
+    "Inspired": {
+        "ability": "Inspire",
+				"pastTense": "Inspired",
+				"effect": "+1 to MELEE ATTACK"
+    },
+    "Weakened": {
+        "ability": "Weaken",
+				"pastTense": "Weakened",
+				"effect": "-1 to HEALTH"
+    },
+    "Silenced": {
+        "ability": "Silence",
+				"pastTense": "Silenced",
+				"effect": "-1 to MAGIC ATTACK"
+    },
+    "Swiftened": {
+        "ability": "Swiftness",
+				"pastTense": "Swiftened",
+				"effect": "+1 to SPEED"
+    },
+    "Strengthened": {
+        "ability": "Strengthen",
+				"pastTense": "Strengthened",
+				"effect": "+1 to HEALTH"
+    },
+    "Shielded": {
+        "ability": "Divine Shield",
+				"pastTense": "Shielded",
+				"effect": "The first time this monster takes damage it is ignored."
+    },
+    "Demoralized": {
+        "ability": "Demoralize",
+				"pastTense": "Demoralized",
+				"effect": "-1 to MELEE ATTACK"
+    },
+    "Afflicted": {
+        "ability": "Affliction",
+				"pastTense": "Afflicted",
+				"effect": "This monster may not be healed."
+    },
+    "Blinded": {
+        "ability": "Blind",
+				"pastTense": "Blinded",
+				"effect": "Reduced chance of hitting with MELEE and RANGED attacks."
+    },
+    "Headwinds": {
+        "ability": "Headwinds",
+				"pastTense": "Headwinds",
+				"effect": "-1 to RANGED ATTACK"
+    }
+};
+
 	return { 
 		randomStr, 
 		timeout, 
@@ -211,6 +291,7 @@ window.splinterlands.utils = (function() {
 		try_parse,
 		validate_acct_name,
 		get_ability_image,
-		get_stat_image
+		get_stat_image,
+		get_buff
 	 };
 })();
