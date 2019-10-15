@@ -74,4 +74,8 @@ splinterlands.League = class {
 	get season_rewards() {
 		return parseInt(splinterlands.get_settings().season.reward_packs[this.id]);
 	}
+
+	static list() {
+		return [0, 100, 400, 700, 1000, 1300, 1600, 1900, 2200, 2500, 2800, 3100, 3400, 3700, 4200, 4700].map(r => new splinterlands.League(r));
+	}
 }
