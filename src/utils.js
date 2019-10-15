@@ -194,7 +194,12 @@ window.splinterlands.utils = (function() {
 			return `https://s3.amazonaws.com/steemmonsters/website/stats/${stat}.png`;
 	}
 
-	function lookup_effect(effect) { return effects[effect]; }
+	function lookup_effect(effect) { 
+		let obj = effects[effect];
+		obj.img = `https://s3.amazonaws.com/steemmonsters/website/abilities/ability_${obj.ability.toLowerCase().replace(/\s/g, '-')}.png`;
+		obj.img_sm = `https://s3.amazonaws.com/steemmonsters/website/abilities/small/ability_${obj.ability.toLowerCase().replace(/\s/g, '-')}.png`;
+		return obj;
+	}
 
 	let effects = {
     "Stun": {
