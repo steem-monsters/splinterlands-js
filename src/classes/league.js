@@ -24,6 +24,9 @@ splinterlands.League = class {
 	}
 
 	get name() {
+		if(this.id == 0)
+			return 'Novice';
+			
 		var name = this.id < 4 ? 'Bronze' : (this.id < 7 ? 'Silver' : (this.id < 10 ? 'Gold' : (this.id < 13 ? 'Diamond' : 'Champion')));
 		var tier = (this.id - 1) % 3;
 		return name + ' ' + (tier == 0 ? 'III' : (tier == 1 ? 'II' : 'I'));
