@@ -196,12 +196,12 @@ var splinterlands = (function() {
 	
 	async function send_tx_wrapper(id, display_name, data, on_success) {
 		return new Promise((resolve, reject) => {
-			send_tx(id, display_name, data).then(result => {
+			send_tx(id, display_name, data).then(async result => {
 				// If there is any type of error, just return the result object
 				if(!result || !result.trx_info || !result.trx_info.success || result.error)
 					reject(result);
 				else {
-					try { resolve(on_success(new splinterlands.Transaction(result.trx_info))); }
+					try { resolve(await on_success(new splinterlands.Transaction(result.trx_info))); }
 					catch (err) { reject(err); }
 				}
 			});
@@ -448,7 +448,7 @@ var splinterlands = (function() {
 				return null;
 
 			// Check if it is allowed but the current ruleset
-			if(match.ruleset == 'Little League' && d.stats.mana > 4)
+			if(match.ruleset.includes('Little League') && d.stats.mana > 4)
 				return null;
 
 			let card = d.owned.find(o => 
@@ -473,16 +473,16 @@ var splinterlands = (function() {
 			.filter(d => d.type == 'Monster' && d.owned.length > 0 && (d.color == summoner_details.color || d.color == 'Gray' || (summoner_details.color == 'Gold' && d.color == ally_color)))
 			.map(d => {
 				// Check if it's an allowed card
-				if((match.ruleset == 'Lost Legendaries' || match.allowed_cards == 'no_legendaries') && d.rarity == 4)
+				if((match.ruleset.includes('Lost Legendaries') || match.allowed_cards == 'no_legendaries') && d.rarity == 4)
 					return;
 
-				if(match.ruleset == 'Rise of the Commons' && d.rarity > 2)
+				if(match.ruleset.includes('Rise of the Commons') && d.rarity > 2)
 					return;
 
-				if(match.ruleset == 'Taking Sides' && d.color == 'Gray')
+				if(match.ruleset.includes('Taking Sides') && d.color == 'Gray')
 					return;
 
-				if(match.ruleset == 'Little League' && d.stats.mana[0] > 4)
+				if(match.ruleset.includes('Little League') && d.stats.mana[0] > 4)
 					return;
 
 				let card = d.owned.find(o => 
@@ -494,13 +494,13 @@ var splinterlands = (function() {
 				if(card) {
 					card.capped_level = splinterlands.utils.get_monster_level(match.rating_level, summoner_card, card);
 
-					if(match.ruleset == 'Up Close & Personal' && d.stats.attack[card.capped_level - 1] == 0)
+					if(match.ruleset.includes('Up Close & Personal') && d.stats.attack[card.capped_level - 1] == 0)
 						return;
 
-					if(match.ruleset == 'Keep Your Distance' && d.stats.attack[card.capped_level - 1] > 0)
+					if(match.ruleset.includes('Keep Your Distance') && d.stats.attack[card.capped_level - 1] > 0)
 						return;
 
-					if(match.ruleset == 'Broken Arrows' && d.stats.ranged[card.capped_level - 1] > 0)
+					if(match.ruleset.includes('Broken Arrows') && d.stats.ranged[card.capped_level - 1] > 0)
 						return;
 				}
 

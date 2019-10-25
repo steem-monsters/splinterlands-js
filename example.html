@@ -116,6 +116,7 @@
 						<h5>Battle:</h5>
 						<button id="btn_practice">PRACTICE</button>
 						<button id="btn_ranked">RANKED</button>
+						<button id="btn_submit_team" style="display: none;">SUBMIT TEAM</button>
 					</div>
 				</div>
       </div>
@@ -521,16 +522,46 @@
 
 			$('#btn_practice').click(async () => {
 				try {
+					$('#btn_practice, #btn_ranked').hide();
+					ShowLoading();
+
 					await splinterlands.ops.find_match('Practice');
 					console.log('Find match transaction submitted...');
 
 					let match = await splinterlands.wait_for_match();
 					console.log(`Match found against @${match.opponent_player}!`);
 
+					HideLoading();
+					$('#btn_submit_team').show();
+
 					let result = await splinterlands.wait_for_result();
 					console.log('Battle finished!');
 					console.log(result);
-				} catch (err) { alert('Error: ' + err.error); }
+
+					HideLoading();
+
+					$('#btn_submit_team').hide();
+					$('#btn_practice, #btn_ranked').show();
+				} catch (err) { 
+					HideLoading();
+					alert('Error: ' + err.error);
+					$('#btn_submit_team').hide();
+					$('#btn_practice, #btn_ranked').show();
+				}
+			});
+
+			$('#btn_submit_team').click(async () => {
+				$('#btn_submit_team').hide();
+				let match = splinterlands.get_match();
+				let summoner = splinterlands.get_battle_summoners(match)[0];
+				let monsters = [splinterlands.get_battle_monsters(match, summoner)[0].uid];
+
+				ShowLoading();
+
+				try { 
+					await splinterlands.ops.submit_team(match, summoner.uid, monsters); 
+					console.log('Team Submitted...');
+				} catch(e) { alert('Error: ' + e.error); }
 			});
 
 			$('#btn_back').click(() => {

@@ -210,6 +210,8 @@ window.splinterlands.utils = (function() {
 		return obj;
 	}
 
+	function asset_url(path) { return splinterlands.get_settings().asset_url + path; }
+
 	let effects = {
     "Stun": {
         "ability": "Stun",
@@ -307,6 +309,7 @@ window.splinterlands.utils = (function() {
 		get_ability_image,
 		get_stat_image,
 		lookup_effect,
-		get_level
+		get_level,
+		asset_url
 	 };
 })();

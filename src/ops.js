@@ -58,12 +58,14 @@ window.splinterlands.ops = (function() {
 		});
 	}
 
-	async function submit_team(trx_id, summoner, monsters, match_type, secret) {
-		let team_hash = md5(`${summoner},${monsters.join()},${secret}`);
-		let data = { trx_id, team_hash };
+	async function submit_team(match, summoner, monsters, secret) {
+		if(!secret)
+			secret = splinterlands.utils.randomStr(10);
+
+		let data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`) };
 
 		// If it's not a tournament battle, submit and reveal the team together unless the player specifies otherwise
-		let submit_and_reveal = (match_type == 'Practice' || match_type == 'Ranked') && !splinterlands.get_player().settings.submit_hashed_team;
+		let submit_and_reveal = ['Practice', 'Ranked'].includes(match.match_type) && !splinterlands.get_player().settings.submit_hashed_team;
 
 		if(submit_and_reveal) {
 			data.summoner = summoner;
@@ -71,11 +73,26 @@ window.splinterlands.ops = (function() {
 			data.secret = secret;
 		}
 
-		return await splinterlands.send_tx('submit_team', 'Submit Team', data);
+		return splinterlands.send_tx_wrapper('submit_team', 'Submit Team', data, async tx => {
+			if(!submit_and_reveal) {
+				let cur_match = splinterlands.get_match();
+
+				if(cur_match && cur_match.id == match.id) {
+					// If the opponent already submitted their team, then we can reveal ours
+					if(cur_match.opponent_team_hash)
+						return await splinterlands.ops.team_reveal(cur_match.id, summoner, monsters, secret);
+
+					// If the opponent has not submitted their team, then queue up the team reveal operation for when they do
+					cur_match.on_opponent_submit = async () => await splinterlands.ops.team_reveal(cur_match.id, summoner, monsters, secret);
+				}
+			}
+			
+			return tx;
+		});
 	}
 
 	async function team_reveal(trx_id, summoner, monsters, secret) {
-		return await splinterlands.send_tx('team_reveal', 'Team Reveal', { trx_id, summoner, monsters, secret });
+		return splinterlands.send_tx_wrapper('team_reveal', 'Team Reveal', { trx_id, summoner, monsters, secret }, r => r);
 	}
 
 	async function cancel_match() {
@@ -87,7 +104,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function claim_season_rewards(season) {
-		return await splinterlands.send_tx_wrapper('claim_reward', 'Claim Reward', { type: 'league_season', season }, tx => tx.result.map(c => new splinterlands.Card(c)));
+		return splinterlands.send_tx_wrapper('claim_reward', 'Claim Reward', { type: 'league_season', season }, tx => tx.result.map(c => new splinterlands.Card(c)));
 
 		// TODO: Update player's card collection?
 	}

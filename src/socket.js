@@ -128,6 +128,17 @@ window.splinterlands.socket = (function() {
 
 				splinterlands.set_match(null);
 			}
+		},
+
+		opponent_submit_team: function(data) {
+			let match = splinterlands.get_match();
+
+			if(match && match.id == data.id) {
+				match = splinterlands.set_match(data);
+
+				if(match.on_opponent_submit)
+					match.on_opponent_submit(match);
+			}
 		}
 	};
 
