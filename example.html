@@ -111,6 +111,12 @@
 						<button id="btn_start_quest" style="display: none;">START QUEST</button>
 						<button id="btn_refresh_quest" style="display: none;">NEW QUEST</button>
 					</div>
+
+					<div>
+						<h5>Battle:</h5>
+						<button id="btn_practice">PRACTICE</button>
+						<button id="btn_ranked">RANKED</button>
+					</div>
 				</div>
       </div>
 
@@ -244,7 +250,7 @@
           img_td.append(card.render('xs'));
 					row.append(img_td);
 					
-					row.click(() => showCardDetails(card));
+					row.click(() => showCardDetails(card.card_detail_id, card.edition, card.gold));
 
           tbody.append(row);
         });
@@ -255,7 +261,8 @@
 				$(`#div_details_${type}`).show();
 			}
 
-			async function showCardDetails(card) {
+			async function showCardDetails(card_detail_id, edition, gold) {
+				let card = splinterlands.group_collection().find(c => c.card_detail_id == card_detail_id && c.edition == edition && c.gold == gold);
 				showDetailsDiv('cards');
 
 				$('#tbl_collection').hide();
@@ -511,6 +518,20 @@
 			}
 
 			function HideLoading() { $('.loading-backdrop').remove(); }
+
+			$('#btn_practice').click(async () => {
+				try {
+					await splinterlands.ops.find_match('Practice');
+					console.log('Find match transaction submitted...');
+
+					let match = await splinterlands.wait_for_match();
+					console.log(`Match found against @${match.opponent_player}!`);
+
+					let result = await splinterlands.wait_for_result();
+					console.log('Battle finished!');
+					console.log(result);
+				} catch (err) { alert('Error: ' + err.error); }
+			});
 
 			$('#btn_back').click(() => {
 				$('#tbl_collection').show();

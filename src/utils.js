@@ -31,6 +31,15 @@ window.splinterlands.utils = (function() {
 		return Math.max(Math.floor((Date.now() - splinterlands.get_settings().timestamp) / 3000), 0) + splinterlands.get_settings().last_block;
 	}
 
+	function get_level(xp, rarity) {
+		for(var i = 0; i < splinterlands.get_settings().xp_levels[rarity - 1].length; i++) {
+			if(xp < splinterlands.get_settings().xp_levels[rarity - 1][i])
+				return i + 1;
+		}
+	
+		return splinterlands.get_settings().xp_levels[rarity - 1].length + 1;
+	}
+
 	function get_summoner_level(rating_level, card) {
 		var rarity = splinterlands.get_card_details(card.card_detail_id).rarity;
 		var max_level = 10 - (rarity - 1) * 2;
@@ -47,7 +56,7 @@ window.splinterlands.utils = (function() {
 
 		var monster_max = 10 - (monster_rarity - 1) * 2;
 		var summoner_max = 10 - (summoner_rarity - 1) * 2;
-		return Math.min(monster.level, Math.max(Math.round(monster_max / summoner_max * summoner_level), 1));
+		return Math.min(monster_card.level, Math.max(Math.round(monster_max / summoner_max * summoner_level), 1));
 	}
 
 	function get_ecr(capture_rate, last_reward_block) {
@@ -297,6 +306,7 @@ window.splinterlands.utils = (function() {
 		validate_acct_name,
 		get_ability_image,
 		get_stat_image,
-		lookup_effect
+		lookup_effect,
+		get_level
 	 };
 })();

@@ -2,6 +2,7 @@ splinterlands.Battle = class {
 	constructor(data) {
 		Object.keys(data).forEach(k => this[k] = data[k]);
 		this.details = splinterlands.utils.try_parse(this.details);
+		this.settings = splinterlands.utils.try_parse(this.settings);
 
 		if(this.details.team1) {
 			this.details.team1.summoner = new splinterlands.Card(Object.assign(this.details.team1.summoner, { team_num: 1 }));

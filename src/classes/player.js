@@ -29,4 +29,15 @@ splinterlands.Player = class {
 	get profile_image() {
 		return `https://steemitimages.com/u/${this.name}/avatar`;
 	}
+
+	static async load(name) {
+		return await new Promise(async (resolve, reject) => {
+			let response = await splinterlands.api('/players/details', { name });
+
+			if(response.error)
+				reject(response);
+			else
+				resolve(new splinterlands.Player(response));
+		});
+	}
 }

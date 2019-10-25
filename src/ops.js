@@ -3,15 +3,24 @@ if(!window.splinterlands)
 
 window.splinterlands.ops = (function() {
 	async function combine_cards(card_ids) {
-		return await splinterlands.send_tx('combine_cards', 'Combine Cards', { cards: card_ids });
+		return splinterlands.send_tx_wrapper('combine_cards', 'Combine Cards', { cards: card_ids }, async tx => {
+			await splinterlands.load_collection();
+			return tx.result;
+		});
 	}
 
 	async function combine_all(card_detail_id, gold, edition) {
-		return await splinterlands.send_tx('combine_all', 'Combine Cards', { card_detail_id, gold, edition });
+		return splinterlands.send_tx_wrapper('combine_all', 'Combine Cards', { card_detail_id, gold, edition }, async tx => {
+			await splinterlands.load_collection();
+			return tx.result;
+		});
 	}
 
 	async function burn_cards(card_ids) {
-		return await splinterlands.send_tx('burn_cards', 'Convert to DEC', { cards: card_ids });
+		return splinterlands.send_tx_wrapper('burn_cards', 'Convert to DEC', { cards: card_ids }, async tx => {
+			await splinterlands.load_collection();
+			return tx.result;
+		});
 	}
 
 	async function convert_cards(card_ids) {
@@ -44,11 +53,9 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function find_match(match_type, opponent, settings) {
-		// Check if they have purchased the starter set if they are looking for a ranked battle
-		if(match_type == 'Ranked' && !splinterlands.get_player().starter_pack_purchase)
-			return { error: 'You must purchase the Starter Set in order to play ranked battles.' };
-
-		return await splinterlands.send_tx('find_match', 'Find Match', { match_type, opponent, settings });
+		return splinterlands.send_tx_wrapper('find_match', 'Find Match', { match_type, opponent, settings }, tx => {
+			splinterlands.set_match({ id: tx.id, status: 0 });
+		});
 	}
 
 	async function submit_team(trx_id, summoner, monsters, match_type, secret) {
@@ -80,72 +87,42 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function claim_season_rewards(season) {
-		let result = await splinterlands.send_tx('claim_reward', 'Claim Reward', { type: 'league_season', season });
-
-		// If there is any type of error, just return the result object
-		if(!result || !result.trx_info || !result.trx_info.success || result.error)
-			return result;
+		return await splinterlands.send_tx_wrapper('claim_reward', 'Claim Reward', { type: 'league_season', season }, tx => tx.result.map(c => new splinterlands.Card(c)));
 
 		// TODO: Update player's card collection?
-
-		let card_data = splinterlands.utils.try_parse(result.trx_info.result);
-
-		if(!card_data)
-			return card_data;
-
-		return { cards: card_data.map(c => new splinterlands.Card(c)) };
 	}
 
 	async function claim_quest_rewards(quest_id) {
-		let result = await splinterlands.send_tx('claim_reward', 'Claim Reward', { type: 'quest', quest_id });
+		return splinterlands.send_tx('claim_reward', 'Claim Reward', { type: 'quest', quest_id }, async r => {
+			// TODO: Update player's card collection?
 
-		// If there is any type of error, just return the result object
-		if(!result || !result.trx_info || !result.trx_info.success || result.error)
-			return result;
+			// Update current player's quest info
+			let quests = await splinterlands.api('/players/quests');
 
-		// TODO: Update player's card collection?
+			if(quests && quests.length > 0)
+				splinterlands.get_player().quest = new splinterlands.Quest(quests[0]);
 
-		// Update current player's quest info
-		let quests = await splinterlands.api('/players/quests');
-
-		if(quests && quests.length > 0)
-			splinterlands.get_player().quest = new splinterlands.Quest(quests[0]);
-
-		let card_data = splinterlands.utils.try_parse(result.trx_info.result);
-
-		if(!card_data)
-			return card_data;
-
-		return { 
-			cards: card_data.map(c => new splinterlands.Card(c)), 
-			quest: splinterlands.get_player().quest 
-		};
+			return { 
+				cards: r.map(c => new splinterlands.Card(c)), 
+				quest: splinterlands.get_player().quest 
+			};
+		});
 	}
 
 	async function start_quest() {
-		let result = await splinterlands.send_tx('start_quest', 'Start Quest', { type: 'daily' });
-
-		// If successful, update the current player's quest info
-		if(result && result.trx_info && result.trx_info.success) {
-			let new_quest = new splinterlands.Quest(splinterlands.utils.try_parse(result.trx_info.result));
+		return splinterlands.send_tx_wrapper('start_quest', 'Start Quest', { type: 'daily' }, tx => {
+			let new_quest = new splinterlands.Quest(tx.result);
 			splinterlands.get_player().quest = new_quest;
-			return { success: true, quest: new_quest };
-		}
-
-		return result;
+			return new_quest
+		});
 	}
 
 	async function refresh_quest() {
-		let result = await splinterlands.send_tx('refresh_quest', 'New Quest', { type: 'daily' });
-
-		// If successful, update the current player's quest info
-		if(result && result.trx_info && result.trx_info.success) {
-			let new_quest = new splinterlands.Quest(splinterlands.utils.try_parse(result.trx_info.result));
+		return splinterlands.send_tx_wrapper('refresh_quest', 'New Quest', { type: 'daily' }, tx => {
+			let new_quest = new splinterlands.Quest(tx.result);
 			splinterlands.get_player().quest = new_quest;
-			return { success: true, quest: new_quest };
-		}
-
-		return result;
+			return new_quest;
+		});
 	}
 
 	async function accept_challenge(id) {
@@ -157,17 +134,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function open_pack(edition) {
-		let response = await splinterlands.send_tx('open_pack', 'Open Pack', { edition });
-
-		if(!response || response.error || !response.trx_info)
-			return response;
-
-		let result = splinterlands.utils.try_parse(response.trx_info.result);
-
-		if(!result || !result.cards)
-			return { error: 'Error loading cards in pack.' };
-
-		return result.cards.map(c => new splinterlands.Card(c));
+		return splinterlands.send_tx_wrapper('open_pack', 'Open Pack', { edition }, tx => tx.result.cards.map(c => new splinterlands.Card(c)));
 	}
 
 	async function open_multi(edition, qty) {

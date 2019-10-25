@@ -84,6 +84,50 @@ window.splinterlands.socket = (function() {
 				clearTimeout(trx.timeout);
 				trx.resolve(data);
 			}
+		},
+
+		match_found: function(data) {
+			let match = splinterlands.get_match();
+
+			if(match && match.id == data.id) {
+				match = splinterlands.set_match(data);
+
+				if(match.on_match)
+					match.on_match(match);
+			}
+		},
+
+		battle_cancelled: function(data) {
+			let match = splinterlands.get_match();
+
+			if(match && match.id == data.id) {
+				if(match.on_timeout)
+					match.on_timeout({ error: 'Neither player submitted a team in the allotted time so the match has been cancelled.', code: 'match_cancelled' });
+					
+				splinterlands.set_match(null);
+			}
+		},
+
+		match_not_found: function(data) {
+			let match = splinterlands.get_match();
+
+			if(match && match.id == data.id) {
+				if(match.on_timeout)
+					match.on_timeout({ error: 'No suitable opponent could be found, please try again.', code: 'match_not_found' });
+
+				splinterlands.set_match(null);
+			}
+		},
+
+		battle_result: async function(data) {
+			let match = splinterlands.get_match();
+
+			if(match && match.id == data.id) {
+				if(match.on_result)
+					match.on_result(await splinterlands.Battle.load(data.id))
+
+				splinterlands.set_match(null);
+			}
 		}
 	};
 

@@ -9,6 +9,7 @@ splinterlands.CardDetails = class {
 	get splinter() { return this.splinter_mapping[this.color]; }
 	get available_editions() { return this.editions.split(',').map(e => parseInt(e)); }
 	get max_level() { return 10 - (this.rarity - 1) * 2; }
+	get max_xp() { return splinterlands.get_settings().xp_levels[this.rarity - 1][this.max_level - 2]; }
 
 	get splinter_mapping() {
 		return {

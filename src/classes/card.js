@@ -4,7 +4,7 @@ splinterlands.Card = class {
     this.details = splinterlands.get_card_details(this.card_detail_id);
     
     if(!this.level)
-      this.level = 1;
+      this.level = splinterlands.utils.get_level(this.xp, this.details.rarity);
 	}
 
 	get bcx() {
@@ -113,6 +113,14 @@ splinterlands.Card = class {
 
 		let cooldown_expiration = splinterlands.utils.get_cur_block_num() - splinterlands.get_settings().transfer_cooldown_blocks;
 		return this.last_transferred_block <= cooldown_expiration || this.last_used_block <= cooldown_expiration;
+	}
+
+	get transferrable() {
+		return !this.market_id && !this.delegated_to;
+	}
+
+	get combinable() {
+		return this.transferrable && this.level < this.max_level;
 	}
 
 	get stats() {
@@ -345,4 +353,41 @@ splinterlands.Card = class {
 	
 	async lore() { return await splinterlands.load_card_lore(this.card_detail_id); }
 	async market_cards() { return await splinterlands.load_market_cards(this.card_detail_id, this.gold, this.edition); }
+
+	static get_combine_result(cards) {
+		// Filter out any cards that are uncombinable (max level or on the market/delegated)
+		cards = cards.filter(c => c.combinable);
+
+		if(cards.length < 2)
+			return { error: 'Must choose two or more cards that are able to be combined.' };
+
+		cards.sort((a, b) => b.xp - a.xp);
+		let first_card = cards.shift();
+		let gold = first_card.gold;
+		let total = first_card.xp;
+		let cards_to_combine = [];
+
+		for(let i = 0; i < cards.length; i++) {
+			let card = cards[i];
+			cards_to_combine.push(card);
+			total += card.xp;
+
+			// Get the XP for each base card (gold cards start with XP so don't need to add XP for the base card)
+			if(!gold)
+				total += card.base_xp;
+
+			// Stop combining if we got to max level
+			if(total >= card.details.max_xp)
+				break;
+		}
+
+		return new splinterlands.Card({ 
+			uid: first_card.uid, 
+			card_detail_id: first_card.card_detail_id, 
+			xp: total, 
+			edition: first_card.edition, 
+			gold: gold,
+			count: cards_to_combine.length + 1
+		});
+	}
 }

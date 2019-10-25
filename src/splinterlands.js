@@ -10,6 +10,7 @@ var splinterlands = (function() {
 	let _collection = [];
 	let _browser_id = null;
 	let _session_id = null;
+	let _match = null;
 
 	async function init(config) { 
 		_config = config;
@@ -191,7 +192,21 @@ var splinterlands = (function() {
     _player = null;
     _collection = null;
 		splinterlands.socket.close();
-  }
+	}
+	
+	async function send_tx_wrapper(id, display_name, data, on_success) {
+		return new Promise((resolve, reject) => {
+			send_tx(id, display_name, data).then(result => {
+				// If there is any type of error, just return the result object
+				if(!result || !result.trx_info || !result.trx_info.success || result.error)
+					reject(result);
+				else {
+					try { resolve(on_success(new splinterlands.Transaction(result.trx_info))); }
+					catch (err) { reject(err); }
+				}
+			});
+		});
+	}
 
 	async function send_tx(id, display_name, data, retries) {
 		if(!retries) retries = 0;
@@ -335,6 +350,7 @@ var splinterlands = (function() {
 			player = _player.name;
 
 		_collection = (await api(`/cards/collection/${player}`)).cards.map(c => new splinterlands.Card(c));
+		_collection_grouped = null;
 		return _collection;
 	}
 
@@ -421,70 +437,70 @@ var splinterlands = (function() {
 		return group_collection().filter(c => c.card_detail_id == card_detail_id);
 	}
 
-	function get_battle_summoners(inactive_splinters, allowed_cards, ruleset, match_type, rating_level) {
+	function get_battle_summoners(match) {
 		return group_collection(_collection, true).filter(d => d.type == 'Summoner' && d.owned.length > 0).map(d => {
 			// Check if the splinter is inactive for this battle
-			if(inactive_splinters.includes(d.color))
+			if(match.inactive.includes(d.color))
 				return null;
 
 			// Check if it's an allowed card
-			if(['no_legendaries', 'no_legendary_summoners'].includes(allowed_cards) && d.rarity == 4)
+			if(['no_legendaries', 'no_legendary_summoners'].includes(match.allowed_cards) && d.rarity == 4)
 				return null;
 
 			// Check if it is allowed but the current ruleset
-			if(ruleset == 'Little League' && d.stats.mana > 4)
+			if(match.ruleset == 'Little League' && d.stats.mana > 4)
 				return null;
 
 			let card = d.owned.find(o => 
-				(allowed_cards != 'gold_only' || o.gold) && 
-				(allowed_cards != 'alpha_only' || o.edition == 0) &&
-				(match_type != 'Ranked' || splinterlands.utils.is_playable(o)) && 
+				(match.allowed_cards != 'gold_only' || o.gold) && 
+				(match.allowed_cards != 'alpha_only' || o.edition == 0) &&
+				(match.match_type != 'Ranked' || o.playable) && 
 				(!o.delegated_to || o.delegated_to == _player.name));
 
 			if(card) {
 				card = Object.assign({}, card);
-				card.level = splinterlands.utils.get_summoner_level(rating_level, card);
+				card.level = splinterlands.utils.get_summoner_level(match.rating_level, card);
 			}
 
 			return card;
 		}).filter(c => c);
 	}
 
-	function get_battle_monsters(allowed_cards, ruleset, match_type, rating_level, summoner_card, ally_color) {
+	function get_battle_monsters(match, summoner_card, ally_color) {
 		let summoner_details = get_card_details(summoner_card.card_detail_id);
 
 		return group_collection(_collection, true)
 			.filter(d => d.type == 'Monster' && d.owned.length > 0 && (d.color == summoner_details.color || d.color == 'Gray' || (summoner_details.color == 'Gold' && d.color == ally_color)))
 			.map(d => {
 				// Check if it's an allowed card
-				if((ruleset == 'Lost Legendaries' || allowed_cards == 'no_legendaries') && d.rarity == 4)
+				if((match.ruleset == 'Lost Legendaries' || match.allowed_cards == 'no_legendaries') && d.rarity == 4)
 					return;
 
-				if(ruleset == 'Rise of the Commons' && d.rarity > 2)
+				if(match.ruleset == 'Rise of the Commons' && d.rarity > 2)
 					return;
 
-				if(ruleset == 'Taking Sides' && d.color == 'Gray')
+				if(match.ruleset == 'Taking Sides' && d.color == 'Gray')
 					return;
 
-				if(ruleset == 'Little League' && d.stats.mana[0] > 4)
+				if(match.ruleset == 'Little League' && d.stats.mana[0] > 4)
 					return;
 
 				let card = d.owned.find(o => 
-					(allowed_cards != 'gold_only' || o.gold) && 
-					(allowed_cards != 'alpha_only' || o.edition == 0) &&
-					(match_type != 'Ranked' || splinterlands.utils.is_playable(o)) && 
+					(match.allowed_cards != 'gold_only' || o.gold) && 
+					(match.allowed_cards != 'alpha_only' || o.edition == 0) &&
+					(match.match_type != 'Ranked' || o.playable) && 
 					(!o.delegated_to || o.delegated_to == _player.name));
 
 				if(card) {
-					card.capped_level = splinterlands.utils.get_monster_level(rating_level, summoner_card, card);
+					card.capped_level = splinterlands.utils.get_monster_level(match.rating_level, summoner_card, card);
 
-					if(ruleset == 'Up Close & Personal' && d.stats.attack[card.capped_level - 1] == 0)
+					if(match.ruleset == 'Up Close & Personal' && d.stats.attack[card.capped_level - 1] == 0)
 						return;
 
-					if(ruleset == 'Keep Your Distance' && d.stats.attack[card.capped_level - 1] > 0)
+					if(match.ruleset == 'Keep Your Distance' && d.stats.attack[card.capped_level - 1] > 0)
 						return;
 
-					if(ruleset == 'Broken Arrows' && d.stats.ranged[card.capped_level - 1] > 0)
+					if(match.ruleset == 'Broken Arrows' && d.stats.ranged[card.capped_level - 1] > 0)
 						return;
 				}
 
@@ -535,15 +551,63 @@ var splinterlands = (function() {
 		} catch(err) { return 0; }
 	}
 
+	function set_match(match_data) {
+		if(!match_data) {
+			_match = null;
+			return;
+		}
+
+		_match = _match ? _match.update(match_data) : new splinterlands.Match(match_data);
+		return _match;
+	}
+	
+	function wait_for_match() {
+		return new Promise((resolve, reject) => {
+			if(!_match) {
+				reject({ error: 'Player is not currently looking for a match.', code: 'not_looking_for_match' });
+				return;
+			}
+
+			// Player has already been matched with an opponent
+			if(_match.status == 1) {
+				resolve(_match);
+				return;
+			}
+
+			_match.on_match = resolve;
+			_match.on_timeout = reject;
+		});
+	}
+
+	function wait_for_result() {
+		return new Promise((resolve, reject) => {
+			if(!_match) {
+				reject({ error: 'Player is not currently in a match.', code: 'not_in_match' });
+				return;
+			}
+
+			// The battle is already resolved
+			if(_match.status == 2) {
+				resolve(_match);
+				return;
+			}
+
+			_match.on_result = resolve;
+			_match.on_timeout = reject;
+		});
+	}
+
 	return { 
-		init, api, login, logout, send_tx, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
+		init, api, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
 		log_event, load_market, send_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code,
-		load_market_cards, load_card_lore, group_collection_by_card, get_available_packs, get_potions,
+		load_market_cards, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result,
 		get_settings: () => _settings,
 		get_player: () => _player,
 		get_market: () => _market,
 		get_collection: () => _collection,
 		get_transaction: (sm_id) => _transactions[sm_id],
-		use_keychain: () => _use_keychain
+		use_keychain: () => _use_keychain,
+		get_match: () => _match,
+		set_match
 	};
 })();
