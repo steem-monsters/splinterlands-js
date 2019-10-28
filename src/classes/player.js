@@ -30,6 +30,8 @@ splinterlands.Player = class {
 		return `https://steemitimages.com/u/${this.name}/avatar`;
 	}
 
+	async recent_teams() { return await splinterlands.api('/players/recent_teams', { player: this.name }); }
+
 	static async load(name) {
 		return await new Promise(async (resolve, reject) => {
 			let response = await splinterlands.api('/players/details', { name });
