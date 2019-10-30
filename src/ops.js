@@ -96,11 +96,11 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function cancel_match() {
-		return await splinterlands.send_tx('cancel_match', 'Cancel Match');
+		return splinterlands.send_tx_wrapper('cancel_match', 'Cancel Match', null, r => r);
 	}
 
 	async function surrender(battle_queue_id) {
-		return await splinterlands.send_tx('surrender', 'Surrender', { battle_queue_id });
+		return splinterlands.send_tx_wrapper('surrender', 'Surrender', { battle_queue_id }, r => r);
 	}
 
 	async function claim_season_rewards(season) {
