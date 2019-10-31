@@ -5,13 +5,13 @@ splinterlands.Battle = class {
 		this.settings = splinterlands.utils.try_parse(this.settings);
 
 		if(this.details.team1) {
-			this.details.team1.summoner = new splinterlands.Card(Object.assign(this.details.team1.summoner, { team_num: 1 }));
-			this.details.team1.monsters = this.details.team1.monsters.map(m => new splinterlands.Card(Object.assign(m, { team_num: 1 })));
+			this.details.team1.summoner = new splinterlands.BattleCard(Object.assign(this.details.team1.summoner, { team_num: 1 }));
+			this.details.team1.monsters = this.details.team1.monsters.map(m => new splinterlands.BattleCard(Object.assign(m, { team_num: 1 })));
 		}
 
 		if(this.details.team2) {
-			this.details.team2.summoner = new splinterlands.Card(Object.assign(this.details.team2.summoner, { team_num: 2 }));
-			this.details.team2.monsters = this.details.team2.monsters.map(m => new splinterlands.Card(Object.assign(m, { team_num: 1 })));
+			this.details.team2.summoner = new splinterlands.BattleCard(Object.assign(this.details.team2.summoner, { team_num: 2 }));
+			this.details.team2.monsters = this.details.team2.monsters.map(m => new splinterlands.BattleCard(Object.assign(m, { team_num: 1 })));
 		}
 	}
 
