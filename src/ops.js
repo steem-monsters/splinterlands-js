@@ -110,7 +110,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function claim_quest_rewards(quest_id) {
-		return splinterlands.send_tx('claim_reward', 'Claim Reward', { type: 'quest', quest_id }, async r => {
+		return splinterlands.send_tx_wrapper('claim_reward', 'Claim Reward', { type: 'quest', quest_id }, async r => {
 			// TODO: Update player's card collection?
 
 			// Update current player's quest info
