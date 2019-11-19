@@ -32,7 +32,17 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function gift_cards(card_ids, to) {
-		return await splinterlands.send_tx('gift_cards', 'Transfer Cards', { cards: card_ids, to });
+		return splinterlands.send_tx_wrapper('gift_cards', 'Transfer Cards', { cards: card_ids, to }, async tx => {
+			await splinterlands.load_collection();
+			return tx.result;
+		});
+	}
+
+	async function delegate_cards(card_ids, to) {
+		return splinterlands.send_tx_wrapper('delegate_cards', 'Delegate Cards', { cards: card_ids, to }, async tx => {
+			await splinterlands.load_collection();
+			return tx.result;
+		});
 	}
 
 	async function token_transfer(to, qty, data) {
@@ -45,7 +55,10 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function sell_cards(card_ids, price) {
-		return await splinterlands.send_tx('sell_cards', 'Sell Cards', { cards: card_ids, price, currency: 'USD', fee_pct: splinterlands.get_settings().market_fee });
+		return await splinterlands.send_tx_wrapper('sell_cards', 'Sell Cards', { cards: card_ids, price, currency: 'USD', fee_pct: splinterlands.get_settings().market_fee }, async tx => {
+			await splinterlands.load_collection();
+			return tx.result;
+		});
 	}
 
 	async function cancel_sell(market_id) {
@@ -165,6 +178,7 @@ window.splinterlands.ops = (function() {
 		burn_cards,
 		add_wallet,
 		gift_cards,
+		delegate_cards,
 		token_transfer,
 		sell_cards,
 		cancel_sell,

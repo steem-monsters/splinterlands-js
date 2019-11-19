@@ -187,6 +187,11 @@ window.splinterlands.utils = (function() {
 		return { available: true };
 	}
 
+	async function account_exists(name) {
+		let existing_account = await steem.api.getAccountsAsync([name]);
+		return existing_account && existing_account.length > 0;
+	}
+
 	function get_ability_image(ability, small) {
 		return `https://s3.amazonaws.com/steemmonsters/website/abilities${small ? '/small' : ''}/ability_${ability.toLowerCase().replace(' ', '-')}.png`;
 	}
@@ -306,6 +311,7 @@ window.splinterlands.utils = (function() {
 		param,
 		try_parse,
 		validate_acct_name,
+		account_exists,
 		get_ability_image,
 		get_stat_image,
 		lookup_effect,

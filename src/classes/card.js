@@ -188,6 +188,11 @@ splinterlands.Card = class {
 			return (splinterlands.get_settings().transfer_cooldown_blocks - (last_block - this.last_used_block)) * 3;
 	}
 
+	get suggested_price() {
+		let market_card = splinterlands.get_market().find(c => c.card_detail_id == this.details.id && c.gold == this.gold && c.edition == this.edition);
+		return market_card ? (market_card.low_price_bcx * this.bcx).toFixed(2) : 'Not Available';
+	}
+
   get is_alpha() { return this.edition == 0 || (this.edition == 2 && this.details.id < 100); }
   get max_level() { return this.details.max_level; }
   
