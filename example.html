@@ -75,12 +75,12 @@
       </div>
 
       <div id="div_game" style="display: none;">
-        <div class="py-3">
-					Logged in as: 
-					<img id="player_profile_img" style="height: 30px; width: 30px; border-radius: 15px;" />
-					@<span id="span_username"></span>
+        <div class="py-3" style="display: flex;">
+					<div style="margin-right: 20px;">Logged in as: </div>
+					<div id="player_avatar" style="margin-right: 20px;"></div>
+					<div>@<span id="span_username"></span></div>
 
-					<div style="display: flex;">
+					<div style="display: flex; margin: 0 30px;">
 						<div id="guild_crest"></div>
 						<div id="guild_name"></div>
 					</div>
@@ -214,7 +214,9 @@
         $('#div_login').hide();
         $('#div_game').show();
 				$('#span_username').text(player.name);
-				$('#player_profile_img').attr('src', player.profile_image);
+				//$('#player_profile_img').attr('src', player.profile_image);
+
+				$('#player_avatar').append(player.render_avatar(40));
 
 				if(player.guild) {
 					$('#guild_crest').append(player.guild.render_crest(30));

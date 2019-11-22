@@ -25,11 +25,17 @@ splinterlands.League = class {
 
 	get name() {
 		if(this.id == 0)
+			return this.group_name;
+			
+		var tier = (this.id - 1) % 3;
+		return this.group_name + ' ' + (tier == 0 ? 'III' : (tier == 1 ? 'II' : 'I'));
+	}
+
+	get group_name() {
+		if(this.id == 0)
 			return 'Novice';
 			
-		var name = this.id < 4 ? 'Bronze' : (this.id < 7 ? 'Silver' : (this.id < 10 ? 'Gold' : (this.id < 13 ? 'Diamond' : 'Champion')));
-		var tier = (this.id - 1) % 3;
-		return name + ' ' + (tier == 0 ? 'III' : (tier == 1 ? 'II' : 'I'));
+		return this.id < 4 ? 'Bronze' : (this.id < 7 ? 'Silver' : (this.id < 10 ? 'Gold' : (this.id < 13 ? 'Diamond' : 'Champion')));
 	}
 
 	get image() {

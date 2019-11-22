@@ -30,6 +30,30 @@ splinterlands.Player = class {
 		return `https://steemitimages.com/u/${this.name}/avatar`;
 	}
 
+	get avatar_frame() {
+		return `https://steemmonsters.s3.amazonaws.com/website/icons/avatars/avatar-frame_${this.league.group_name.toLowerCase()}.png`
+	}
+
+	render_avatar(size) {
+		let avatar = document.createElement('div');
+
+		let frame_img = document.createElement('img');
+		frame_img.setAttribute('src', this.avatar_frame);
+		frame_img.setAttribute('style', `height: ${size}px;`);
+		avatar.appendChild(frame_img);
+
+		let avatar_container = document.createElement('div');
+		avatar_container.setAttribute('class', 'sl-rel-pos');
+
+		let avatar_img = document.createElement('img');
+		avatar_img.setAttribute('src', this.profile_image);
+		avatar_img.setAttribute('style', `height: ${(size * 0.667).toFixed(2)}px; width: ${(size * 0.667).toFixed(2)}px; border-radius: ${(size * 0.667).toFixed()}px; position: absolute; left: ${(size / 6).toFixed(2)}px; top: -${(size * (5/6)).toFixed(2)}px;`);
+		avatar_container.appendChild(avatar_img);
+		avatar.appendChild(avatar_container);
+		
+		return avatar;
+	}
+
 	async recent_teams() { return await splinterlands.api('/players/recent_teams', { player: this.name }); }
 
 	static async load(name) {
