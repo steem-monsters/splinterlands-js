@@ -324,7 +324,7 @@ splinterlands.Card = class {
   }
 
   get image_url() {
-		return ((this.edition == 1 || this.edition == 3) ? BETA_CARD_URL : ALPHA_CARD_URL) +
+		return CARD_URLS[this.edition] +
 			(this.skin ? this.skin + '/' : '') +
 			encodeURIComponent(this.details.name) +
 			(this.gold ? '_gold' : '') +
@@ -332,9 +332,7 @@ splinterlands.Card = class {
 	}
 
 	get image_url_battle() {
-		let edition = (this.edition == 1 || this.edition == 3) ? 1 : 0;
-
-		return BATTLE_CARD_URLS[edition] +
+		return BATTLE_CARD_URLS[this.edition] +
 			(this.skin ? this.skin + '/' : '') +
 			encodeURIComponent(this.details.name) +
 			(this.gold ? '_gold' : '') +

@@ -9,7 +9,7 @@
 			$(() =>	setTimeout(init, 500));
 
 			async function init() {
-				await splinterlands.init({ api_url: 'https://testnet.steemmonsters.io', ws_url: 'wss://sm-ws.mrosen.com' });
+				await splinterlands.init({ api_url: 'https://untamed.steemmonsters.io', ws_url: 'wss://untamed-ws.steemmonsters.io' });
 				//await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
 
 				if(splinterlands.has_saved_login())

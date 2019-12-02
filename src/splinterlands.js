@@ -128,6 +128,10 @@ var splinterlands = (function() {
 		if(username.startsWith('@')) 
 			username = username.substr(1);
 
+		// They are logging in with an email address
+		if(username.includes('@'))
+			return await email_login(username, key);
+
 		// Use the keychain extension if no private key is specified for login
 		_use_keychain = !key;
 
@@ -184,7 +188,11 @@ var splinterlands = (function() {
 		await load_collection();
 
 		return _player;
-  }
+	}
+	
+	async function reset_password(email) {
+		return await api('/players/forgot_password', { email });
+	}
   
   function logout() {
     localStorage.removeItem('splinterlands:username');
@@ -508,26 +516,26 @@ var splinterlands = (function() {
 			}).filter(c => c);
 	}
 
-	async function create_account_email(username, email, password, is_test) {
-		// Start a new purchase
-		let purchase = await api('/purchases/start', { player: is_test ? '$TEST' : '', type: 'starter_pack', qty: 1, currency: 'STEEM' });
-
+	async function create_account_email(username, email, password, subscribe) {
 		// Generate a key pair based on the email and password
 		let password_pub_key = steem.auth.getPrivateKeys(email, password).ownerPubkey;
 
 		let params = { 
-			purchase_id: purchase.uid,
+			purchase_id: 'new-' + splinterlands.utils.randomStr(6),	// We need to set a purchase ID even though not making a purchase for backwards compatibility
 			name: username, 
 			email: email, 
-			password_pub_key: password_pub_key
+			password_pub_key: password_pub_key,
+			subscribe: subscribe,
+			is_test: splinterlands.get_settings().test_acct_creation,
+			ref: localStorage.getItem('ref')
 		};
 
 		let response = await api('/players/create_email', params);
 
-		if(response && response.success)
-			splinterlands.socket.connect(_config.ws_url, username, null, true);
+		if(response && !response.error)
+			return await email_login(email, password);
 
-		return response && response.success ? params : response;
+		return response;
 	}
 
 	async function redeem_promo_code(code, purchase_id) {
@@ -608,7 +616,7 @@ var splinterlands = (function() {
 
 	return { 
 		init, api, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
-		log_event, load_market, send_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code,
+		log_event, load_market, send_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password,
 		load_market_cards, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
 		get_settings: () => _settings,
 		get_player: () => _player,
