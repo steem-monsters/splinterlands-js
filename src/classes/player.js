@@ -32,7 +32,14 @@ splinterlands.Player = class {
 
 	get avatar_frame() {
 		return `https://steemmonsters.s3.amazonaws.com/website/icons/avatars/avatar-frame_${this.league.group_name.toLowerCase()}.png`
-	}
+  }
+  
+  get quest_rewards() { 
+    if(!this.quest)
+      return null;
+
+    return this.quest.rewards(this.league.id);
+  }
 
 	render_avatar(size) {
 		let avatar = document.createElement('div');
