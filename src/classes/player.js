@@ -62,6 +62,15 @@ splinterlands.Player = class {
 		return avatar;
 	}
 
+	async update_avatar(avatar_id) { 
+		let response = await splinterlands.api('/players/set_avatar', { avatar_id }); 
+
+		if(response && response.success)
+			this.avatar_id = avatar_id;
+
+		return response;
+	}
+
 	async recent_teams() { return await splinterlands.api('/players/recent_teams', { player: this.name }); }
 
 	async last_team() {
