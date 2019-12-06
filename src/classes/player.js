@@ -27,7 +27,8 @@ splinterlands.Player = class {
 	}
 
 	get profile_image() {
-		return `https://steemitimages.com/u/${this.name}/avatar`;
+		return `${splinterlands.get_config().api_url}/players/avatar/${this.name}`;
+		//return `https://steemitimages.com/u/${this.name}/avatar`;
 	}
 
 	get avatar_frame() {
@@ -39,7 +40,7 @@ splinterlands.Player = class {
       return null;
 
     return this.quest.rewards(this.league.id);
-  }
+	}
 
 	render_avatar(size) {
 		let avatar = document.createElement('div');
@@ -62,6 +63,18 @@ splinterlands.Player = class {
 	}
 
 	async recent_teams() { return await splinterlands.api('/players/recent_teams', { player: this.name }); }
+
+	async last_team() {
+		let teams = await this.recent_teams();
+
+		if(!teams || teams.length == 0) 
+			return null;
+
+		let team = teams[0];
+		team.summoner = new splinterlands.Card(team.summoner);
+		team.monsters = team.monsters.map(m => new splinterlands.Card(m));
+		return team;
+	}
 
 	static async load(name) {
 		return await new Promise(async (resolve, reject) => {
