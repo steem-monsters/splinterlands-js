@@ -83,7 +83,8 @@ window.splinterlands.socket = (function() {
 			if(trx) {
 				clearTimeout(trx.timeout);
 				trx.resolve(data);
-			}
+			} else
+				window.dispatchEvent(new CustomEvent('splinterlands:purchase_complete', { detail: data }));
 		},
 
 		match_found: function(data) {

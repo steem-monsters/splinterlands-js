@@ -291,25 +291,14 @@ var splinterlands = (function() {
 		}
 	}
 
-	async function send_payment(to, amount, currency, id, data) {
-		id = splinterlands.utils.format_tx_id(id);
-
-		try { data = splinterlands.utils.format_tx_data(data); }
-		catch(err) {
-			log_event('tx_length_exceeded', { type: id });
-			return { success: false, error: err.toString() };
-		}
-
+	async function steem_payment(to, amount, currency, memo) {
 		let token = splinterlands.utils.get_token(currency);
-		let memo = JSON.stringify([id, data]);
 
 		switch(token.type) {
 			case 'steem':
 				if(_use_keychain) {
 					var result = await new Promise(resolve => steem_keychain.requestTransfer(_player.name, to, parseFloat(amount).toFixed(3), memo, currency, response => resolve(response)));
-
-					if(!result.success)
-						return { success: false, error: result.error };
+					return !result.success ? { success: false, error: result.error } : result;
 				} else {
 					let sc_url = `https://v2.steemconnect.com/sign/transfer?to=${to}&amount=${parseFloat(amount).toFixed(3)}%20${currency}&memo=${encodeURIComponent(memo)}`;
 					splinterlands.utils.popup_center(sc_url, `${currency} Payment`, 500, 560);
@@ -317,18 +306,10 @@ var splinterlands = (function() {
 				break;
 			case 'steem_engine':
 				var result = await splinterlands.utils.steem_engine_transfer(to, currency, amount, memo);
-
-				if(!result.success)
-						return { success: false, error: result.error };
-				break;
-			case 'tron':
-				break;
+				return !result.success ? { success: false, error: result.error } : result;
 			case 'internal':
-				return await splinterlands.ops.token_transfer(to, amount, data);
+				return await splinterlands.ops.token_transfer(to, amount, splinterlands.utils.tryParse(memo));
 		}
-
-		// Start waiting for the transaction to be picked up by the server
-		return await check_tx(data.sm_id, 120 * 1000);
 	}
 
 	function check_tx(sm_id, timeout) {
@@ -616,7 +597,7 @@ var splinterlands = (function() {
 
 	return { 
 		init, api, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
-		log_event, load_market, send_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password,
+		log_event, load_market, steem_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password,
 		load_market_cards, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
 		get_config: () => _config,
 		get_settings: () => _settings,

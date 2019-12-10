@@ -22,6 +22,13 @@ window.splinterlands.utils = (function() {
 		'https://s3.amazonaws.com/steemmonsters/cards_battle_mobile/'
 	];
 
+	function parse_payment(payment_str) {
+		return {
+			amount: parseFloat(payment_str),
+			currency: payment_str.substr(payment_str.indexOf(' ') + 1)
+		}
+	}
+
 	function randomStr(length) {
     var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
         retVal = "";
@@ -322,6 +329,7 @@ window.splinterlands.utils = (function() {
 		get_stat_image,
 		lookup_effect,
 		get_level,
-		asset_url
+		asset_url,
+		parse_payment
 	 };
 })();

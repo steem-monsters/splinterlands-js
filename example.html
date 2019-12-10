@@ -37,6 +37,10 @@
 			window.addEventListener('splinterlands:version_change', e => {
 				alert(`New Version - ${e.detail}!`);
 			}, false);
+
+			window.addEventListener('splinterlands:purchase_complete', e => {
+				alert(`Purchase Complete - ${JSON.stringify(e.detail, null, 2)}!`);
+			}, false);
 		</script>
 
 		<style type="text/css">
