@@ -99,6 +99,9 @@ var splinterlands = (function() {
 	}
 
 	async function email_login(email, password) {
+		// Make sure the email address is all lowercase
+		email = email.toLowerCase();
+		
 		let params = { email };
 		let password_key = steem.auth.getPrivateKeys(email, password).owner;
 
@@ -498,6 +501,9 @@ var splinterlands = (function() {
 	}
 
 	async function create_account_email(username, email, password, subscribe) {
+		// Make sure the email address is all lowercase
+		email = email.toLowerCase();
+
 		// Generate a key pair based on the email and password
 		let password_pub_key = steem.auth.getPrivateKeys(email, password).ownerPubkey;
 
