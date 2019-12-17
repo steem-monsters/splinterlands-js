@@ -7,6 +7,8 @@ splinterlands.Player = class {
 
 		if(data.guild)
 			this.guild = new splinterlands.Guild(data.guild);
+		else if(data.guild_id)
+			this.guild = new splinterlands.Guild({ id: data.guild_id, name: data.guild_name, data: data.guild_data });
 	}
 
 	async load_balances() {
