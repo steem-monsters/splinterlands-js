@@ -101,7 +101,7 @@ var splinterlands = (function() {
 	async function email_login(email, password) {
 		// Make sure the email address is all lowercase
 		email = email.toLowerCase();
-		
+
 		let params = { email };
 		let password_key = steem.auth.getPrivateKeys(email, password).owner;
 
@@ -602,7 +602,13 @@ var splinterlands = (function() {
 	}
 
 	async function get_leaderboard(season) {
-		return (await api('/players/leaderboard', { season })).map(p => new splinterlands.Player(p));
+		let leaderboard = await api('/players/leaderboard_with_player', { season });
+
+		if(leaderboard.leaderboard)
+			leaderboard.leaderboard = leaderboard.leaderboard.map(p => new splinterlands.Player(p));
+
+		leaderboard.player = leaderboard.player ? new splinterlands.Player(leaderboard.player) : _player;
+		return leaderboard;
 	}
 
 	return { 
