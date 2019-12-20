@@ -24,6 +24,17 @@ splinterlands.Player = class {
 		return balance ? parseFloat(balance.balance) : 0;
 	}
 
+	async refresh() {
+		let data = await splinterlands.api('/players/refresh');
+		Object.keys(data).forEach(k => this[k] = data[k]);
+
+		this.league = new splinterlands.League(data.rating);
+		this.quest = new splinterlands.Quest(data.quest || {});
+
+		if(data.guild)
+			this.guild = new splinterlands.Guild(data.guild);
+	}
+
 	get ecr() {
 		return Math.min((isNaN(parseInt(this.capture_rate)) ? 10000 : this.capture_rate) + (splinterlands.get_settings().last_block - this.last_reward_block) * splinterlands.get_settings().dec.ecr_regen_rate, 10000);
 	}
@@ -62,6 +73,14 @@ splinterlands.Player = class {
 		avatar.appendChild(avatar_container);
 		
 		return avatar;
+	}
+
+	async get_wallets() {
+		return await splinterlands.api('/players/wallets');
+	}
+
+	async get_referrals() {
+		return await splinterlands.api('/players/referrals');
 	}
 
 	async update_avatar(avatar_id) { 

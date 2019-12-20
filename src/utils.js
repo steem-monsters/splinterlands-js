@@ -228,6 +228,17 @@ window.splinterlands.utils = (function() {
 		return obj;
 	}
 
+	function get_abilities() {
+		if(!_abilities[0].img) {
+			_abilities.forEach(a => {
+				a.img = `https://s3.amazonaws.com/steemmonsters/website/abilities/ability_${a.name.toLowerCase().replace(/\s/g, '-')}.png`;
+				a.img_sm = `https://s3.amazonaws.com/steemmonsters/website/abilities/small/ability_${a.name.toLowerCase().replace(/\s/g, '-')}.png`;
+			});
+		}
+
+		return _abilities;
+	}
+
 	function asset_url(path) { return splinterlands.get_settings().asset_url + path; }
 
 	let effects = {
@@ -306,7 +317,230 @@ window.splinterlands.utils = (function() {
 				"pastTense": "Headwinds",
 				"desc": "-1 to RANGED ATTACK"
     }
-};
+	};
+
+	let _abilities = [
+		{
+			"name": "Affliction",
+			"desc": "When a Monster with Affliction hits a target, it has a chance of applying Affliction on the target causing it to be unable to be healed.",
+			"effect_name": "Afflicted",
+			"effect_desc": "This monster may not be healed."
+		},
+		{
+			"name": "Blast",
+			"desc": "Does additional damage to Monsters adjacent to the target Monster."
+		},
+		{
+			"name": "Blind",
+			"desc": "All enemy Melee & Ranged attacks have an increased chance of missing their target.",
+			"effect_name": "Blinded",
+			"effect_desc": "Reduced chance of hitting with MELEE and RANGED attacks."
+		},
+		{
+			"name": "Cleanse",
+			"desc": "Removes all negative effects on the Monster in the first position on the friendly team."
+		},
+		{
+			"name": "Demoralize",
+			"desc": "Reduces the Melee attack of all enemy Monsters.",
+			"effect_name": "Demoralized",
+			"effect_desc": "-1 to MELEE ATTACK"
+		},
+		{
+			"name": "Divine Shield",
+			"desc": "The first time the Monster takes damage it is ignored.",
+			"effect_name": "Shielded",
+			"effect_desc": "The first time this monster takes damage it is ignored."
+		},
+		{
+			"name": "Dodge",
+			"desc": "Has an increased chance of evading Melee or Ranged attacks."
+		},
+		{
+			"name": "Double Strike",
+			"desc": "Monster attacks twice each round."
+		},
+		{
+			"name": "Enrage",
+			"desc": "Has increased Melee attack and Speed when damaged.",
+			"effect_name": "Enraged",
+			"effect_desc": "Enraged monsters get increased speed and attack damage when not at full health."
+		},
+		{
+			"name": "Flying",
+			"desc": "Has an increased chance of evading Melee or Ranged attacks from Monsters who do not have the Flying ability."
+		},
+		{
+			"name": "Headwinds",
+			"desc": "Reduces the Ranged attack of all enemy Monsters.",
+			"effect_name": "Headwinds",
+			"effect_desc": "-1 to RANGED ATTACK"
+		},
+		{
+			"name": "Heal",
+			"desc": "Restores a portion of the Monster's health each round."
+		},
+		{
+			"name": "Tank Heal",
+			"desc": "Restores a portion of the Monster in the first position's health each round."
+		},
+		{
+			"name": "Inspire",
+			"desc": "Gives all friendly Monsters +1 Melee attack.",
+			"effect_name": "Inspired",
+			"effect_desc": "+1 to MELEE ATTACK"
+		},
+		{
+			"name": "Knock Out",
+			"desc": "Does double damage when attacking an enemy that is stunned."
+		},
+		{
+			"name": "Last Stand",
+			"desc": "Gains increased stats if it's the only Monster on the team alive.",
+			"effect_name": "Last Stand",
+			"effect_desc": "+50% to all stats"
+		},
+		{
+			"name": "Life Leech",
+			"desc": "Monster's health increases each time it damages an enemy Monster's health in proportion to the damage dealt."
+		},
+		{
+			"name": "Magic Reflect",
+			"desc": "When hit with Magic damage, does reduced Magic damage back to the attacker."
+		},
+		{
+			"name": "Opportunity",
+			"desc": "Monsters with the Opportunity ability may attack from any position and will target the enemy Monster with the lowest health."
+		},
+		{
+			"name": "Piercing",
+			"desc": "If Melee or Ranged attack damage is in excess of the target's Armor, the remainder will damage the target's Health."
+		},
+		{
+			"name": "Poison",
+			"desc": "Attacks have a chance to apply poison, which does automatic damage to the target at the beginning of each round after the poison is applied.",
+			"effect_name": "Poisoned",
+			"effect_desc": "Poisoned monsters take 2 damage at the start of each round."
+		},
+		{
+			"name": "Protect",
+			"desc": "All friendly Monsters gain +2 Armor.",
+			"effect_name": "Protected",
+			"effect_desc": "+2 to ARMOR"
+		},
+		{
+			"name": "Reach",
+			"desc": "Melee attack Monsters with the Reach ability may attack from the second position on the team."
+		},
+		{
+			"name": "Redemption",
+			"desc": "When this Monster dies, it does 2 damage to all enemy monsters."
+		},
+		{
+			"name": "Repair",
+			"desc": "Restores some armor to the friendly Monster whose armor has taken the most damage."
+		},
+		{
+			"name": "Resurrect",
+			"desc": "When a friendly Monster dies it is brought back to life with 1 Health. This ability can only trigger once per battle."
+		},
+		{
+			"name": "Retaliate",
+			"desc": "When hit with a Melee attack, Monsters with Retaliate have a chance of attacking their attacker."
+		},
+		{
+			"name": "Return Fire",
+			"desc": "When hit with a Ranged attack, Monsters with Return Fire will return reduced damage back to their attacker."
+		},
+		{
+			"name": "Rust",
+			"desc": "Reduces the Armor of all enemy Monsters.",
+			"effect_name": "Rusted",
+			"effect_desc": "-2 Armor"
+		},
+		{
+			"name": "Scavenger",
+			"desc": "Gains 1 max health each time any monster dies."
+		},
+		{
+			"name": "Shatter",
+			"desc": "Target's armor is destroyed when hit by an attack from Monsters with Shatter."
+		},
+		{
+			"name": "Shield",
+			"desc": "Reduced damage from Melee and Ranged attacks."
+		},
+		{
+			"name": "Silence",
+			"desc": "Reduces the Magic Attack of all enemy Monsters.",
+			"effect_name": "Silenced",
+			"effect_desc": "-1 to MAGIC ATTACK"
+		},
+		{
+			"name": "Slow",
+			"desc": "Reduces the Speed of all enemy Monsters.",
+			"effect_name": "Slowed",
+			"effect_desc": "-1 to SPEED"
+		},
+		{
+			"name": "Snare",
+			"desc": "When attacking enemies with Flying, removes the Flying ability and cannot miss.",
+			"effect_name": "Snared",
+			"effect_desc": "Loses the Flying ability"
+		},
+		{
+			"name": "Sneak",
+			"desc": "Targets the last Monster on the enemy Team instead of the first Monster."
+		},
+		{
+			"name": "Snipe",
+			"desc": "Targets enemy Monsters with Ranged, Magic, or no attack that are not in the first position."
+		},
+		{
+			"name": "Strengthen",
+			"desc": "All friendly Monsters have increased Health.",
+			"effect_name": "Strengthened",
+			"effect_desc": "+1 to HEALTH"
+		},
+		{
+			"name": "Stun",
+			"desc": "When a Monster with Stun hits a target, it has a chance to stun the target causing it to skip its next turn.",
+			"effect_name": "Stunned",
+			"effect_desc": "Stunned monsters skip their next turn."
+		},
+		{
+			"name": "Swiftness",
+			"desc": "All friendly Monsters have increased Speed.",
+			"effect_name": "Swiftened",
+			"effect_desc": "+1 to SPEED"
+		},
+		{
+			"name": "Taunt",
+			"desc": "All enemy Monsters target this Monster (if they are able to)."
+		},
+		{
+			"name": "Thorns",
+			"desc": "When hit with a Melee attack, does damage back to the attacker."
+		},
+		{
+			"name": "Trample",
+			"desc": "When a Monster with Trample hits and kills its target, it will perform another attack on the next Monster on the enemy Team."
+		},
+		{
+			"name": "Triage",
+			"desc": "Heals the friendly back-line Monster that has taken the most damage."
+		},
+		{
+			"name": "Void",
+			"desc": "Reduced damage from Magic attacks."
+		},
+		{
+			"name": "Weaken",
+			"desc": "Reduces the Health of all enemy Monsters.",
+			"effect_name": "Weakened",
+			"effect_desc": "-1 to HEALTH"
+		}
+	];
 
 	return { 
 		randomStr, 
@@ -330,6 +564,7 @@ window.splinterlands.utils = (function() {
 		lookup_effect,
 		get_level,
 		asset_url,
-		parse_payment
+		parse_payment,
+		get_abilities
 	 };
 })();
