@@ -54,6 +54,12 @@ splinterlands.Guild = class {
 		return await splinterlands.api('/guilds/members', { guild_id: this.id });
 	}
 
+	async get_chat() {
+		let history = await splinterlands.api('/players/chat_history', { guild_id: this.id });
+		history.forEach(h => h.player = new splinterlands.Player(h.player));
+		return history;
+	}
+
 	render_crest(size) {
 		let banners = ['black', 'blue', 'gold', 'green', 'mint', 'orange', 'pink', 'purple', 'red', 'silver', 'teal', 'yellow'];
 		let banner = banners.includes(this.crest.banner) ? this.crest.banner : 'black';

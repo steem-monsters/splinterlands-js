@@ -611,11 +611,17 @@ var splinterlands = (function() {
 		return leaderboard;
 	}
 
+	async function get_global_chat() {
+		let history = await api('/players/chat_history');
+		history.forEach(h => h.player = new splinterlands.Player(h.player));
+		return history;
+	}
+
 	return { 
 		init, api, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
 		log_event, load_market, steem_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password,
 		load_market_cards, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
-		get_leaderboard,
+		get_leaderboard, get_global_chat,
 		get_config: () => _config,
 		get_settings: () => _settings,
 		get_player: () => _player,

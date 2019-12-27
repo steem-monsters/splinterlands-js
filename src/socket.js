@@ -140,8 +140,26 @@ window.splinterlands.socket = (function() {
 				if(match.on_opponent_submit)
 					match.on_opponent_submit(match);
 			}
+		},
+
+		guild_chat: function(data) {
+			if(data.player_info) {
+				data.player = new splinterlands.Player(data.player_info);
+				delete data['player_info'];
+			}
+
+			window.dispatchEvent(new CustomEvent('splinterlands:chat_message', { detail: Object.assign({ type: 'guild' }, data) }));
+		},
+
+		global_chat: function(data) {
+			if(data.player_info) {
+				data.player = new splinterlands.Player(data.player_info);
+				delete data['player_info'];
+			}
+			
+			window.dispatchEvent(new CustomEvent('splinterlands:chat_message', { detail: Object.assign({ type: 'global' }, data) }));
 		}
 	};
 
-	return { connect, close };
+	return { connect, close, send };
 })();

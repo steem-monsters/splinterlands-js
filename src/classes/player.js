@@ -116,4 +116,20 @@ splinterlands.Player = class {
 				resolve(new splinterlands.Player(response));
 		});
 	}
+
+	send_chat(message, is_global) {
+		splinterlands.socket.send({ 
+			type: 'post_chat_msg',
+			guild_id: is_global ? 'global' : this.guild.id, 
+			message: message
+		});
+	}
+
+	subscribe_global_chat(subscribe) {
+		splinterlands.socket.send({ 
+			type: 'subscribe',
+			room: 'global',
+			subscribe
+		});
+	}
 }
