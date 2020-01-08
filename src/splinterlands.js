@@ -343,6 +343,13 @@ var splinterlands = (function() {
 
 		_collection = (await api(`/cards/collection/${player}`)).cards.map(c => new splinterlands.Card(c));
 		_collection_grouped = null;
+
+		// If this is the current player's collection, add any "starter" cards
+		if(player == _player.name) {
+			get_card_details().filter(d => d.rarity < 3 && d.available_editions.includes(_player.starter_edition) && !_collection.find(c => c.card_detail_id == d.id))
+				.forEach(c => _collection.push(splinterlands.utils.get_starter_card(c.id, _player.starter_edition)));
+		}
+
 		return _collection;
 	}
 
@@ -387,7 +394,7 @@ var splinterlands = (function() {
 		// Group the cards in the collection by card_detail_id, edition, and gold foil
 		_cards.forEach(details => {
 			if(id_only) {
-				grouped.push(Object.assign({ card_detail_id: details.id, owned: collection.filter(o => o.card_detail_id == details.id) }, details));	 
+				grouped.push(new splinterlands.CardDetails(Object.assign({ card_detail_id: details.id, owned: collection.filter(o => o.card_detail_id == details.id) }, details)));	 
 			} else {
 				details.available_editions.forEach(edition => {
           let reg_cards = collection.filter(o => o.card_detail_id == details.id && o.gold == false && o.edition == parseInt(edition));
@@ -446,8 +453,12 @@ var splinterlands = (function() {
 			let card = d.owned.find(o => 
 				(match.allowed_cards != 'gold_only' || o.gold) && 
 				(match.allowed_cards != 'alpha_only' || o.edition == 0) &&
-				(match.match_type != 'Ranked' || o.playable) && 
+				(match.match_type == 'Ranked' ? o.playable_ranked : o.playable) &&
 				(!o.delegated_to || o.delegated_to == _player.name));
+
+			// Add "starter" card
+			if(!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.rarity < 3 && d.available_editions.includes(_player.starter_edition))
+				card = splinterlands.utils.get_starter_card(d.id, _player.starter_edition);
 
 			if(card) {
 				card = Object.assign({}, card);
@@ -477,11 +488,21 @@ var splinterlands = (function() {
 				if(match.ruleset.includes('Little League') && d.stats.mana[0] > 4)
 					return;
 
+				if(match.ruleset.includes('Even Stevens') && d.stats.mana[0] % 2 == 1)
+					return;
+
+				if(match.ruleset.includes('Odd Ones Out') && d.stats.mana[0] % 2 == 0)
+					return;
+
 				let card = d.owned.find(o => 
 					(match.allowed_cards != 'gold_only' || o.gold) && 
 					(match.allowed_cards != 'alpha_only' || o.edition == 0) &&
-					(match.match_type != 'Ranked' || o.playable) && 
+					(match.match_type == 'Ranked' ? o.playable_ranked : o.playable) &&
 					(!o.delegated_to || o.delegated_to == _player.name));
+
+				// Add "starter" card
+				if(!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.rarity < 3 && d.available_editions.includes(_player.starter_edition))
+					card = splinterlands.utils.get_starter_card(d.id, _player.starter_edition);
 
 				if(card) {
 					card.capped_level = splinterlands.utils.get_monster_level(match.rating_level, summoner_card, card);

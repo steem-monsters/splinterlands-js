@@ -239,6 +239,16 @@ window.splinterlands.utils = (function() {
 		return _abilities;
 	}
 
+	function get_starter_card(id, edition) {
+		return new splinterlands.Card({
+			uid: `starter-${id}-${randomStr(5)}`,
+			card_detail_id: id,
+			gold: false,
+			xp: edition == 4 ? 1 : 0,
+			edition: edition
+		});
+	}
+
 	function asset_url(path) { return splinterlands.get_settings().asset_url + path; }
 
 	let effects = {
@@ -565,6 +575,7 @@ window.splinterlands.utils = (function() {
 		get_level,
 		asset_url,
 		parse_payment,
-		get_abilities
+		get_abilities,
+		get_starter_card
 	 };
 })();

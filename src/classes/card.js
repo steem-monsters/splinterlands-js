@@ -4,7 +4,10 @@ splinterlands.Card = class {
     this.details = splinterlands.get_card_details(this.card_detail_id);
     
     if(!this.level)
-      this.level = splinterlands.utils.get_level(this.xp, this.details.rarity);
+			this.level = splinterlands.utils.get_level(this.xp, this.details.rarity);
+			
+		if(!this.alpha_xp)
+			this.alpha_xp = 0
 	}
 
 	get bcx() {
@@ -23,7 +26,15 @@ splinterlands.Card = class {
 		this._base_xp = splinterlands.get_settings()[xp_property][this.details.rarity - 1];
 
 		return this._base_xp;
-  }
+	}
+	
+	get max_xp() { 
+		if(this.edition == 4) {
+			let rates = splinterlands.get_settings()[this.gold ? 'combine_rates_gold' : 'combine_rates'][this.details.rarity - 1];
+			return rates[rates.length - 1];
+		} else
+			return splinterlands.get_settings().xp_levels[this.details.rarity - 1][this.details.max_level - 2]; 
+	}
   
   get next_level_progress() {
     if(this._next_level_progress)
@@ -68,11 +79,12 @@ splinterlands.Card = class {
 
 		let alpha_bcx = 0, alpha_dec = 0;
 		let xp = Math.max(this.xp - this.alpha_xp, 0);
+		let burn_rate = splinterlands.get_settings().dec[this.edition == 4 ? 'untamed_burn_rate' : 'burn_rate'][this.details.rarity - 1];
 	
 		if(this.alpha_xp) {
 			let alpha_bcx_xp = splinterlands.get_settings()[this.gold ? 'gold_xp' : 'alpha_xp'][this.details.rarity - 1];
 			alpha_bcx = Math.max(this.gold ? this.alpha_xp / alpha_bcx_xp : this.alpha_xp / alpha_bcx_xp, 1);
-			alpha_dec = splinterlands.get_settings().dec.burn_rate[this.details.rarity - 1] * alpha_bcx * splinterlands.get_settings().dec.alpha_burn_bonus;
+			alpha_dec = burn_rate * alpha_bcx * splinterlands.get_settings().dec.alpha_burn_bonus;
 	
 			if(this.gold)
 				alpha_dec *= splinterlands.get_settings().dec.gold_burn_bonus;
@@ -80,10 +92,13 @@ splinterlands.Card = class {
 	
 		let bcx = Math.max(this.gold ? xp / this.base_xp : (xp + this.base_xp) / this.base_xp, 1);
 	
+		if(this.edition == 4)
+			bcx = this.xp;
+
 		if(this.alpha_xp)
 			bcx--;
 	
-		let dec = splinterlands.get_settings().dec.burn_rate[this.details.rarity - 1] * bcx;
+		let dec = burn_rate * bcx;
 	
 		if(this.gold)
 			dec *= splinterlands.get_settings().dec.gold_burn_bonus;
@@ -97,7 +112,7 @@ splinterlands.Card = class {
 		let total_dec = dec + alpha_dec;
 		
 		// Give a bonus if burning a max level card
-		if(this.xp >= splinterlands.get_settings().xp_levels[this.details.rarity - 1][splinterlands.get_settings().xp_levels[this.details.rarity - 1].length - 1])
+		if(this.xp >= this.max_xp)
 			total_dec *= splinterlands.get_settings().dec.max_burn_bonus;
 	
 		this._dec = total_dec;
@@ -105,12 +120,25 @@ splinterlands.Card = class {
 	}
 
 	get playable() {
+		// If it's listed for sale on the market it's not playable
 		if(this.market_id)
 			return false;
 
+		// If it's delegated to another player it's not playable
+		if(this.delegated_to && this.delegated_to != splinterlands.get_player().name)
+			return false;
+	}
+
+	// Is the card playable in ranked battles?
+	get playable_ranked() {
+		if(!this.playable)
+			return false;
+
+		// If it hasn't been transferred or used in battle recently it's playable
 		if(!this.last_transferred_block || !this.last_used_block)
 			return true;
 
+		// There is a 7 day cooldown period after a card has been transferred before it can be played in ranked battles
 		let cooldown_expiration = splinterlands.utils.get_cur_block_num() - splinterlands.get_settings().transfer_cooldown_blocks;
 		return this.last_transferred_block <= cooldown_expiration || this.last_used_block <= cooldown_expiration;
 	}
@@ -376,11 +404,11 @@ splinterlands.Card = class {
 			total += card.xp;
 
 			// Get the XP for each base card (gold cards start with XP so don't need to add XP for the base card)
-			if(!gold)
+			if(!gold && edition < 4)
 				total += card.base_xp;
 
 			// Stop combining if we got to max level
-			if(total >= card.details.max_xp)
+			if(total >= card.max_xp)
 				break;
 		}
 
@@ -393,4 +421,6 @@ splinterlands.Card = class {
 			count: cards_to_combine.length + 1
 		});
 	}
+
+	get is_starter() { return this.uid.startsWith('starter-'); }
 }

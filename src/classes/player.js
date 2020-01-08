@@ -55,6 +55,13 @@ splinterlands.Player = class {
     return this.quest.rewards(this.league.id);
 	}
 
+	get starter_edition() {
+		if(!this._starter_edition)
+			this._starter_edition = (new Date(this.join_date) < new Date(splinterlands.get_settings().untamed_edition_date)) ? 1 : 4;
+
+		return this._starter_edition;
+	}
+
 	render_avatar(size) {
 		let avatar = document.createElement('div');
 
