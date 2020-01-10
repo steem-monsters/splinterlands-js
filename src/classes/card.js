@@ -356,7 +356,7 @@ splinterlands.Card = class {
   get image_url() {
 		return CARD_URLS[this.edition] +
 			(this.skin ? this.skin + '/' : '') +
-			encodeURIComponent(this.details.name) +
+			encodeURIComponent(this.details.name.replace(/'/g, '')) +
 			(this.gold ? '_gold' : '') +
 			'.png';
 	}
@@ -364,7 +364,7 @@ splinterlands.Card = class {
 	get image_url_battle() {
 		return BATTLE_CARD_URLS[this.edition] +
 			(this.skin ? this.skin + '/' : '') +
-			encodeURIComponent(this.details.name) +
+			encodeURIComponent(this.details.name.replace(/'/g, '')) +
 			(this.gold ? '_gold' : '') +
 			'.png';
 	}
@@ -373,13 +373,13 @@ splinterlands.Card = class {
 		if(this.details.type == 'Summoner') {
 			return SUMMONER_CARD_URL_MOBILE + 
 				(this.team_num == 2 ? 'Right/' : 'Left/') + 
-				encodeURIComponent(this.details.name) + '.png';
+				encodeURIComponent(this.details.name.replace(/'/g, '')) + '.png';
 		}
 
 		let edition = (this.edition == 1 || this.edition == 3) ? 1 : 0;
 
 		return BATTLE_CARD_URLS_MOBILE[edition] +
-			encodeURIComponent(this.details.name) +
+			encodeURIComponent(this.details.name.replace(/'/g, '')) +
 			(this.gold ? '_gold' : '') +
 			'.png';
 	}
