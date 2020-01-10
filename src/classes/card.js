@@ -127,6 +127,8 @@ splinterlands.Card = class {
 		// If it's delegated to another player it's not playable
 		if(this.delegated_to && this.delegated_to != splinterlands.get_player().name)
 			return false;
+
+		return true;
 	}
 
 	// Is the card playable in ranked battles?
