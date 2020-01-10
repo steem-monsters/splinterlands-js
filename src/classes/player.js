@@ -5,6 +5,9 @@ splinterlands.Player = class {
     this.league = new splinterlands.League(data.rating);
 		this.quest = new splinterlands.Quest(data.quest || {});
 
+		if(!this.name && this.player)
+			this.name = this.player;
+
 		if(data.guild)
 			this.guild = new splinterlands.Guild(data.guild);
 		else if(data.guild_id)
