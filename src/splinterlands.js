@@ -141,7 +141,7 @@ var splinterlands = (function() {
 		if(_use_keychain && !window.steem_keychain)
 			return { success: false, error: 'Missing private posting key.' };
 
-		let params = { name: username, ref: localStorage.getItem('splinterlands:ref') };
+		let params = { name: username, ref: localStorage.getItem('splinterlands:ref'), ts: Date.now() };
 
 		if(!_use_keychain) {
 			if(key.startsWith('STM'))
@@ -158,6 +158,11 @@ var splinterlands = (function() {
 			// Sign the login request using the provided private key
 			params.ts = Date.now();
 			params.sig = eosjs_ecc.sign(username + params.ts, key);
+		} else {
+			params.sig = await new Promise(resolve => steem_keychain.requestSignBuffer(username, username + params.ts, 'Posting', r => resolve(r.result)));
+
+			if(!params.sig)
+				return { success: false, error: 'Unable to log in with account @' + username };
 		}
 
 		// Get the encrypted access token from the server
@@ -165,16 +170,6 @@ var splinterlands = (function() {
 
 		if(!response || response.error)
 			return { success: false, error: 'Login Error: ' + response.error };
-
-		if(_use_keychain) {
-			// Request that the keychain extension decrypt the token
-			let keychain_response = await new Promise(resolve => steem_keychain.requestVerifyKey(username, response.token, 'Posting', r => resolve(r)));
-
-			if(!keychain_response || !keychain_response.success)
-				return { success: false, error: `The login attempt for account @${username} was unsuccessful.` };
-
-			response.token = keychain_response.result.startsWith('#') ? keychain_response.result.substr(1) : keychain_response.result;
-		}
 
 		_player = new splinterlands.Player(response);
 

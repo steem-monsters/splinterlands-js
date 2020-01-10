@@ -158,6 +158,19 @@ window.splinterlands.socket = (function() {
 			}
 			
 			window.dispatchEvent(new CustomEvent('splinterlands:chat_message', { detail: Object.assign({ type: 'global' }, data) }));
+		},
+
+		balance_update: function(data) {
+			let balance = splinterlands.get_player().balances.find(b => b.token == data.token);
+
+			// Update the balance record for the current player
+			if(balance)
+				balance.balance = parseFloat(data.balance_end);
+			else
+				splinterlands.get_player().balances.push({ player: data.player, token: data.token, balance: parseFloat(data.balance_end) });
+
+			// Emit a balance_update event
+			window.dispatchEvent(new CustomEvent('splinterlands:balance_update', { detail: data }));
 		}
 	};
 
