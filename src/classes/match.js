@@ -16,6 +16,6 @@ splinterlands.Match = class {
 	}
 
 	get ruleset_images() {
-		return this.ruleset.map(r => splinterlands.utils.asset_url(`website/icons/rulesets/img_combat-rule_${r.toLowerCase().replace(/\s/g, '_')}.png`));
+		return this.ruleset.map(r => splinterlands.utils.asset_url(`website/icons/rulesets/img_combat-rule_${r.toLowerCase().replace(/[^a-zA-Z]+/g, '_')}.png`));
 	}
 }
