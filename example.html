@@ -96,6 +96,7 @@
 					<div class="py-1">
 						<h5>Balances:</h5>
 						<div>DEC: <span id="span_balance_dec"></span></div>
+						<div>UNTAMED: <span id="span_balance_untamed"></span></div>
 						<div>BETA: <span id="span_balance_beta"></span></div>
 						<div>ALPHA: <span id="span_balance_alpha"></span></div>
 						<div>ORB: <span id="span_balance_orb"></span></div>
@@ -160,6 +161,7 @@
 								<th>Next Lvl</th>
 								<th>DEC</th>
 								<th>Status</th>
+								<th>Card ID</th>
 							</thead>
 							<tbody></tbody>
 						</table>
@@ -227,7 +229,7 @@
 					$('#guild_name').text(player.guild.name);
 				}
 
-        ['DEC', 'BETA', 'ALPHA', 'ORB'].forEach(async token => {
+        ['DEC', 'UNTAMED', 'BETA', 'ALPHA', 'ORB'].forEach(async token => {
           let balance = await player.get_balance(token);
           $(`#span_balance_${token.toLowerCase()}`).text(balance);
 				});
@@ -303,6 +305,7 @@
 
 					row.append(`<td>${c.dec}</td>`);
 					row.append(`<td></td>`);
+					row.append(`<td>${c.uid}</td>`);
 
 					tbody.append(row);
 				});

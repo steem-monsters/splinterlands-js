@@ -33,6 +33,13 @@ window.splinterlands.ops = (function() {
 
 	async function gift_cards(card_ids, to) {
 		return splinterlands.send_tx_wrapper('gift_cards', 'Transfer Cards', { cards: card_ids, to }, async tx => {
+			await splinterlands.get_player().load_balances();
+			return tx.result;
+		});
+	}
+
+	async function send_packs(edition, qty, to) {
+		return splinterlands.send_tx_wrapper('gift_packs', 'Transfer Packs', { edition, qty, to }, async tx => {
 			await splinterlands.load_collection();
 			return tx.result;
 		});
@@ -178,6 +185,7 @@ window.splinterlands.ops = (function() {
 		burn_cards,
 		add_wallet,
 		gift_cards,
+		send_packs,
 		delegate_cards,
 		token_transfer,
 		sell_cards,
