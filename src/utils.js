@@ -44,13 +44,24 @@ window.splinterlands.utils = (function() {
 		return Math.max(Math.floor((Date.now() - splinterlands.get_settings().timestamp) / 3000), 0) + splinterlands.get_settings().last_block;
 	}
 
-	function get_level(xp, rarity) {
-		for(var i = 0; i < splinterlands.get_settings().xp_levels[rarity - 1].length; i++) {
-			if(xp < splinterlands.get_settings().xp_levels[rarity - 1][i])
-				return i + 1;
+	function get_level(card) {
+		if(card.edition == 4) {
+			let rates = splinterlands.get_settings()[card.gold ? 'combine_rates_gold' : 'combine_rates'][card.details.rarity - 1];
+
+			for(let i = 0; i < rates.length; i++) {
+				if(rates[i] > card.xp)
+					return i;
+			}
+
+			return card.details.max_level;
+		} else {
+			for(var i = 0; i < splinterlands.get_settings().xp_levels[card.details.rarity - 1].length; i++) {
+				if(card.xp < splinterlands.get_settings().xp_levels[card.details.rarity - 1][i])
+					return i + 1;
+			}
+		
+			return splinterlands.get_settings().xp_levels[card.details.rarity - 1].length + 1;
 		}
-	
-		return splinterlands.get_settings().xp_levels[rarity - 1].length + 1;
 	}
 
 	function get_summoner_level(rating_level, card) {
@@ -161,7 +172,7 @@ window.splinterlands.utils = (function() {
   }
   
   function get_edition_str(edition) {
-    return ['Alpha', 'Beta', 'Promo', 'Reward'][edition];
+    return ['Alpha', 'Beta', 'Promo', 'Reward', 'Untamed'][edition];
 	}
 	
 	function param(object) {

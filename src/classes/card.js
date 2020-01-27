@@ -4,7 +4,7 @@ splinterlands.Card = class {
     this.details = splinterlands.get_card_details(this.card_detail_id);
     
     if(!this.level)
-			this.level = splinterlands.utils.get_level(this.xp, this.details.rarity);
+			this.level = splinterlands.utils.get_level(this);
 			
 		if(!this.alpha_xp)
 			this.alpha_xp = 0
@@ -14,7 +14,7 @@ splinterlands.Card = class {
 		if(this._bcx)
 			return this._bcx;
 
-		this._bcx = Math.floor(Math.max(this.gold ? this.xp / this.base_xp : (this.xp + this.base_xp) / this.base_xp, 1));
+		this._bcx = (this.edition == 4) ? this.xp : Math.floor(Math.max(this.gold ? this.xp / this.base_xp : (this.xp + this.base_xp) / this.base_xp, 1));
 		return this._bcx;
 	}
 
@@ -50,27 +50,43 @@ splinterlands.Card = class {
       return this._next_level_progress;
     }
 
-    let bcx = this.gold ? this.bcx : Math.max(this.bcx - 1, 0);
-    let xp_levels = splinterlands.get_settings().xp_levels[this.details.rarity - 1];
-    let next_lvl_bcx = Math.ceil(xp_levels[this.level - 1] / this.base_xp);
-    let cur_lvl_bcx = this.level <= 1 ? 0 : Math.ceil(xp_levels[this.level - 2] / this.base_xp);
+		if(this.edition == 4) {
+			let rates = splinterlands.get_settings()[this.gold ? 'combine_rates_gold' : 'combine_rates'][this.details.rarity - 1];
 
-    this._next_level_progress = { 
-      current: bcx - cur_lvl_bcx || 0, 
-      total: next_lvl_bcx - cur_lvl_bcx, 
-      progress: ((bcx - cur_lvl_bcx) || 0) / (next_lvl_bcx - cur_lvl_bcx) * 100
-    };
+			this._next_level_progress = { 
+				current: this.bcx - rates[this.level - 1] || 0, 
+				total: rates[this.level] - rates[this.level - 1],
+				progress: (this.bcx - rates[this.level - 1] || 0) / (rates[this.level] - rates[this.level - 1]) * 100
+			};
+		} else {
+			let bcx = this.gold ? this.bcx : Math.max(this.bcx - 1, 0);
+			let xp_levels = splinterlands.get_settings().xp_levels[this.details.rarity - 1];
+			let next_lvl_bcx = Math.ceil(xp_levels[this.level - 1] / this.base_xp);
+			let cur_lvl_bcx = this.level <= 1 ? 0 : Math.ceil(xp_levels[this.level - 2] / this.base_xp);
+
+			this._next_level_progress = { 
+				current: bcx - cur_lvl_bcx || 0, 
+				total: next_lvl_bcx - cur_lvl_bcx, 
+				progress: ((bcx - cur_lvl_bcx) || 0) / (next_lvl_bcx - cur_lvl_bcx) * 100
+			};
+		}
 
     return this._next_level_progress;
 	}
 	
 	cards_to_level(level) {
-		let gold_na = [3, 2, 2, 1];
-		let xp_levels = splinterlands.get_settings().xp_levels[this.details.rarity - 1];
+		if(this.edition == 4) {
+			let rates = splinterlands.get_settings()[this.gold ? 'combine_rates_gold' : 'combine_rates'][this.details.rarity - 1];
+			let cards = rates[level - 1];
+			return cards <= 0 ? 'N/A' : cards;
+		} else {
+			let gold_na = [3, 2, 2, 1];
+			let xp_levels = splinterlands.get_settings().xp_levels[this.details.rarity - 1];
 
-		return this.gold ? 
-			(level <= gold_na[this.details.rarity - 1] ? 0 : Math.ceil(xp_levels[level - 2] / this.base_xp)) : 
-			(level == 1 ? 1 : Math.ceil(xp_levels[level - 2] / this.base_xp) + 1);
+			return this.gold ? 
+				(level <= gold_na[this.details.rarity - 1] ? 0 : Math.ceil(xp_levels[level - 2] / this.base_xp)) : 
+				(level == 1 ? 1 : Math.ceil(xp_levels[level - 2] / this.base_xp) + 1);
+		}
 	}
 
 	get dec() {	

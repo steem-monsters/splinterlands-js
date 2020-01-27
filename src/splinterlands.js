@@ -510,6 +510,9 @@ var splinterlands = (function() {
 
 					if(match.ruleset.includes('Broken Arrows') && d.stats.ranged[card.capped_level - 1] > 0)
 						return;
+
+					if(match.ruleset.includes('Lost Magic') && d.stats.magic[card.capped_level - 1] > 0)
+						return;
 				}
 
 				return card;
