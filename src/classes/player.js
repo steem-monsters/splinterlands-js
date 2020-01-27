@@ -27,6 +27,11 @@ splinterlands.Player = class {
 		return balance ? parseFloat(balance.balance) : 0;
 	}
 
+	balance(token) {
+		let balance = this.balances.find(b => b.token == token);
+		return balance ? parseFloat(balance.balance) : 0;
+	}
+
 	async refresh() {
 		let data = await splinterlands.api('/players/refresh');
 		Object.keys(data).forEach(k => this[k] = data[k]);

@@ -355,7 +355,7 @@ var splinterlands = (function() {
 
 	async function get_potions() {
 		if(_potions.length == 0)
-			_potions = (await api('/purchases/items')).map(p => new splinterlands.Potion(p));
+			_potions = splinterlands.get_settings().potions.map(p => new splinterlands.Potion(p));
 
 		return _potions;
 	}
