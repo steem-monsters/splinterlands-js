@@ -10,4 +10,9 @@ splinterlands.Potion = class {
 	get image_url() {
 		return `https://s3.amazonaws.com/steemmonsters/website/ui_elements/shop/potions/potion_${this.id}.png`;
 	}
+
+	static async get_active(type) {
+		let potions = await splinterlands.get_potions();
+		return potions.find(p => p.id == type);
+	}
 }
