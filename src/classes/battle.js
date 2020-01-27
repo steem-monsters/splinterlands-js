@@ -24,6 +24,12 @@ splinterlands.Battle = class {
 		this.ruleset = this.ruleset.split('|');
 		this.rating_level = this.settings ? this.settings.rating_level : null;
 		this.allowed_cards = this.settings ? this.settings.allowed_cards : null;
+
+		if(data.player_1_data)
+			this.player1 = new splinterlands.Player(data.player_1_data);
+
+		if(data.player_2_data)
+			this.player2 = new splinterlands.Player(data.player_2_data);
 	}
 	
 	get ruleset_images() {

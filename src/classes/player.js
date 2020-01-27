@@ -8,10 +8,10 @@ splinterlands.Player = class {
 		if(!this.name && this.player)
 			this.name = this.player;
 
-		if(data.guild)
+		if(data.guild && typeof data.guild == 'object')
 			this.guild = new splinterlands.Guild(data.guild);
-		else if(data.guild_id)
-			this.guild = new splinterlands.Guild({ id: data.guild_id, name: data.guild_name, data: data.guild_data });
+		else if(data.guild_id || (data.guild && typeof data.guild == 'string'))
+			this.guild = new splinterlands.Guild({ id: data.guild_id || data.guild, name: data.guild_name, data: data.guild_data });
 	}
 
 	async load_balances() {
