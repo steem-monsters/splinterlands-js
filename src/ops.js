@@ -124,7 +124,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function claim_season_rewards(season) {
-		return splinterlands.send_tx_wrapper('claim_reward', 'Claim Reward', { type: 'league_season', season }, tx => tx.result.map(c => new splinterlands.Card(c)));
+		return splinterlands.send_tx_wrapper('claim_reward', 'Claim Reward', { type: 'league_season', season }, tx => tx.result.cards.map(c => new splinterlands.Card(c)));
 
 		// TODO: Update player's card collection?
 	}
@@ -140,7 +140,7 @@ window.splinterlands.ops = (function() {
 				splinterlands.get_player().quest = new splinterlands.Quest(quests[0]);
 
 			return { 
-				cards: tx.result.map(c => new splinterlands.Card(c)), 
+				cards: tx.result.cards.map(c => new splinterlands.Card(c)), 
 				quest: splinterlands.get_player().quest 
 			};
 		});
