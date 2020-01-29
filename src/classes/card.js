@@ -422,7 +422,7 @@ splinterlands.Card = class {
 			total += card.xp;
 
 			// Get the XP for each base card (gold cards start with XP so don't need to add XP for the base card)
-			if(!gold && edition < 4)
+			if(!gold && card.edition < 4)
 				total += card.base_xp;
 
 			// Stop combining if we got to max level

@@ -234,6 +234,12 @@ window.splinterlands.utils = (function() {
 
 	function lookup_effect(effect) { 
 		let obj = effects[effect];
+		
+		if(!obj) {
+			console.log('*** CANNOT FIND EFFECT: ' + effect);
+			return {};
+		}
+
 		obj.img = `https://s3.amazonaws.com/steemmonsters/website/abilities/ability_${obj.ability.toLowerCase().replace(/\s/g, '-')}.png`;
 		obj.img_sm = `https://s3.amazonaws.com/steemmonsters/website/abilities/small/ability_${obj.ability.toLowerCase().replace(/\s/g, '-')}.png`;
 		return obj;
