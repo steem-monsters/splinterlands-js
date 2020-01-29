@@ -6,6 +6,7 @@ window.splinterlands.socket = (function() {
 	let _ws = null;
 	let _ping_interval = null;
 	let _session_id = null;
+	let _connected = false;
 
 	function connect(url, player, token, new_account) {
 		// Make sure we don't already have an open connection
@@ -19,7 +20,10 @@ window.splinterlands.socket = (function() {
 		_ws = new WebSocket(_url);
 		console.log('Opening socket connection...');
 
-		_ws.onopen = function () { 
+		_ws.onopen = function () {
+			_connected = true;
+			window.dispatchEvent(new CustomEvent('splinterlands:socket_connect', { detail: { url, player, new_account } }));
+
 			if(new_account)
 				send({ type: 'new_account', player: player, session_id: _session_id });
 			else
@@ -59,6 +63,11 @@ window.splinterlands.socket = (function() {
 	function on_close(e) {
 		console.log('Socket closed...');
 		console.log(e);
+
+		if(_connected) 
+			window.dispatchEvent(new CustomEvent('splinterlands:socket_disconnect', { detail: { e } }));
+
+		_connected = false;
 
 		if(splinterlands.get_player())
 			setTimeout(() => connect(_url, splinterlands.get_player().name, splinterlands.get_player().token), 1000);

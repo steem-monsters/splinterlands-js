@@ -41,6 +41,14 @@
 			window.addEventListener('splinterlands:purchase_complete', e => {
 				alert(`Purchase Complete - ${JSON.stringify(e.detail, null, 2)}!`);
 			}, false);
+
+			window.addEventListener('splinterlands:socket_connect', e => {
+				console.log(`Socket Connect - ${e.detail}!`);
+			}, false);
+
+			window.addEventListener('splinterlands:socket_disconnect', e => {
+				console.log(`Socket Disconnect - ${e.detail}!`);
+			}, false);
 		</script>
 
 		<style type="text/css">
