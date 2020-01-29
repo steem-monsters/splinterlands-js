@@ -1,6 +1,9 @@
 splinterlands.Potion = class {
 	constructor(data) {
 		Object.keys(data).forEach(k => this[k] = data[k]);
+
+		if(!data.subtype)
+			this.subtype = this.id;
 	}
 
 	get charges_remaining() {
