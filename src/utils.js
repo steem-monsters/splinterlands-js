@@ -343,7 +343,22 @@ window.splinterlands.utils = (function() {
         "ability": "Headwinds",
 				"pastTense": "Headwinds",
 				"desc": "-1 to RANGED ATTACK"
-    }
+		},
+		"Snared": {
+			"ability": "Snare",
+			"pastTense": "Snared",
+			"desc": "Loses the Flying ability"
+		},
+		"Rusted": {
+			"ability": "Rust",
+			"pastTense": "Rusted",
+			"desc": "-2 Armor"
+		},
+		"Last Stand": {
+			"ability": "Last Stand",
+			"pastTense": "Last Stand",
+			"desc": "+50% to all stats"
+		}
 	};
 
 	let _abilities = [
