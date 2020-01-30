@@ -180,6 +180,11 @@ window.splinterlands.socket = (function() {
 
 			// Emit a balance_update event
 			window.dispatchEvent(new CustomEvent('splinterlands:balance_update', { detail: data }));
+		},
+
+		quest_progress: function(data) {
+			splinterlands.get_player().quest = new splinterlands.Quest(data);
+			window.dispatchEvent(new CustomEvent('splinterlands:quest_progress', { detail: splinterlands.get_player().quest }));
 		}
 	};
 
