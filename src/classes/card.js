@@ -440,5 +440,5 @@ splinterlands.Card = class {
 		});
 	}
 
-	get is_starter() { return this.uid.startsWith('starter-'); }
+	get is_starter() { return this.uid && this.uid.startsWith('starter-'); }
 }
