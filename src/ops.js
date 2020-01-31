@@ -124,14 +124,20 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function claim_season_rewards(season) {
-		return splinterlands.send_tx_wrapper('claim_reward', 'Claim Reward', { type: 'league_season', season }, tx => tx.result.cards.map(c => new splinterlands.Card(c)));
+		return splinterlands.send_tx_wrapper('claim_reward', 'Claim Reward', { type: 'league_season', season }, async tx => {
+			await splinterlands.load_collection();
 
-		// TODO: Update player's card collection?
+			// New reward system
+			if(tx.result.rewards)
+				return { rewards: tx.result.rewards.map(r => new splinterlands.RewardItem(r)) };
+			else if(tx.result.cards)
+				return { cards: tx.result.cards.map(c => new splinterlands.Card(c)) };
+		});
 	}
 
 	async function claim_quest_rewards(quest_id) {
 		return splinterlands.send_tx_wrapper('claim_reward', 'Claim Reward', { type: 'quest', quest_id }, async tx => {
-			// TODO: Update player's card collection?
+			await splinterlands.load_collection();
 
 			// Update current player's quest info
 			let quests = await splinterlands.api('/players/quests');
@@ -139,10 +145,19 @@ window.splinterlands.ops = (function() {
 			if(quests && quests.length > 0)
 				splinterlands.get_player().quest = new splinterlands.Quest(quests[0]);
 
-			return { 
-				cards: tx.result.cards.map(c => new splinterlands.Card(c)), 
-				quest: splinterlands.get_player().quest 
-			};
+			let ret_val = { cards: [], quest: splinterlands.get_player().quest };
+
+			if(tx.result.rewards) {
+				// New reward system
+				ret_val.rewards = tx.result.rewards.map(r => new splinterlands.RewardItem(r));				
+				let card_rewards = tx.result.rewards.find(i => i.type == 'reward_card');
+
+				if(card_rewards)
+					ret_val.cards = card_rewards.cards.map(c => new splinterlands.Card(c));
+			} else
+				ret_val.cards = tx.result.cards.map(c => new splinterlands.Card(c))
+
+			return ret_val;
 		});
 	}
 
