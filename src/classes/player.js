@@ -48,13 +48,19 @@ splinterlands.Player = class {
 	}
 
 	get profile_image() {
-		return `${splinterlands.get_config().api_url}/players/avatar/${this.name}`;
-		//return `https://steemitimages.com/u/${this.name}/avatar`;
+		return isNaN(this.avatar_id) ?
+			`${splinterlands.get_config().api_url}/players/avatar/${this.name}` :
+			`https://d36mxiodymuqjm.cloudfront.net/website/icons/avatars/avatar_${this.avatar_id}.png`;
 	}
 
 	get avatar_frame() {
 		return `https://steemmonsters.s3.amazonaws.com/website/icons/avatars/avatar-frame_${this.league.group_name.toLowerCase()}.png`
-  }
+	}
+	
+	get display_name() {
+		return this._display_name || this.name;
+	}
+	set display_name(val) { this._display_name = val; }
   
   get quest_rewards() { 
     if(!this.quest)
