@@ -266,6 +266,30 @@ window.splinterlands.utils = (function() {
 		});
 	}
 
+	async function loadScriptAsync(url) {
+		return new Promise(resolve => loadScript(url, resolve));
+	}
+
+	function loadScript(url, callback) {
+		var script = document.createElement("script");
+		script.type = "text/javascript";
+		if(script.readyState) {  //IE
+			script.onreadystatechange = function() {
+				if(script.readyState === "loaded" || script.readyState === "complete") {
+					script.onreadystatechange = null;
+					callback();
+				}
+			};
+		} else if(callback) {  //Others
+			script.onload = function() {
+				callback();
+			};
+		}
+	
+		script.src = url;
+		document.getElementsByTagName("head")[0].appendChild( script );
+	}
+
 	function asset_url(path) { return splinterlands.get_settings().asset_url + path; }
 
 	let effects = {
@@ -608,6 +632,8 @@ window.splinterlands.utils = (function() {
 		asset_url,
 		parse_payment,
 		get_abilities,
-		get_starter_card
+		get_starter_card,
+		loadScript,
+		loadScriptAsync
 	 };
 })();
