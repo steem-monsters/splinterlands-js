@@ -85,6 +85,11 @@ var splinterlands = (function() {
 			window.dispatchEvent(new CustomEvent('splinterlands:version_change', { detail: response.version }));
 		}
 
+		if(_settings.maintenance_mode !== undefined && _settings.maintenance_mode != response.maintenance_mode) {
+			// Dispatch maintenance mode event
+			window.dispatchEvent(new CustomEvent('splinterlands:maintenance_mode', { detail: { maintenance_mode: response.maintenance_mode } }));
+		}
+
 		_settings = response;
 	}
 

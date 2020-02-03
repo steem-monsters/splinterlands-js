@@ -185,6 +185,10 @@ window.splinterlands.socket = (function() {
 		quest_progress: function(data) {
 			splinterlands.get_player().quest = new splinterlands.Quest(data);
 			window.dispatchEvent(new CustomEvent('splinterlands:quest_progress', { detail: splinterlands.get_player().quest }));
+		},
+
+		system_message: function(data) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: data }));
 		}
 	};
 
