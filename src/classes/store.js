@@ -53,7 +53,7 @@ splinterlands.Store = class {
 		if(!['STEEM', 'SBD', 'DEC'].includes(currency))
 			currency = 'STEEM';
 
-		let payment_info = await splinterlands.api('/purchases/start', { player, type, qty, currency, orig_currency, merchant, data });
+		let payment_info = await splinterlands.api('/purchases/start', { player, type, qty, currency, orig_currency, merchant, data: data || null });
 
 		if(payment_info && payment_info.payment)
 			payment_info.payment = splinterlands.utils.parse_payment(payment_info.payment);
@@ -70,5 +70,57 @@ splinterlands.Store = class {
 			total_remaining: available % 100000,
 			player_purchased: purchases ? parseInt(purchases.packs) + parseInt(purchases.bonus_packs) : 0
 		};
+	}
+
+	static async paypal_button(type, get_qty) {
+		if(!window.paypal)
+			await splinterlands.utils.loadScriptAsync(`https://www.paypal.com/sdk/js?client-id=${splinterlands.get_settings().paypal_client_id}&disable-funding=credit`);
+
+		return paypal.Buttons({
+			style: {
+				layout: 'horizontal',
+				height: 40,
+				shape: 'rect',
+				size: 'responsive',
+				tagline: false,
+				display: 'paypal',
+			},
+			createOrder: async function(data, actions) {
+				const purchaseInfo = await splinterlands.Store.start_purchase(type, get_qty(), 'USD');
+
+				// Set up the transaction
+				return actions.order.create({
+					intent: "CAPTURE",
+					purchase_units: [{
+						reference_id: purchaseInfo.uid,
+						custom_id: purchaseInfo.uid,
+						invoice_id: purchaseInfo.uid,
+						description: (type == 'starter_pack') ? 'Splinterlands Starter Set' : purchaseInfo.quantity + 'X Splinterlands Booster Pack',
+						amount: {
+							value: purchaseInfo.amount_usd,
+							payee: {
+								email_address: splinterlands.get_settings().paypal_acct,
+								merchant_id: splinterlands.get_settings().paypal_merchant_id,
+							}
+						}
+					}]
+				});
+			},
+			onError: function (err) {
+				console.log(err);
+			},
+			onApprove: function(data, actions) {
+				splinterlands.log_event('paypal_purchase', data);
+
+				return actions.order.capture().then(async function(details) {
+					const refID = details.purchase_units[0].reference_id;
+					const orderID = data.orderID;
+
+					let result = await splinterlands.api('/purchases/paypal', { uid: refID, tx: orderID });
+					console.log(result);
+					return result;
+				}).catch(err =>	splinterlands.log_event('paypal_failed', Object.assign({ err }, data)));
+			}
+		})
 	}
 }
