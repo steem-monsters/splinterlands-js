@@ -9,6 +9,7 @@
 			$(() =>	setTimeout(init, 500));
 
 			async function init() {
+				//await splinterlands.init({ api_url: 'https://steemmonsters.com', ws_url: 'wss://ws.steemmonsters.io' });
 				await splinterlands.init({ api_url: 'https://untamed.steemmonsters.io', ws_url: 'wss://untamed-ws.steemmonsters.io' });
 				//await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
 
@@ -49,6 +50,14 @@
 			window.addEventListener('splinterlands:socket_disconnect', e => {
 				console.log(`Socket Disconnect - ${e.detail}!`);
 			}, false);
+
+			window.addEventListener('splinterlands:system_message', e => {
+				alert(`SYSTEM MESSAGE: ${e.detail.title} - ${e.detail.message}`);
+			}, false);
+
+			window.addEventListener('splinterlands:maintenance_mode', e => {
+				alert(e.detail.maintenance_mode ? 'Game is down for maintenance.' : 'Game is back up!');
+			}, false);
 		</script>
 
 		<style type="text/css">
@@ -72,6 +81,8 @@
 				height: 30px;
 			}
 		</style>
+
+		<script type="text/javascript" src="https://d36mxiodymuqjm.cloudfront.net/libraries/TronWeb.js"></script>
 	</head>
 	<body>
     <div class="container">
@@ -130,6 +141,11 @@
 						<button id="btn_practice">PRACTICE</button>
 						<button id="btn_ranked">RANKED</button>
 						<button id="btn_submit_team" style="display: none;">SUBMIT TEAM</button>
+					</div>
+
+					<div>
+						<h5>Store:</h5>
+						<div id="paypal_button_container"></div>
 					</div>
 				</div>
       </div>
