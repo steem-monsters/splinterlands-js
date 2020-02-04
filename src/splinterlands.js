@@ -461,7 +461,7 @@ var splinterlands = (function() {
 				card = splinterlands.utils.get_starter_card(d.id, _player.starter_edition);
 
 			if(card) {
-				card = Object.assign({}, card);
+				card = new splinterlands.Card(Object.assign({}, card));
 				card.level = splinterlands.utils.get_summoner_level(match.rating_level, card);
 			}
 
@@ -505,18 +505,19 @@ var splinterlands = (function() {
 					card = splinterlands.utils.get_starter_card(d.id, _player.starter_edition);
 
 				if(card) {
-					card.capped_level = splinterlands.utils.get_monster_level(match.rating_level, summoner_card, card);
+					card = new splinterlands.Card(Object.assign({}, card));
+					card.level = splinterlands.utils.get_monster_level(match.rating_level, summoner_card, card);
 
-					if(match.ruleset.includes('Up Close & Personal') && d.stats.attack[card.capped_level - 1] == 0)
+					if(match.ruleset.includes('Up Close & Personal') && d.stats.attack[card.level - 1] == 0)
 						return;
 
-					if(match.ruleset.includes('Keep Your Distance') && d.stats.attack[card.capped_level - 1] > 0)
+					if(match.ruleset.includes('Keep Your Distance') && d.stats.attack[card.level - 1] > 0)
 						return;
 
-					if(match.ruleset.includes('Broken Arrows') && d.stats.ranged[card.capped_level - 1] > 0)
+					if(match.ruleset.includes('Broken Arrows') && d.stats.ranged[card.level - 1] > 0)
 						return;
 
-					if(match.ruleset.includes('Lost Magic') && d.stats.magic[card.capped_level - 1] > 0)
+					if(match.ruleset.includes('Lost Magic') && d.stats.magic[card.level - 1] > 0)
 						return;
 				}
 

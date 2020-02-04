@@ -170,7 +170,7 @@ splinterlands.Card = class {
 	}
 
 	get stats() {
-		if(this._stats)
+		if(this._stats && this._stats.level == this.level)
 			return this._stats;
 			
     let stats = this.details.stats;
