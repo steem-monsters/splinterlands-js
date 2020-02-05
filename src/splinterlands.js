@@ -466,7 +466,7 @@ var splinterlands = (function() {
 			}
 
 			return card;
-		}).filter(c => c);
+		}).filter(c => c).sort((a, b) => a.stats.mana - b.stats.mana);
 	}
 
 	function get_battle_monsters(match, summoner_card, ally_color) {
@@ -522,7 +522,7 @@ var splinterlands = (function() {
 				}
 
 				return card;
-			}).filter(c => c);
+			}).filter(c => c).sort((a, b) => a.stats.mana - b.stats.mana);
 	}
 
 	async function create_account_email(username, email, password, subscribe) {
