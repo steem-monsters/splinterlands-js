@@ -1,4 +1,15 @@
 splinterlands.Store = class {
+	static get payment_tokens() { 
+		return [
+			{ name: 'STEEM', symbol: 'STEEM' },
+			{ name: 'Tron', symbol: 'TRX' },
+			{ name: 'Steem Dollars', symbol: 'SBD' },
+			{ name: 'Bitcoin', symbol: 'BTC' },
+			{ name: 'Ether', symbol: 'ETH' },
+			{ name: 'Litecoin', symbol: 'LTC' }
+		];
+	}
+
 	static async get_available_packs(edition) {
 		try {
 			let packs = (await splinterlands.api('/purchases/stats')).packs;
@@ -53,12 +64,15 @@ splinterlands.Store = class {
 		if(!['STEEM', 'SBD', 'DEC'].includes(currency))
 			currency = 'STEEM';
 
-		let payment_info = await splinterlands.api('/purchases/start', { player, type, qty, currency, orig_currency, merchant, data: data || null });
+		let params = { player, type, qty, currency, orig_currency };
 
-		if(payment_info && payment_info.payment)
-			payment_info.payment = splinterlands.utils.parse_payment(payment_info.payment);
-		
-		return payment_info;
+		if(merchant)
+			params.merchant = merchant;
+
+		if(data)
+			params.data = data;
+
+		return new splinterlands.Purchase(await splinterlands.api('/purchases/start', params));
 	}
 
 	static async airdrop_info() {
@@ -125,5 +139,11 @@ splinterlands.Store = class {
 				}).catch(err =>	splinterlands.log_event('paypal_failed', Object.assign({ err }, data)));
 			}
 		})
+	}
+}
+
+splinterlands.Purchase = class {
+	constructor(data) {
+		Object.keys(data).forEach(k => this[k] = data[k]);
 	}
 }

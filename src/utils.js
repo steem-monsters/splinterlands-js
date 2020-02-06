@@ -169,7 +169,20 @@ window.splinterlands.utils = (function() {
 		}
 
 		return { success: true };
-  }
+	}
+	
+	// Checks whether or not a browser payment method is available for the specified token (i.e. Web3 for ETH or TronWeb for TRX)
+	function browser_payment_available(token) {
+		switch(token) {
+			case 'STEEM':
+			case 'SBD':
+				return true;
+			case 'TRX':
+				return window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58;
+			default:
+				return false;
+		}
+	}
   
   function get_edition_str(edition) {
     return ['Alpha', 'Beta', 'Promo', 'Reward', 'Untamed'][edition];
@@ -634,6 +647,7 @@ window.splinterlands.utils = (function() {
 		get_abilities,
 		get_starter_card,
 		loadScript,
-		loadScriptAsync
+		loadScriptAsync,
+		browser_payment_available
 	 };
 })();

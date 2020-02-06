@@ -115,6 +115,7 @@
 					<div class="py-1">
 						<h5>Balances:</h5>
 						<div>DEC: <span id="span_balance_dec"></span></div>
+						<div>CREDITS: <span id="span_balance_credits"></span></div>
 						<div>UNTAMED: <span id="span_balance_untamed"></span></div>
 						<div>BETA: <span id="span_balance_beta"></span></div>
 						<div>ALPHA: <span id="span_balance_alpha"></span></div>
@@ -253,7 +254,7 @@
 					$('#guild_name').text(player.guild.name);
 				}
 
-        ['DEC', 'UNTAMED', 'BETA', 'ALPHA', 'ORB'].forEach(async token => {
+        ['DEC', 'CREDITS', 'UNTAMED', 'BETA', 'ALPHA', 'ORB'].forEach(async token => {
           let balance = await player.get_balance(token);
           $(`#span_balance_${token.toLowerCase()}`).text(balance);
 				});

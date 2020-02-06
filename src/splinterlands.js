@@ -294,7 +294,7 @@ var splinterlands = (function() {
 		}
 	}
 
-	async function steem_payment(to, amount, currency, memo) {
+	async function browser_payment(to, amount, currency, memo) {
 		let token = splinterlands.utils.get_token(currency);
 
 		switch(token.type) {
@@ -303,7 +303,7 @@ var splinterlands = (function() {
 					var result = await new Promise(resolve => steem_keychain.requestTransfer(_player.name, to, parseFloat(amount).toFixed(3), memo, currency, response => resolve(response)));
 					return !result.success ? { success: false, error: result.error } : result;
 				} else {
-					let sc_url = `https://v2.steemconnect.com/sign/transfer?to=${to}&amount=${parseFloat(amount).toFixed(3)}%20${currency}&memo=${encodeURIComponent(memo)}`;
+					let sc_url = `https://steemconnect.com/sign/transfer?to=${to}&amount=${parseFloat(amount).toFixed(3)}%20${currency}&memo=${encodeURIComponent(memo)}`;
 					splinterlands.utils.popup_center(sc_url, `${currency} Payment`, 500, 560);
 				}
 				break;
@@ -312,6 +312,8 @@ var splinterlands = (function() {
 				return !result.success ? { success: false, error: result.error } : result;
 			case 'internal':
 				return await splinterlands.ops.token_transfer(to, amount, splinterlands.utils.tryParse(memo));
+			case 'tron':
+				return await window.tronWeb.trx.sendTransaction(to, tronWeb.toSun(parseFloat(amount).toFixed(6)));
 		}
 	}
 
@@ -644,7 +646,7 @@ var splinterlands = (function() {
 
 	return { 
 		init, api, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
-		log_event, load_market, steem_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password,
+		log_event, load_market, browser_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password,
 		load_market_cards, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
 		get_leaderboard, get_global_chat,
 		get_config: () => _config,
