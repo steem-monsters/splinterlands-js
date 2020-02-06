@@ -150,10 +150,10 @@ window.splinterlands.ops = (function() {
 			if(tx.result.rewards) {
 				// New reward system
 				ret_val.rewards = tx.result.rewards.map(r => new splinterlands.RewardItem(r));				
-				let card_rewards = tx.result.rewards.find(i => i.type == 'reward_card');
+				let card_rewards = tx.result.rewards.filter(i => i.type == 'reward_card');
 
 				if(card_rewards)
-					ret_val.cards = card_rewards.cards.map(c => new splinterlands.Card(c));
+					ret_val.cards = card_rewards.map(c => new splinterlands.Card(c.card));
 			} else
 				ret_val.cards = tx.result.cards.map(c => new splinterlands.Card(c))
 
