@@ -117,7 +117,10 @@ splinterlands.Store = class {
 					const orderID = data.orderID;
 
 					let result = await splinterlands.api('/purchases/paypal', { uid: refID, tx: orderID });
-					console.log(result);
+					
+					if(result && !result.error)
+						window.dispatchEvent(new CustomEvent('splinterlands:purchase_approved', { detail: result }));
+
 					return result;
 				}).catch(err =>	splinterlands.log_event('paypal_failed', Object.assign({ err }, data)));
 			}
