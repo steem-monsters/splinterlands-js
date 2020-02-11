@@ -14,7 +14,7 @@ splinterlands.Card = class {
 		if(this._bcx)
 			return this._bcx;
 
-		this._bcx = (this.edition == 4) ? this.xp : Math.floor(Math.max(this.gold ? this.xp / this.base_xp : (this.xp + this.base_xp) / this.base_xp, 1));
+		this._bcx = (this.edition >= 4 || this.details.tier >= 4) ? this.xp : Math.floor(Math.max(this.gold ? this.xp / this.base_xp : (this.xp + this.base_xp) / this.base_xp, 1));
 		return this._bcx;
 	}
 
@@ -29,7 +29,7 @@ splinterlands.Card = class {
 	}
 	
 	get max_xp() { 
-		if(this.edition == 4) {
+		if(this.edition >= 4 || this.details.tier >= 4) {
 			let rates = splinterlands.get_settings()[this.gold ? 'combine_rates_gold' : 'combine_rates'][this.details.rarity - 1];
 			return rates[rates.length - 1];
 		} else
@@ -50,7 +50,7 @@ splinterlands.Card = class {
       return this._next_level_progress;
     }
 
-		if(this.edition == 4) {
+		if(this.edition >= 4 || this.details.tier >= 4) {
 			let rates = splinterlands.get_settings()[this.gold ? 'combine_rates_gold' : 'combine_rates'][this.details.rarity - 1];
 
 			this._next_level_progress = { 
@@ -75,7 +75,7 @@ splinterlands.Card = class {
 	}
 	
 	cards_to_level(level) {
-		if(this.edition == 4) {
+		if(this.edition >= 4 || this.details.tier >= 4) {
 			let rates = splinterlands.get_settings()[this.gold ? 'combine_rates_gold' : 'combine_rates'][this.details.rarity - 1];
 			let cards = rates[level - 1];
 			return cards <= 0 ? 'N/A' : cards;
@@ -95,7 +95,7 @@ splinterlands.Card = class {
 
 		let alpha_bcx = 0, alpha_dec = 0;
 		let xp = Math.max(this.xp - this.alpha_xp, 0);
-		let burn_rate = splinterlands.get_settings().dec[this.edition == 4 ? 'untamed_burn_rate' : 'burn_rate'][this.details.rarity - 1];
+		let burn_rate = splinterlands.get_settings().dec[(this.edition >= 4 || this.details.tier >= 4) ? 'untamed_burn_rate' : 'burn_rate'][this.details.rarity - 1];
 	
 		if(this.alpha_xp) {
 			let alpha_bcx_xp = splinterlands.get_settings()[this.gold ? 'gold_xp' : 'alpha_xp'][this.details.rarity - 1];
@@ -108,7 +108,7 @@ splinterlands.Card = class {
 	
 		let bcx = Math.max(this.gold ? xp / this.base_xp : (xp + this.base_xp) / this.base_xp, 1);
 	
-		if(this.edition == 4)
+		if(this.edition >= 4 || this.details.tier >= 4)
 			bcx = this.xp;
 
 		if(this.alpha_xp)

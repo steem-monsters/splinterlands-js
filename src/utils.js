@@ -45,7 +45,7 @@ window.splinterlands.utils = (function() {
 	}
 
 	function get_level(card) {
-		if(card.edition == 4) {
+		if(card.edition >= 4 || card.details.tier >= 4) {
 			let rates = splinterlands.get_settings()[card.gold ? 'combine_rates_gold' : 'combine_rates'][card.details.rarity - 1];
 
 			for(let i = 0; i < rates.length; i++) {
@@ -274,7 +274,7 @@ window.splinterlands.utils = (function() {
 			uid: `starter-${id}-${randomStr(5)}`,
 			card_detail_id: id,
 			gold: false,
-			xp: edition == 4 ? 1 : 0,
+			xp: edition >= 4 ? 1 : 0,
 			edition: edition
 		});
 	}
