@@ -107,7 +107,7 @@ var splinterlands = (function() {
 		// Make sure the email address is all lowercase
 		email = email.toLowerCase();
 
-		let params = { email };
+		let params = { email: encodeURIComponent(email) };
 		let password_key = steem.auth.getPrivateKeys(email, password).owner;
 
 		// Sign the login request using the private key generated from the email and password combination
@@ -543,7 +543,7 @@ var splinterlands = (function() {
 		let params = { 
 			purchase_id: 'new-' + splinterlands.utils.randomStr(6),	// We need to set a purchase ID even though not making a purchase for backwards compatibility
 			name: username, 
-			email: email, 
+			email: encodeURIComponent(email), 
 			password_pub_key: password_pub_key,
 			subscribe: subscribe,
 			is_test: splinterlands.get_settings().test_acct_creation,
