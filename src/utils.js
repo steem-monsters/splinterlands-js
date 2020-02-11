@@ -170,6 +170,17 @@ window.splinterlands.utils = (function() {
 
 		return { success: true };
 	}
+
+	function sc_custom_json(id, title, data, use_active) {
+		let url = 'https://steemconnect.com/sign/custom-json?';
+		url += 'required_posting_auths=' + encodeURI('[' + (use_active ? '' : `"${splinterlands.get_player().name}"`) + ']');
+		url += '&required_auths=' + encodeURI('[' + (use_active ? `"${splinterlands.get_player().name}"` : '') + ']');
+		url += '&id=' + id;
+		url += '&json=' + encodeURI(JSON.stringify(data));
+		url += use_active ? '&authority=active' : '';
+
+		popup_center(url, title, 500, 560);
+	}
 	
 	// Checks whether or not a browser payment method is available for the specified token (i.e. Web3 for ETH or TronWeb for TRX)
 	function browser_payment_available(token) {
@@ -648,6 +659,7 @@ window.splinterlands.utils = (function() {
 		get_starter_card,
 		loadScript,
 		loadScriptAsync,
-		browser_payment_available
+		browser_payment_available,
+		sc_custom_json
 	 };
 })();

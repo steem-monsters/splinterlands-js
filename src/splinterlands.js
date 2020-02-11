@@ -222,6 +222,7 @@ var splinterlands = (function() {
 	async function send_tx(id, display_name, data, retries) {
 		if(!retries) retries = 0;
 
+		let active_auth = _player.require_active_auth && _settings.active_auth_ops.includes(id);
 		id = splinterlands.utils.format_tx_id(id);
 
 		try { data = splinterlands.utils.format_tx_data(data); }
@@ -238,7 +239,7 @@ var splinterlands = (function() {
 		let broadcast_promise = null;
 
 		if(_use_keychain) {
-			broadcast_promise = new Promise(resolve => steem_keychain.requestCustomJson(_player.name, id, 'Posting', data_str, display_name, response => {
+			broadcast_promise = new Promise(resolve => steem_keychain.requestCustomJson(_player.name, id, active_auth ? 'Active' : 'Posting', data_str, display_name, response => {
 				resolve({ 
 					type: 'broadcast',
 					success: response.success, 
@@ -247,14 +248,19 @@ var splinterlands = (function() {
 				})
 			}));
 		} else {
-			broadcast_promise = new Promise(resolve => steem.broadcast.customJson(localStorage.getItem('splinterlands:key'), [], [_player.name], id, data_str, (err, response) => {
-				resolve({
-					type: 'broadcast',
-					success: (response && response.id),
-					trx_id: (response && response.id) ? response.id : null,
-					error: err ? JSON.stringify(err) : null
-				});
-			}));
+			if(active_auth) {
+				splinterlands.utils.sc_custom_json(id, 'Splinterlands Transaction', data, true);
+				broadcast_promise = new Promise(resolve => resolve({ type: 'broadcast', success: true }));
+			} else {
+				broadcast_promise = new Promise(resolve => steem.broadcast.customJson(localStorage.getItem('splinterlands:key'), [], [_player.name], id, data_str, (err, response) => {
+					resolve({
+						type: 'broadcast',
+						success: (response && response.id),
+						trx_id: (response && response.id) ? response.id : null,
+						error: err ? JSON.stringify(err) : null
+					});
+				}));
+			}
 		}
 
 		let result = await Promise.race([check_tx_promise, broadcast_promise]);
