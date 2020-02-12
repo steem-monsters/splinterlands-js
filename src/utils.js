@@ -38,6 +38,15 @@ window.splinterlands.utils = (function() {
     return retVal;
 	}
 
+	function getURLParameter(url, name) {
+		let index = url.indexOf('?');
+
+		if(index < 0)
+			return null;
+		
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(url.substring(index)) || [, ""])[1].replace(/\+/g, '%20')) || null;
+	}
+
 	function timeout(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
 	function get_cur_block_num() {
@@ -206,7 +215,7 @@ window.splinterlands.utils = (function() {
             if (encodedString.length > 0) {
                 encodedString += '&';
             }
-            encodedString += encodeURI(prop + '=' + object[prop]);
+            encodedString += prop + '=' + encodeURIComponent(object[prop]);
         }
     }
     return encodedString;
@@ -660,6 +669,7 @@ window.splinterlands.utils = (function() {
 		loadScript,
 		loadScriptAsync,
 		browser_payment_available,
-		sc_custom_json
+		sc_custom_json,
+		getURLParameter
 	 };
 })();

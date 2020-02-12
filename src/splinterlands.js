@@ -11,17 +11,18 @@ var splinterlands = (function() {
 	let _browser_id = null;
 	let _session_id = null;
 	let _match = null;
+	let _url = null;
 
 	async function init(config) { 
 		_config = config;
 
 		// Load the browser id and create a new session id
 		_browser_id = localStorage.getItem('splinterlands:browser_id');
-		_session_id = 'sid_' + splinterlands.utils.randomStr(20);
+		_session_id = 'msid_' + splinterlands.utils.randomStr(20);
 
 		// Create a new browser id if one is not already set
 		if(!_browser_id) {
-			_browser_id = 'bid_' + splinterlands.utils.randomStr(20);
+			_browser_id = 'mbid_' + splinterlands.utils.randomStr(20);
 			localStorage.setItem('splinterlands:browser_id', _browser_id);
 		}
 
@@ -34,6 +35,11 @@ var splinterlands = (function() {
 
 		// Load market data
 		await load_market();
+	}
+
+	function set_url(url) { 
+		_url = url; 
+		localStorage.setItem('splinterlands:ref', splinterlands.utils.getURLParameter(url, 'ref'));
 	}
 
 	function get_card_details(card_detail_id) { 
@@ -65,7 +71,7 @@ var splinterlands = (function() {
 	}
 
 	async function log_event(event_name, data) {
-		return await api('/players/event', {
+		let params = {
 			browser_id: _browser_id,
 			session_id: _session_id,
 			event_name: event_name,
@@ -73,8 +79,14 @@ var splinterlands = (function() {
 			user_agent: window.navigator.userAgent,
 			browser_language: window.navigator.language,
 			site_language: localStorage.getItem('splinterlands:locale'),
-			data: JSON.stringify(data)
-		});
+			url: _url,
+			ref: localStorage.getItem('splinterlands:ref')
+		};
+
+		if(data)
+			params.data = JSON.stringify(data);
+
+		return await api('/players/event', params);
 	}
 
 	async function load_settings() {
@@ -189,6 +201,8 @@ var splinterlands = (function() {
 
 		// Load the player's card collection
 		await load_collection();
+
+		log_event('log_in');
 
 		return _player;
 	}
@@ -547,13 +561,15 @@ var splinterlands = (function() {
 			password_pub_key: password_pub_key,
 			subscribe: subscribe,
 			is_test: splinterlands.get_settings().test_acct_creation,
-			ref: localStorage.getItem('ref')
+			ref: localStorage.getItem('splinterlands:ref')
 		};
 
 		let response = await api('/players/create_email', params);
 
-		if(response && !response.error)
+		if(response && !response.error) {
+			log_event('sign_up');
 			return await email_login(email, password);
+		}
 
 		return response;
 	}
@@ -654,7 +670,7 @@ var splinterlands = (function() {
 		init, api, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
 		log_event, load_market, browser_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password,
 		load_market_cards, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
-		get_leaderboard, get_global_chat,
+		get_leaderboard, get_global_chat, set_url,
 		get_config: () => _config,
 		get_settings: () => _settings,
 		get_player: () => _player,
