@@ -104,6 +104,9 @@ window.splinterlands.ops = (function() {
 
 					// If the opponent has not submitted their team, then queue up the team reveal operation for when they do
 					cur_match.on_opponent_submit = async () => await splinterlands.ops.team_reveal(cur_match.id, summoner, monsters, secret);
+
+					// Save the team info locally in case the browser is refreshed or something and it needs to be resubmitted later
+					localStorage.setItem(`splinterlands:${cur_match.id}`, JSON.stringify({ summoner, monsters, secret }));
 				}
 			}
 			
@@ -112,7 +115,22 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function team_reveal(trx_id, summoner, monsters, secret) {
-		return splinterlands.send_tx_wrapper('team_reveal', 'Team Reveal', { trx_id, summoner, monsters, secret }, r => r);
+		if(!summoner) {
+			// If no summoner is specified, check if the team info is saved in local storage
+			let saved_team = splinterlands.utils.try_parse(localStorage.getItem(`splinterlands:${trx_id}`));
+
+			if(saved_team) {
+				summoner = saved_team.summoner;
+				monsters = saved_team.monsters;
+				secret = saved_team.secret;
+			}
+		}
+
+		return splinterlands.send_tx_wrapper('team_reveal', 'Team Reveal', { trx_id, summoner, monsters, secret }, r => {
+			// Clear any team info saved in local storage after it is revealed
+			localStorage.removeItem(`splinterlands:${trx_id}`)
+			return r;
+		});
 	}
 
 	async function cancel_match() {

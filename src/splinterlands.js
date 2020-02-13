@@ -204,6 +204,27 @@ var splinterlands = (function() {
 
 		log_event('log_in');
 
+		// Check if the player is currently involved in a match
+		if(_player.outstanding_match) {
+			// Set it as the currently active match
+			let match = set_match(_player.outstanding_match);
+			_player.outstanding_match = match;
+
+			// Check if the current player has already submitted, but not revealed, their team
+			if(match.team_hash && !match.team) {
+				// If the opponent already submitted their team, then we can reveal ours
+				if(match.opponent_team_hash)
+					await splinterlands.ops.team_reveal(match.id);
+				else {
+					// If the opponent has not submitted their team, then queue up the team reveal operation for when they do
+					match.on_opponent_submit = async () => await splinterlands.ops.team_reveal(match.id);
+				}
+			}
+
+			// Emit an outstanding_match event
+			window.dispatchEvent(new CustomEvent('splinterlands:outstanding_match', { detail: match }));
+		}
+
 		return _player;
 	}
 	
