@@ -182,6 +182,13 @@ window.splinterlands.socket = (function() {
 			window.dispatchEvent(new CustomEvent('splinterlands:balance_update', { detail: data }));
 		},
 
+		rating_update: function(data) {
+			splinterlands.get_player().rating = data.new_rating;
+
+			// Emit a rating_update event
+			window.dispatchEvent(new CustomEvent('splinterlands:rating_update', { detail: data }));
+		},
+
 		quest_progress: function(data) {
 			splinterlands.get_player().quest = new splinterlands.Quest(data);
 			window.dispatchEvent(new CustomEvent('splinterlands:quest_progress', { detail: splinterlands.get_player().quest }));
