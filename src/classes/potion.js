@@ -18,4 +18,11 @@ splinterlands.Potion = class {
 		let potions = await splinterlands.get_potions();
 		return potions.find(p => p.id == type);
 	}
+
+	static get_potion(type) {
+		if(!splinterlands.Potion._potions || splinterlands.Potion._potions.length == 0)
+			splinterlands.Potion._potions = splinterlands.get_settings().potions.map(p => new splinterlands.Potion(p));
+
+		return splinterlands.Potion._potions.find(p => p.id == type);
+	}
 }
