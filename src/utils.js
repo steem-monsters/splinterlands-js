@@ -231,6 +231,7 @@ window.splinterlands.utils = (function() {
 	}
 
 	async function validate_acct_name(name) {
+		name = name.toLowerCase();
 		let error = steem.utils.validateAccountName(name);
 
 		if(error)

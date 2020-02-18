@@ -153,7 +153,19 @@ window.splinterlands.ops = (function() {
 		});
 	}
 
-	async function claim_quest_rewards(quest_id) {
+	async function claim_quest_rewards(quest_id, test) {
+		if(test) {
+			let ret_val = { cards: [], quest: splinterlands.get_player().quest };
+
+			ret_val.rewards = _test_reward_data.rewards.map(r => new splinterlands.RewardItem(r));				
+			let card_rewards = _test_reward_data.rewards.filter(i => i.type == 'reward_card');
+
+			if(card_rewards)
+				ret_val.cards = card_rewards.map(c => new splinterlands.Card(c.card));
+
+			return ret_val;
+		}
+
 		return splinterlands.send_tx_wrapper('claim_reward', 'Claim Reward', { type: 'quest', quest_id }, async tx => {
 			await splinterlands.load_collection();
 
@@ -178,6 +190,99 @@ window.splinterlands.ops = (function() {
 			return ret_val;
 		});
 	}
+
+	_test_reward_data = {
+		"success": true,
+		"rewards": [
+			{
+				"type": "potion",
+				"quantity": 1,
+				"potion_type": "gold"
+			},
+			{
+				"type": "reward_card",
+				"quantity": 1,
+				"card": {
+					"uid": "C3-218-MMSX4GJXLC",
+					"card_detail_id": 218,
+					"xp": 0,
+					"gold": false,
+					"edition": 3
+				}
+			},
+			{
+				"type": "reward_card",
+				"quantity": 1,
+				"card": {
+					"uid": "C3-134-CQRELRWI40",
+					"card_detail_id": 134,
+					"xp": 0,
+					"gold": false,
+					"edition": 3
+				}
+			},
+			{
+				"type": "dec",
+				"quantity": 11
+			},
+			{
+				"type": "potion",
+				"quantity": 1,
+				"potion_type": "legendary"
+			},
+			{
+				"type": "reward_card",
+				"quantity": 1,
+				"card": {
+					"uid": "C3-231-G6LAY0NDXC",
+					"card_detail_id": 231,
+					"xp": 1,
+					"gold": false,
+					"edition": 3
+				}
+			},
+			{
+				"type": "potion",
+				"quantity": 1,
+				"potion_type": "gold"
+			},
+			{
+				"type": "reward_card",
+				"quantity": 1,
+				"card": {
+					"uid": "C3-93-AAZOMA7H3K",
+					"card_detail_id": 93,
+					"xp": 0,
+					"gold": false,
+					"edition": 3
+				}
+			},
+			{
+				"type": "reward_card",
+				"quantity": 1,
+				"card": {
+					"uid": "C3-213-1ZKLYGKH28",
+					"card_detail_id": 213,
+					"xp": 0,
+					"gold": false,
+					"edition": 3
+				}
+			},
+			{
+				"type": "dec",
+				"quantity": 12
+			}
+		],
+		"potions": {
+			"legendary": {
+				"potion_type": "legendary",
+				"charges": 0,
+				"charges_used": 1,
+				"charges_remaining": 0
+			},
+			"gold": null
+		}
+	};
 
 	async function start_quest() {
 		return splinterlands.send_tx_wrapper('start_quest', 'Start Quest', { type: 'daily' }, tx => {
