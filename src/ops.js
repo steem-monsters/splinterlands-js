@@ -316,6 +316,10 @@ window.splinterlands.ops = (function() {
 		return await splinterlands.send_tx('open_all', 'Open Multiple Packs', { edition, qty });
 	}
 
+	async function purchase(type, qty, currency) {
+		return splinterlands.send_tx_wrapper('purchase', 'Purchase', { type, qty, currency }, tx => tx);
+	}
+
 	return {
 		combine_cards,
 		combine_all,
@@ -340,6 +344,7 @@ window.splinterlands.ops = (function() {
 		accept_challenge,
 		decline_challenge,
 		open_pack,
-		open_multi
+		open_multi,
+		purchase
 	};
 })();
