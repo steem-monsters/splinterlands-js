@@ -1,6 +1,9 @@
 splinterlands.RewardItem = class {
 	constructor(data) {
 		Object.keys(data).forEach(k => this[k] = data[k]);
+
+		if(this.card)
+			this.card = new splinterlands.Card(this.card);
 	}
 
 	get name() {
