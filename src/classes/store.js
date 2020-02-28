@@ -140,6 +140,31 @@ splinterlands.Store = class {
 			}
 		})
 	}
+
+	static async check_code(code) {
+		let result = await splinterlands.api('/purchases/check_code', { code });
+
+		if(!result || !result.valid)
+			return result;
+
+		if(result.type == 'starter_pack' && splinterlands.get_player().starter_pack_purchase)
+			return { error: `This promo code is for a Summoner's Spellbook which has already been purchased for this account.` };
+
+		return result;
+	}
+
+	static async redeem_code(code) {
+		if(typeof code == 'string')
+			code = await splinterlands.api('/purchases/check_code', { code });
+		
+		switch(code.type) {
+			case 'starter_pack':
+				let purchase = await splinterlands.Store.start_purchase('starter_pack', 1, 'PROMO');
+				return await splinterlands.api('/purchases/start_code', { code: code.code, purchase_id: purchase.uid });
+			default:
+				return { error: 'The specified promo code is not currently supported.' };
+		}
+	}
 }
 
 splinterlands.Purchase = class {

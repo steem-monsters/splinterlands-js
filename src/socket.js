@@ -92,8 +92,14 @@ window.splinterlands.socket = (function() {
 			if(trx) {
 				clearTimeout(trx.timeout);
 				trx.resolve(data);
-			} else
+			} else {
+				if(data.type == 'starter_pack')
+					splinterlands.get_player().starter_pack_purchase = true;
+					
+				// TODO: Send starter_purchase event here?
+
 				window.dispatchEvent(new CustomEvent('splinterlands:purchase_complete', { detail: data }));
+			}
 		},
 
 		match_found: function(data) {
