@@ -183,7 +183,7 @@ window.splinterlands.socket = (function() {
 		},
 
 		rating_update: function(data) {
-			splinterlands.get_player().rating = data.new_rating;
+			splinterlands.get_player().update_rating(data.new_rating);
 
 			// Emit a rating_update event
 			window.dispatchEvent(new CustomEvent('splinterlands:rating_update', { detail: data }));

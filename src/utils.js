@@ -198,7 +198,7 @@ window.splinterlands.utils = (function() {
 			case 'SBD':
 				return true;
 			case 'TRX':
-				return window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58;
+				return (window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) ? true : false;
 			default:
 				return false;
 		}

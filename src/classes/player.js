@@ -153,4 +153,9 @@ splinterlands.Player = class {
 			subscribe
 		});
 	}
+
+	update_rating(new_rating) {
+		this.rating = new_rating;
+		this.league = new splinterlands.League(new_rating);
+	}
 }
