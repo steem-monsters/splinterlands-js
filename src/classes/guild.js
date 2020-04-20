@@ -94,4 +94,11 @@ splinterlands.Guild = class {
 
 		return crest_container;
 	}
+
+	get shop_discount() {
+		if(!this.quest_lodge_level)
+			return 0;
+			
+		return splinterlands.get_settings().guilds.shop_discount_pct[this.quest_lodge_level - 1];
+	}
 }

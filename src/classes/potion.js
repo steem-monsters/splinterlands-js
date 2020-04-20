@@ -4,6 +4,9 @@ splinterlands.Potion = class {
 
 		if(!data.subtype)
 			this.subtype = this.id;
+
+		this.base_price_per_charge = this.price_per_charge;
+		this.price_per_charge = splinterlands.utils.guild_discounted_cost(this.price_per_charge);
 	}
 
 	get charges_remaining() {

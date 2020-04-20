@@ -18,7 +18,7 @@ splinterlands.Store = class {
 	}
 
 	static get booster_price() { return splinterlands.get_settings().booster_pack_price; }
-	static get starter_price() { return splinterlands.get_settings().starter_pack_price_account_create; }
+	static get starter_price() { return splinterlands.get_settings().starter_pack_price; }
 	static get orb_price() { return splinterlands.get_settings().dec.orb_cost; }
 
 	static pack_purchase_info(edition, qty) {
@@ -39,8 +39,24 @@ splinterlands.Store = class {
 				qty,
 				bonus: Math.floor(qty >= 100 ? qty * 0.1 : (qty >= 20 ? qty * 0.05 : 0)),
 				total_usd: +(qty * splinterlands.Store.orb_price / 1000).toFixed(2),
-				total_dec: Math.floor(qty * splinterlands.Store.orb_price)
+				total_dec: Math.floor(splinterlands.utils.guild_discounted_cost(qty * splinterlands.Store.orb_price))
 			}
+		}
+	}
+
+	static potion_purchase_info(type, qty) {
+		let potion = splinterlands.Potion.get_potion(type);
+
+		if(!potion)
+			return { error: 'Invalid potion type specified.' };
+
+		let bonus_obj = potion.bonuses.slice().reverse().find(b => b.min <= qty);
+
+		return {
+			type, qty,
+			bonus: bonus_obj ? Math.floor(qty * bonus_obj.bonus_pct / 100) : 0,
+			total_usd: +(potion.price_per_charge * qty / 1000).toFixed(2),
+			total_dec: Math.floor(potion.price_per_charge * qty)
 		}
 	}
 
@@ -142,20 +158,28 @@ splinterlands.Store = class {
 	}
 
 	static async check_code(code) {
+		code = code.toUpperCase();
 		let result = await splinterlands.api('/purchases/check_code', { code });
 
 		if(!result || !result.valid)
 			return result;
 
+		if(result.type != 'starter_pack')
+			return { error: 'The specified promo code is not currently supported in the mobile app, please try the desktop site.' };
+
 		if(result.type == 'starter_pack' && splinterlands.get_player().starter_pack_purchase)
 			return { error: `This promo code is for a Summoner's Spellbook which has already been purchased for this account.` };
+
+		// Un-hardcode these later when we accept more promo code types
+		result.img_url = 'https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/shop/img_spellbook.png';
+		result.name = `Summoner's Spellbook`;
 
 		return result;
 	}
 
 	static async redeem_code(code) {
 		if(typeof code == 'string')
-			code = await splinterlands.api('/purchases/check_code', { code });
+			code = await splinterlands.api('/purchases/check_code', { code: code.toUpperCase() });
 		
 		switch(code.type) {
 			case 'starter_pack':

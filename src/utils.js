@@ -22,6 +22,16 @@ window.splinterlands.utils = (function() {
 		'https://s3.amazonaws.com/steemmonsters/cards_battle_mobile/'
 	];
 
+	rpc_index = 0;
+	rpc_nodes = ["https://api.steemit.com", "https://seed.steemmonsters.com", "https://steemd.minnowsupportproject.org"];
+
+	function switch_rpc() {
+		// Try the next RPC node
+		let rpc_node = rpc_nodes[++rpc_index % rpc_nodes.length];
+		steem.api.setOptions({ transport: 'http', uri: rpc_node, url: rpc_node });
+		console.log(`SWITCHED TO NEW RPC NODE: ${rpc_node}`);
+	}
+
 	function parse_payment(payment_str) {
 		return {
 			amount: parseFloat(payment_str),
@@ -101,12 +111,10 @@ window.splinterlands.utils = (function() {
 	}
 
 	function format_tx_id(id) {
-		if(!id.startsWith('sm_'))
-			id = `sm_${id}`;
+		let prefix = (splinterlands.get_settings().test_mode) ? `${splinterlands.get_settings().prefix}sm_` : 'sm_';
 
-		// Add dev mode prefix if specified in settings
-		if(splinterlands.get_settings().test_mode && !id.startsWith(splinterlands.get_settings().prefix))
-			id = `${splinterlands.get_settings().prefix}${id}`;
+		if(!id.startsWith(prefix))
+			id = `${prefix}${id}`;
 
 		return id;
 	}
@@ -118,7 +126,8 @@ window.splinterlands.utils = (function() {
 		data.app = `steemmonsters/${splinterlands.get_settings().version}`;
 
 		// Generate a random ID for this transaction so we can look it up later
-		data.sm_id = randomStr(10);
+		if(!data.sm_id)
+			data.sm_id = randomStr(10);
 
 		// Append the prefix to the app name if in test mode
 		if(splinterlands.get_settings().test_mode)
@@ -298,6 +307,15 @@ window.splinterlands.utils = (function() {
 			xp: edition >= 4 ? 1 : 0,
 			edition: edition
 		});
+	}
+
+	function guild_discounted_cost(base_cost) {
+		let player = splinterlands.get_player();
+
+		if(!player || !player.guild)
+			return base_cost;
+
+		return +(base_cost * (1 - (player.guild.shop_discount / 100))).toFixed(1);
 	}
 
 	async function loadScriptAsync(url) {
@@ -671,6 +689,8 @@ window.splinterlands.utils = (function() {
 		loadScriptAsync,
 		browser_payment_available,
 		sc_custom_json,
-		getURLParameter
+		getURLParameter,
+		guild_discounted_cost,
+		switch_rpc
 	 };
 })();

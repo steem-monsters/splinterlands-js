@@ -28,7 +28,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function add_wallet(type, address) {
-		return await splinterlands.send_tx('add_wallet', 'Link External Wallet', { type, address });
+		return await splinterlands.send_tx_wrapper('add_wallet', 'Link External Wallet', { type, address }, tx => tx);
 	}
 
 	async function gift_cards(card_ids, to) {
@@ -143,6 +143,7 @@ window.splinterlands.ops = (function() {
 
 	async function claim_season_rewards(season) {
 		return splinterlands.send_tx_wrapper('claim_reward', 'Claim Reward', { type: 'league_season', season }, async tx => {
+			splinterlands.get_player().season_reward = null;
 			await splinterlands.load_collection();
 
 			// New reward system
@@ -316,8 +317,20 @@ window.splinterlands.ops = (function() {
 		return await splinterlands.send_tx('open_all', 'Open Multiple Packs', { edition, qty });
 	}
 
-	async function purchase(type, qty, currency) {
-		return splinterlands.send_tx_wrapper('purchase', 'Purchase', { type, qty, currency }, tx => tx);
+	async function purchase(type, qty, currency, data) {
+		if(type == 'orb') {
+			if(!currency || currency.toUpperCase() != 'DEC')
+				return new Promise((resolve, reject) => reject({ error: 'Invalid currency specified. Essence Orbs may only be purchased with DEC.' }));
+
+			return splinterlands.send_tx_wrapper('purchase_orbs', 'Purchase Essence Orbs', { qty }, tx => tx);
+		}
+
+		return splinterlands.send_tx_wrapper('purchase', 'Purchase', { type, qty, currency, data }, tx => tx);
+	}
+
+	async function withdraw_dec(qty, wallet) {
+		let to_account = (wallet == 'tron') ? 'sm-dec-tron' : (wallet == 'ethereum' ? 'sl-eth' : splinterlands.get_settings().account);
+		return splinterlands.send_tx_wrapper('token_transfer', 'Withdraw DEC', { type: 'withdraw', to: to_account, qty, token: 'DEC' }, tx => tx);
 	}
 
 	return {
@@ -345,6 +358,7 @@ window.splinterlands.ops = (function() {
 		decline_challenge,
 		open_pack,
 		open_multi,
-		purchase
+		purchase,
+		withdraw_dec
 	};
 })();

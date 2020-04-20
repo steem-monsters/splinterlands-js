@@ -12,6 +12,9 @@ splinterlands.Player = class {
 			this.guild = new splinterlands.Guild(data.guild);
 		else if(data.guild_id || (data.guild && typeof data.guild == 'string'))
 			this.guild = new splinterlands.Guild({ id: data.guild_id || data.guild, name: data.guild_name, data: data.guild_data });
+
+		if(this.season_reward)
+			this.season_reward = new splinterlands.Season(this.season_reward);
 	}
 
 	async load_balances() {
@@ -157,5 +160,15 @@ splinterlands.Player = class {
 	update_rating(new_rating) {
 		this.rating = new_rating;
 		this.league = new splinterlands.League(new_rating);
+	}
+
+	async request_keys() {
+		if(!this.starter_pack_purchase)
+			return { error: `You must purchase the Summoner's Spellbook before you may request your account keys.` };
+
+		if(this.has_keys)
+			return { error: `Account keys have already been requested from this account and may only be requested once. Please contact us at support@splinterlands.com or on Discord for help.` };
+
+		return await splinterlands.api('/players/request_keys');
 	}
 }

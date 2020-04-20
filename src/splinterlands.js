@@ -277,6 +277,7 @@ var splinterlands = (function() {
 			broadcast_promise = new Promise(resolve => steem_keychain.requestCustomJson(_player.name, id, active_auth ? 'Active' : 'Posting', data_str, display_name, response => {
 				resolve({ 
 					type: 'broadcast',
+					method: 'keychain',
 					success: response.success, 
 					trx_id: response.success ? response.result.id : null,
 					error: response.success ? null : ((typeof response.error == 'string') ? response.error : JSON.stringify(response.error))
@@ -285,11 +286,12 @@ var splinterlands = (function() {
 		} else {
 			if(active_auth) {
 				splinterlands.utils.sc_custom_json(id, 'Splinterlands Transaction', data, true);
-				broadcast_promise = new Promise(resolve => resolve({ type: 'broadcast', success: true }));
+				broadcast_promise = new Promise(resolve => resolve({ type: 'broadcast', success: true, method: 'steem_connect' }));
 			} else {
 				broadcast_promise = new Promise(resolve => steem.broadcast.customJson(localStorage.getItem('splinterlands:key'), [], [_player.name], id, data_str, (err, response) => {
 					resolve({
 						type: 'broadcast',
+						method: 'steem_js',
 						success: (response && response.id),
 						trx_id: (response && response.id) ? response.id : null,
 						error: err ? JSON.stringify(err) : null
@@ -325,6 +327,9 @@ var splinterlands = (function() {
 					return "Oops, it looks like you don't have enough Resource Credits to transact on the Steem blockchain. Please contact us on Discord for help! Error: " + result.error;
 				}
 			} else if(retries < 2) {
+				// Try switching to another RPC node
+				splinterlands.utils.switch_rpc();
+
 				// Retry the transaction after 3 seconds
 				await splinterlands.utils.timeout(3000);
 				return await send_tx(id, display_name, data, retries + 1);
