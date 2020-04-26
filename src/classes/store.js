@@ -189,6 +189,29 @@ splinterlands.Store = class {
 				return { error: 'The specified promo code is not currently supported.' };
 		}
 	}
+
+	static async dec_deposit_info(wallet_type) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				switch(wallet_type) {
+					case 'steem_engine':
+					case 'hive_engine':
+						resolve({ address: splinterlands.get_settings().account, browser_payment_available: true });
+						break;
+					case 'tron':
+						let address = await splinterlands.api('/purchases/get_payment_address', { type: 'dec_deposit', currency: 'TRX', data: '' });
+						resolve({ address: address.wallet_address, browser_payment_available: splinterlands.tron.browser_payment_available() });
+						break;
+					case 'ethereum':
+						resolve({ address: splinterlands.get_settings().ethereum.contracts.crystals.address, browser_payment_available: false });
+						break;
+					default:
+						reject({ error: 'Missing or invalid "wallet_type" parameter.' });
+						break;
+				}
+			} catch (err) { reject(err); }
+		});
+	}
 }
 
 splinterlands.Purchase = class {

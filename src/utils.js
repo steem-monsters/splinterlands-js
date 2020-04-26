@@ -183,7 +183,7 @@ window.splinterlands.utils = (function() {
 			url += '&id=' + splinterlands.get_settings().ssc.chain_id;
 			url += '&json=' + encodeURI(JSON.stringify(transaction_data));
 
-			popup_center(url, `${currency} Payment`, 500, 560);
+			popup_center(url, `${token} Payment`, 500, 760);
 		}
 
 		return { success: true };

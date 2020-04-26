@@ -363,6 +363,20 @@ var splinterlands = (function() {
 		}
 	}
 
+	async function external_deposit(wallet_type, to, amount, currency, memo) {
+		switch(wallet_type) {
+			case 'steem_engine':
+				var result = await splinterlands.utils.steem_engine_transfer(to, currency, amount, memo);
+				return !result.success ? { success: false, error: result.error } : result;
+			case 'tron':
+				if(currency != 'DEC')
+					return { success: false, error: 'Invalid currency specified.' };
+
+				let token = splinterlands.utils.get_token('DEC-TRON');
+				return await splinterlands.tron.sendToken(to, amount, token.token_id);
+		}
+	}
+
 	function check_tx(sm_id, timeout) {
 		return new Promise(resolve => {
 			_transactions[sm_id] = { resolve: resolve };
@@ -696,7 +710,7 @@ var splinterlands = (function() {
 		init, api, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
 		log_event, load_market, browser_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password,
 		load_market_cards, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
-		get_leaderboard, get_global_chat, set_url,
+		get_leaderboard, get_global_chat, set_url, external_deposit,
 		get_config: () => _config,
 		get_settings: () => _settings,
 		get_player: () => _player,

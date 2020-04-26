@@ -17,5 +17,15 @@ window.splinterlands.tron = (function() {
 		return await tronWeb.trx.sendRawTransaction(signed_tx);
 	}
 
-	return { sendTransaction };
+	async function sendToken(to, qty, token_id) {
+		let tx = await tronWeb.transactionBuilder.sendToken(to, qty, token_id, window.tronWeb.defaultAddress.base58);
+		tx = await tronWeb.trx.sign(tx);
+		return await tronWeb.trx.sendRawTransaction(tx);
+	}
+
+	function browser_payment_available() {
+		return (window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) ? true : false;
+	}
+
+	return { sendTransaction, sendToken, browser_payment_available };
 })();
