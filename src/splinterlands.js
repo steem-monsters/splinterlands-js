@@ -205,7 +205,7 @@ var splinterlands = (function() {
 		log_event('log_in');
 
 		// Check if the player is currently involved in a match
-		if(_player.outstanding_match) {
+		if(_player.outstanding_match && _player.outstanding_match.id) {
 			// Set it as the currently active match
 			let match = set_match(_player.outstanding_match);
 			_player.outstanding_match = match;
