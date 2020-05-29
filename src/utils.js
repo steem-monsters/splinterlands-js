@@ -23,7 +23,8 @@ window.splinterlands.utils = (function() {
 	];
 
 	rpc_index = 0;
-	rpc_nodes = ["https://api.steemit.com", "https://seed.steemmonsters.com", "https://steemd.minnowsupportproject.org"];
+	//rpc_nodes = ["https://api.steemit.com", "https://seed.steemmonsters.com", "https://steemd.minnowsupportproject.org"];
+	rpc_nodes = ["https://api.hive.blog", "https://anyx.io", "https://hived.splinterlands.com"];
 
 	function switch_rpc() {
 		// Try the next RPC node
@@ -171,7 +172,7 @@ window.splinterlands.utils = (function() {
 			}
 		};
 
-		if(splinterlands.use_keychain()) {
+		if(window.steem_keychain) {
 			var result = await new Promise(resolve => steem_keychain.requestCustomJson(splinterlands.get_player().name, splinterlands.get_settings().ssc.chain_id, 'Active', JSON.stringify(transaction_data), 'Transfer Token: ' + token, r => resolve(r)));
 			
       if(!result.success)
@@ -205,6 +206,8 @@ window.splinterlands.utils = (function() {
 		switch(token) {
 			case 'STEEM':
 			case 'SBD':
+			case 'HIVE':
+			case 'HBD':
 				return true;
 			case 'TRX':
 				return (window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) ? true : false;

@@ -10,14 +10,14 @@
 
 			async function init() {
 				//await splinterlands.init({ api_url: 'https://steemmonsters.com', ws_url: 'wss://ws.steemmonsters.io' });
-				await splinterlands.init({ api_url: 'https://untamed.steemmonsters.io', ws_url: 'wss://untamed-ws.steemmonsters.io' });
+				await splinterlands.init({ api_url: 'https://hive.steemmonsters.io', ws_url: 'wss://hive-ws.steemmonsters.io' });
 				//await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
 
 				if(splinterlands.has_saved_login())
 					savedLogin();
 				
 				// If the steem keychain browser extension is not present, show the password login option
-				if(!window.steem_keychain) {
+				if(!window.hive_keychain) {
 					$('#chk_pwd_login').prop('checked', true);
 					$('#div_pwd_login').show();
           $('#btn_login_keychain').hide();
