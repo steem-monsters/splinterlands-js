@@ -402,6 +402,7 @@ window.splinterlands.ops = (function() {
 		purchase,
 		withdraw_dec,
 		join_guild,
+		request_join_guild,
 		leave_guild,
 		create_guild,
 		update_guild
