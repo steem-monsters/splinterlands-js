@@ -374,6 +374,16 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx('edit_guild', 'Update Guild', guild_data);
 	}
 
+	async function request_join_guild(guild_id) {
+		return splinterlands.send_tx('join_guild', 'Request Join Guild', { guild_id });
+	}
+
+	async function invite_guild(guild_id, recipient) {
+		return splinterlands.send_tx('guild_invite', 'Invite Player', { guild_id, player: recipient});
+	}
+
+
+
 	return {
 		combine_cards,
 		combine_all,
@@ -405,6 +415,7 @@ window.splinterlands.ops = (function() {
 		request_join_guild,
 		leave_guild,
 		create_guild,
-		update_guild
+		update_guild,
+		invite_guild
 	};
 })();
