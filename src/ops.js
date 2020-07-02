@@ -402,6 +402,10 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx('guild_remove', 'Kick Member', { guild_id, player });
 	}
 
+	async function guild_contribution(guild_id, amount) {
+		return splinterlands.send_tx('guild_contribution', 'Guild Contribution', { guild_id, amount });
+	}
+
 
 
 	return {
@@ -441,7 +445,7 @@ window.splinterlands.ops = (function() {
 		guild_decline_member,
 		guild_promote_member,
 		guild_demote_member,
-		guild_kick_member
-
+		guild_kick_member,
+		guild_contribution
 	};
 })();
