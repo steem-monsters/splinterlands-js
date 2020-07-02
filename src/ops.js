@@ -337,8 +337,41 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx('join_guild', 'Join Guild', { guild_id });
 	}
 
+	async function request_join_guild(guild_id) {
+		return splinterlands.send_tx('join_guild', 'Request Join Guild', { guild_id });
+	}
+
 	async function leave_guild(guild_id) {
 		return splinterlands.send_tx('leave_guild', 'Leave Guild', { guild_id });
+	}
+
+	async function create_guild(name, motto, description, membership_type, language, banner, decal) {
+		let guild_data = {
+			name: name,
+			motto: motto,
+			description: description,
+			membership_type: membership_type,
+			language: language,
+			banner: banner,
+			decal: decal
+		};
+
+		return splinterlands.send_tx('create_guild', 'Create Guild', guild_data);
+	}
+
+	async function update_guild(guild_id, name, motto, description, membership_type, language, banner, decal) {
+		let guild_data = {
+			guild_id: guild_id,
+			name: name,
+			motto: motto,
+			description: description,
+			membership_type: membership_type,
+			language: language,
+			banner: banner,
+			decal: decal
+		};
+
+		return splinterlands.send_tx('edit_guild', 'Update Guild', guild_data);
 	}
 
 	return {
@@ -369,6 +402,8 @@ window.splinterlands.ops = (function() {
 		purchase,
 		withdraw_dec,
 		join_guild,
-		leave_guild
+		leave_guild,
+		create_guild,
+		update_guild
 	};
 })();
