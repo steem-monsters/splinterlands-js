@@ -333,6 +333,14 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx_wrapper('token_transfer', 'Withdraw DEC', { type: 'withdraw', to: to_account, qty, token: 'DEC' }, tx => tx);
 	}
 
+	async function join_guild(guild_id) {
+		return splinterlands.send_tx('join_guild', 'Join Guild', { guild_id });
+	}
+
+	async function leave_guild(guild_id) {
+		return splinterlands.send_tx('leave_guild', 'Leave Guild', { guild_id });
+	}
+
 	return {
 		combine_cards,
 		combine_all,
@@ -359,6 +367,8 @@ window.splinterlands.ops = (function() {
 		open_pack,
 		open_multi,
 		purchase,
-		withdraw_dec
+		withdraw_dec,
+		join_guild,
+		leave_guild
 	};
 })();
