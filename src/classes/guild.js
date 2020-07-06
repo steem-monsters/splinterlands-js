@@ -101,4 +101,18 @@ splinterlands.Guild = class {
 			
 		return splinterlands.get_settings().guilds.shop_discount_pct[this.quest_lodge_level - 1];
 	}
+
+	async post_announcement(subject, message, is_private) {
+		let data = {
+			guild_id: this.id,
+			subject: subject,
+			message: message,
+			is_private: is_private
+		};
+		return await splinterlands.api('/guilds/post_announcement', data);
+	}
+
+	async delete_announcement(announcement_id) {		
+		return await splinterlands.api('/guilds/delete_announcement', {id : announcement_id });
+	}
 }

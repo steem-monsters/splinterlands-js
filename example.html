@@ -242,6 +242,7 @@
 
 	<script type="text/javascript">
 	  var guildHallBuilding = null;
+	  var testGuild = null;
       function onLogin(player) {
         $('#div_login').hide();
         $('#div_game').show();
@@ -254,7 +255,7 @@
 					$('#guild_crest').append(player.guild.render_crest(30));
 					$('#guild_name').text(player.guild.name);
 					guildHallBuilding = new splinterlands.GuildBuilding(player.guild.id, 'guild_hall', player.guild.data);
-
+					testGuild = new splinterlands.Guild(player.guild);
 				}
 
         ['DEC', 'CREDITS', 'UNTAMED', 'BETA', 'ALPHA', 'ORB'].forEach(async token => {
