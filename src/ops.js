@@ -334,15 +334,24 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function guild_join(guild_id) {
-		return splinterlands.send_tx_wrapper('join_guild', 'Join Guild', { guild_id }, tx => tx);
+		return splinterlands.send_tx_wrapper('join_guild', 'Join Guild', { guild_id }, async tx => {
+			await splinterlands.get_player().refresh();
+			return tx;
+		});
 	}
 
 	async function guild_request_join(guild_id) {
-		return splinterlands.send_tx_wrapper('join_guild', 'Request Join Guild', { guild_id }, tx => tx);
+		return splinterlands.send_tx_wrapper('join_guild', 'Request Join Guild', { guild_id }, async tx => {			
+			await splinterlands.get_player().refresh();
+			return tx;
+		});
 	}
 
 	async function guild_leave(guild_id) {
-		return splinterlands.send_tx_wrapper('leave_guild', 'Leave Guild', { guild_id }, tx => tx);
+		return splinterlands.send_tx_wrapper('leave_guild', 'Leave Guild', { guild_id }, async tx => {			
+			delete splinterlands.get_player().guild;
+			return tx;
+		});
 	}
 
 	async function guild_create(name, motto, description, membership_type, language, banner, decal) {
