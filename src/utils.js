@@ -492,6 +492,12 @@ window.splinterlands.utils = (function() {
 			"desc": "Has an increased chance of evading Melee or Ranged attacks from Monsters who do not have the Flying ability."
 		},
 		{
+			"name": "Halving",
+			"desc": "Each time this Monster hits a target , the target's attack is cut in half (rounded down).",
+			"effect_name": "Halved",
+			"effect_desc": "Attack stats cut in half"
+		},
+		{
 			"name": "Headwinds",
 			"desc": "Reduces the Ranged attack of all enemy Monsters.",
 			"effect_name": "Headwinds",
@@ -532,6 +538,10 @@ window.splinterlands.utils = (function() {
 		{
 			"name": "Opportunity",
 			"desc": "Monsters with the Opportunity ability may attack from any position and will target the enemy Monster with the lowest health."
+		},
+		{
+			"name": "Oppress",
+			"desc": "Does double damage when attacking an enemy that has no attack."
 		},
 		{
 			"name": "Piercing",
