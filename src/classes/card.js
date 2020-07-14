@@ -7,7 +7,7 @@ splinterlands.Card = class {
 			this.level = splinterlands.utils.get_level(this);
 			
 		if(!this.alpha_xp)
-			this.alpha_xp = 0
+			this.alpha_xp = 0;
 	}
 
 	get bcx() {
@@ -152,13 +152,7 @@ splinterlands.Card = class {
 		if(!this.playable)
 			return false;
 
-		// If it hasn't been transferred or used in battle recently it's playable
-		if(!this.last_transferred_block || !this.last_used_block)
-			return true;
-
-		// There is a 7 day cooldown period after a card has been transferred before it can be played in ranked battles
-		let cooldown_expiration = splinterlands.utils.get_cur_block_num() - splinterlands.get_settings().transfer_cooldown_blocks;
-		return this.last_transferred_block <= cooldown_expiration || this.last_used_block <= cooldown_expiration;
+		return this.cooldown <= 0;
 	}
 
 	get transferrable() {
@@ -226,12 +220,20 @@ splinterlands.Card = class {
 	}
 	
 	get cooldown() {
-		if(!this.last_transferred_block || !this.last_used_block)
+		if(!this.last_transferred_date || !this.last_used_date)
 			return 0;
 
-		var last_block = splinterlands.utils.get_cur_block_num();
-		if(this.last_transferred_block > last_block - splinterlands.get_settings().transfer_cooldown_blocks && this.last_used_block > last_block - splinterlands.get_settings().transfer_cooldown_blocks)
-			return (splinterlands.get_settings().transfer_cooldown_blocks - (last_block - this.last_used_block)) * 3;
+		let cooldown_start = new Date(Date.now() - splinterlands.get_settings().transfer_cooldown_blocks * 3000);
+		let last_transferred_date = new Date(this.last_transferred_date);
+		let last_used_date = new Date(this.last_used_date);
+		let different_last_used_player = this.delegated_to ? this.delegated_to != this.last_used_player : this.player != this.last_used_player;
+
+		if(last_transferred_date > cooldown_start && last_used_date > cooldown_start && different_last_used_player) {
+			let seconds_since_last_used = (Date.now() - last_used_date.getTime()) / 1000;
+			return (splinterlands.get_settings().transfer_cooldown_blocks * 3) - seconds_since_last_used;
+		}
+
+		return 0;
 	}
 
 	get suggested_price() {
