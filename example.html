@@ -607,17 +607,10 @@
 				$('#card_details').hide();
 			});
 
-			function eosTransactionTest() {
-				const params = {					
-					source_account_type: 'eos',
-					destination_account: 'splinterland',
-					amount: '1',
-					precision: 4,
-					symbol: 'EOS',
-					memo: 'PX-TESTTEST'
-				};
-
-				splinterlands.eos.scatterPay(params, (r) => console.log(r));
+			async function eosTransactionTest() {								
+				const data = await splinterlands.Store.start_purchase("credits", 1000, 'EOS');
+				
+				return splinterlands.eos.scatterPay(data.payment_info.amount, data.payment_info.memo);
 			}
     </script>
 	</body>

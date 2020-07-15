@@ -8,7 +8,8 @@ splinterlands.Store = class {
 			{ name: 'Steem Dollars', symbol: 'SBD' },
 			{ name: 'Bitcoin', symbol: 'BTC' },
 			{ name: 'Ether', symbol: 'ETH' },
-			{ name: 'Litecoin', symbol: 'LTC' }
+			{ name: 'Litecoin', symbol: 'LTC' },
+			{ name: 'EOS', symbol: 'EOS' }
 		];
 	}
 
@@ -73,7 +74,8 @@ splinterlands.Store = class {
 			{ name: 'Ether', symbol: 'ETH' },
 			{ name: 'Litecoin', symbol: 'LTC' },
 			{ name: 'Binance Coin', symbol: 'BNB' },
-			{ name: 'KuCoin Shares', symbol: 'KCS' }
+			{ name: 'KuCoin Shares', symbol: 'KCS' },
+			{ name: 'EOS', symbol: 'EOS' }
 		]
 	}
 
