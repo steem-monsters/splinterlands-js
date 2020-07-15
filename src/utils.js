@@ -23,7 +23,8 @@ window.splinterlands.utils = (function() {
 	];
 
 	rpc_index = 0;
-	rpc_nodes = ["https://api.steemit.com", "https://seed.steemmonsters.com", "https://steemd.minnowsupportproject.org"];
+	//rpc_nodes = ["https://api.steemit.com", "https://seed.steemmonsters.com", "https://steemd.minnowsupportproject.org"];
+	rpc_nodes = ["https://api.hive.blog", "https://anyx.io", "https://hived.splinterlands.com"];
 
 	function switch_rpc() {
 		// Try the next RPC node
