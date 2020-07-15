@@ -606,6 +606,19 @@
 				$('#tbl_collection').show();
 				$('#card_details').hide();
 			});
+
+			function eosTransactionTest() {
+				const params = {					
+					source_account_type: 'eos',
+					destination_account: 'splinterland',
+					amount: '1',
+					precision: 4,
+					symbol: 'EOS',
+					memo: 'PX-TESTTEST'
+				};
+
+				splinterlands.eos.scatterPay(params, (r) => console.log(r));
+			}
     </script>
 	</body>
 </html>
