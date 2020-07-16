@@ -62,6 +62,8 @@ window.splinterlands.eos = (function() {
 	async function sendFromScatter(to, amount, memo) {
 		try {
 			let account = await getScatterIdentity(this.config.scatter.eos_network, 'eos');
+			const network = scatterConn.Network.fromJson(this.config.scatter.eos_network);
+
 			const eos = scatterConn.eos(network, window.Eos);
 			const transactionOptions = { authorization:[`${account.name}@${account.authority}`] };
 			return await eos.transfer(account.name, to, `${parseFloat(amount).toFixed(4)} EOS`, memo, transactionOptions);
