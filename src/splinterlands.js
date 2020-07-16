@@ -15,6 +15,7 @@ var splinterlands = (function() {
 
 	async function init(config) { 
 		_config = config;
+		steem.api.setOptions({ transport: 'http', uri: 'https://api.hive.blog', url: 'https://api.hive.blog' });
 
 		// Load the browser id and create a new session id
 		_browser_id = localStorage.getItem('splinterlands:browser_id');
@@ -155,7 +156,7 @@ var splinterlands = (function() {
 		// Use the keychain extension if no private key is specified for login
 		_use_keychain = !key;
 
-		if(_use_keychain && !window.steem_keychain)
+		if(_use_keychain && !window.hive_keychain)
 			return { success: false, error: 'Missing private posting key.' };
 
 		let params = { name: username, ref: localStorage.getItem('splinterlands:ref'), ts: Date.now() };
@@ -176,7 +177,7 @@ var splinterlands = (function() {
 			params.ts = Date.now();
 			params.sig = eosjs_ecc.sign(username + params.ts, key);
 		} else {
-			params.sig = await new Promise(resolve => steem_keychain.requestSignBuffer(username, username + params.ts, 'Posting', r => resolve(r.result)));
+			params.sig = await new Promise(resolve => hive_keychain.requestSignBuffer(username, username + params.ts, 'Posting', r => resolve(r.result)));
 
 			if(!params.sig)
 				return { success: false, error: 'Unable to log in with account @' + username };
@@ -274,7 +275,7 @@ var splinterlands = (function() {
 		let broadcast_promise = null;
 
 		if(_use_keychain) {
-			broadcast_promise = new Promise(resolve => steem_keychain.requestCustomJson(_player.name, id, active_auth ? 'Active' : 'Posting', data_str, display_name, response => {
+			broadcast_promise = new Promise(resolve => hive_keychain.requestCustomJson(_player.name, id, active_auth ? 'Active' : 'Posting', data_str, display_name, response => {
 				resolve({ 
 					type: 'broadcast',
 					method: 'keychain',
@@ -344,8 +345,17 @@ var splinterlands = (function() {
 		let token = splinterlands.utils.get_token(currency);
 
 		switch(token.type) {
-			case 'steem':
+			case 'hive':
 				if(_use_keychain) {
+					var result = await new Promise(resolve => hive_keychain.requestTransfer(_player.name, to, parseFloat(amount).toFixed(3), memo, currency, response => resolve(response)));
+					return !result.success ? { success: false, error: result.error } : result;
+				} else {
+					let sc_url = `https://hivesigner.com/sign/transfer?to=${to}&amount=${parseFloat(amount).toFixed(3)}%20${currency}&memo=${encodeURIComponent(memo)}`;
+					splinterlands.utils.popup_center(sc_url, `${currency} Payment`, 500, 560);
+				}
+				break;
+			case 'steem':
+				if(window.steem_keychain) {
 					var result = await new Promise(resolve => steem_keychain.requestTransfer(_player.name, to, parseFloat(amount).toFixed(3), memo, currency, response => resolve(response)));
 					return !result.success ? { success: false, error: result.error } : result;
 				} else {

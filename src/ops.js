@@ -24,11 +24,11 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function convert_cards(card_ids) {
-		return await splinterlands.send_tx('convert_cards', 'Convert to Beta', { cards: card_ids });
+		return splinterlands.send_tx_wrapper('convert_cards', 'Convert to Beta', { cards: card_ids }, tx => tx);
 	}
 
 	async function add_wallet(type, address) {
-		return await splinterlands.send_tx_wrapper('add_wallet', 'Link External Wallet', { type, address }, tx => tx);
+		return splinterlands.send_tx_wrapper('add_wallet', 'Link External Wallet', { type, address }, tx => tx);
 	}
 
 	async function gift_cards(card_ids, to) {
@@ -58,18 +58,18 @@ window.splinterlands.ops = (function() {
 		if(data && typeof data == 'object')
 			obj = Object.assign(obj, data);
 
-		return await splinterlands.send_tx('token_transfer', 'Transfer DEC', obj);
+		return splinterlands.send_tx_wrapper('token_transfer', 'Transfer DEC', obj, tx => tx);
 	}
 
 	async function sell_cards(card_ids, price) {
-		return await splinterlands.send_tx_wrapper('sell_cards', 'Sell Cards', { cards: card_ids, price, currency: 'USD', fee_pct: splinterlands.get_settings().market_fee }, async tx => {
+		return splinterlands.send_tx_wrapper('sell_cards', 'Sell Cards', { cards: card_ids, price, currency: 'USD', fee_pct: splinterlands.get_settings().market_fee }, async tx => {
 			await splinterlands.load_collection();
 			return tx.result;
 		});
 	}
 
 	async function cancel_sell(market_id) {
-		return await splinterlands.send_tx('cancel_sell', 'Cancel Market Sale', { trx_ids: [market_id] });
+		return splinterlands.send_tx_wrapper('cancel_sell', 'Cancel Market Sale', { trx_ids: [market_id] }, tx => tx);
 	}
 
 	async function find_match(match_type, opponent, settings) {
@@ -302,11 +302,11 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function accept_challenge(id) {
-		return await splinterlands.send_tx('accept_challenge', 'Accept Challenge', { id });
+		return splinterlands.send_tx_wrapper('accept_challenge', 'Accept Challenge', { id }, tx => tx);
 	}
 
 	async function decline_challenge(id) {
-		return await splinterlands.send_tx('decline_challenge', 'Decline Challenge', { id });
+		return splinterlands.send_tx_wrapper('decline_challenge', 'Decline Challenge', { id }, tx => tx);
 	}
 
 	async function open_pack(edition) {
@@ -314,7 +314,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function open_multi(edition, qty) {
-		return await splinterlands.send_tx('open_all', 'Open Multiple Packs', { edition, qty });
+		return splinterlands.send_tx_wrapper('open_all', 'Open Multiple Packs', { edition, qty }, tx => tx);
 	}
 
 	async function purchase(type, qty, currency, data) {
@@ -332,6 +332,93 @@ window.splinterlands.ops = (function() {
 		let to_account = (wallet == 'tron') ? 'sm-dec-tron' : (wallet == 'ethereum' ? 'sl-eth' : splinterlands.get_settings().account);
 		return splinterlands.send_tx_wrapper('token_transfer', 'Withdraw DEC', { type: 'withdraw', to: to_account, qty, token: 'DEC' }, tx => tx);
 	}
+
+	async function guild_join(guild_id) {
+		return splinterlands.send_tx_wrapper('join_guild', 'Join Guild', { guild_id }, async tx => {
+			await splinterlands.get_player().refresh();
+			return tx;
+		});
+	}
+
+	async function guild_request_join(guild_id) {
+		return splinterlands.send_tx_wrapper('join_guild', 'Request Join Guild', { guild_id }, async tx => {			
+			await splinterlands.get_player().refresh();
+			return tx;
+		});
+	}
+
+	async function guild_leave(guild_id) {
+		return splinterlands.send_tx_wrapper('leave_guild', 'Leave Guild', { guild_id }, async tx => {			
+			delete splinterlands.get_player().guild;
+			return tx;
+		});
+	}
+
+	async function guild_create(name, motto, description, membership_type, language, banner, decal) {
+		let guild_data = {
+			name: name,
+			motto: motto,
+			description: description,
+			membership_type: membership_type,
+			language: language,
+			banner: banner,
+			decal: decal
+		};
+
+		return splinterlands.send_tx_wrapper('create_guild', 'Create Guild', guild_data, async tx => {			
+			await splinterlands.get_player().refresh();
+			return tx;
+		});
+	}
+
+	async function guild_update(guild_id, name, motto, description, membership_type, language, banner, decal) {
+		let guild_data = {
+			guild_id: guild_id,
+			name: name,
+			motto: motto,
+			description: description,
+			membership_type: membership_type,
+			language: language,
+			banner: banner,
+			decal: decal
+		};
+
+		return splinterlands.send_tx_wrapper('edit_guild', 'Update Guild', guild_data, tx => tx);
+	}
+
+	async function guild_request_join(guild_id) {
+		return splinterlands.send_tx_wrapper('join_guild', 'Request Join Guild', { guild_id }, tx => tx);
+	}
+
+	async function guild_invite(guild_id, recipient) {
+		return splinterlands.send_tx_wrapper('guild_invite', 'Invite Player', { guild_id, player: recipient}, tx => tx);
+	}
+
+	async function guild_approve_member(guild_id, player) {
+		return splinterlands.send_tx_wrapper('guild_accept', 'Accept Member', { guild_id, player }, tx => tx);
+	}
+
+	async function guild_decline_member(guild_id, player) {
+		return splinterlands.send_tx_wrapper('guild_decline', 'Decline Member', { guild_id, player }, tx => tx);
+	}
+
+	async function guild_promote_member(guild_id, player) {
+		return splinterlands.send_tx_wrapper('guild_promote', 'Promote Member', { guild_id, player }, tx => tx);
+	}
+
+	async function guild_demote_member(guild_id, player) {
+		return splinterlands.send_tx_wrapper('guild_demote', 'Demote Member', { guild_id, player }, tx => tx);
+	}
+
+	async function guild_kick_member(guild_id, player) {
+		return splinterlands.send_tx_wrapper('guild_remove', 'Kick Member', { guild_id, player }, tx => tx);
+	}
+
+	async function guild_contribution(guild_id, amount) {
+		return splinterlands.send_tx_wrapper('guild_contribution', 'Guild Contribution', { guild_id, amount }, tx => tx);
+	}
+
+
 
 	return {
 		combine_cards,
@@ -359,6 +446,18 @@ window.splinterlands.ops = (function() {
 		open_pack,
 		open_multi,
 		purchase,
-		withdraw_dec
+		withdraw_dec,
+		guild_join,
+		guild_request_join,
+		guild_leave,
+		guild_create,
+		guild_update,
+		guild_invite,
+		guild_approve_member,
+		guild_decline_member,
+		guild_promote_member,
+		guild_demote_member,
+		guild_kick_member,
+		guild_contribution
 	};
 })();

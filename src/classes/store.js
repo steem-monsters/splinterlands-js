@@ -1,8 +1,10 @@
 splinterlands.Store = class {
 	static get payment_tokens() { 
 		return [
+			{ name: 'HIVE', symbol: 'HIVE' },
 			{ name: 'STEEM', symbol: 'STEEM' },
 			{ name: 'Tron', symbol: 'TRX' },
+			{ name: 'Hive Dollars', symbol: 'HBD' },
 			{ name: 'Steem Dollars', symbol: 'SBD' },
 			{ name: 'Bitcoin', symbol: 'BTC' },
 			{ name: 'Ether', symbol: 'ETH' },
@@ -62,8 +64,10 @@ splinterlands.Store = class {
 
 	static get currencies() {
 		return [
+			{ name: 'HIVE', symbol: 'HIVE' },
 			{ name: 'STEEM', symbol: 'STEEM' },
 			{ name: 'Tron', symbol: 'TRX' },
+			{ name: 'Hive Dollars', symbol: 'HBD' },
 			{ name: 'Steem Dollars', symbol: 'SBD' },
 			{ name: 'Bitcoin', symbol: 'BTC' },
 			{ name: 'Ether', symbol: 'ETH' },
@@ -77,8 +81,8 @@ splinterlands.Store = class {
 		let orig_currency = currency;
 		let player = splinterlands.get_player() ? splinterlands.get_player().name : '';
 
-		if(!['STEEM', 'SBD', 'DEC'].includes(currency))
-			currency = 'STEEM';
+		if(!['HIVE', 'HBD', 'DEC'].includes(currency))
+			currency = 'HIVE';
 
 		let params = { player, type, qty, currency, orig_currency };
 

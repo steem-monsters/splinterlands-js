@@ -172,7 +172,7 @@ window.splinterlands.utils = (function() {
 			}
 		};
 
-		if(splinterlands.use_keychain()) {
+		if(window.steem_keychain) {
 			var result = await new Promise(resolve => steem_keychain.requestCustomJson(splinterlands.get_player().name, splinterlands.get_settings().ssc.chain_id, 'Active', JSON.stringify(transaction_data), 'Transfer Token: ' + token, r => resolve(r)));
 			
       if(!result.success)
@@ -206,6 +206,8 @@ window.splinterlands.utils = (function() {
 		switch(token) {
 			case 'STEEM':
 			case 'SBD':
+			case 'HIVE':
+			case 'HBD':
 				return true;
 			case 'TRX':
 				return (window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) ? true : false;
@@ -490,6 +492,12 @@ window.splinterlands.utils = (function() {
 			"desc": "Has an increased chance of evading Melee or Ranged attacks from Monsters who do not have the Flying ability."
 		},
 		{
+			"name": "Halving",
+			"desc": "Each time this Monster hits a target , the target's attack is cut in half (rounded down).",
+			"effect_name": "Halved",
+			"effect_desc": "Attack stats cut in half"
+		},
+		{
 			"name": "Headwinds",
 			"desc": "Reduces the Ranged attack of all enemy Monsters.",
 			"effect_name": "Headwinds",
@@ -530,6 +538,10 @@ window.splinterlands.utils = (function() {
 		{
 			"name": "Opportunity",
 			"desc": "Monsters with the Opportunity ability may attack from any position and will target the enemy Monster with the lowest health."
+		},
+		{
+			"name": "Oppress",
+			"desc": "Does double damage when attacking an enemy that has no attack."
 		},
 		{
 			"name": "Piercing",
