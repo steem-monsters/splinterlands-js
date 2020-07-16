@@ -24,11 +24,11 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function convert_cards(card_ids) {
-		return await splinterlands.send_tx_wrapper('convert_cards', 'Convert to Beta', { cards: card_ids }, tx => tx);
+		return splinterlands.send_tx_wrapper('convert_cards', 'Convert to Beta', { cards: card_ids }, tx => tx);
 	}
 
 	async function add_wallet(type, address) {
-		return await splinterlands.send_tx_wrapper('add_wallet', 'Link External Wallet', { type, address }, tx => tx);
+		return splinterlands.send_tx_wrapper('add_wallet', 'Link External Wallet', { type, address }, tx => tx);
 	}
 
 	async function gift_cards(card_ids, to) {
@@ -58,18 +58,18 @@ window.splinterlands.ops = (function() {
 		if(data && typeof data == 'object')
 			obj = Object.assign(obj, data);
 
-		return await splinterlands.send_tx_wrapper('token_transfer', 'Transfer DEC', obj, tx => tx);
+		return splinterlands.send_tx_wrapper('token_transfer', 'Transfer DEC', obj, tx => tx);
 	}
 
 	async function sell_cards(card_ids, price) {
-		return await splinterlands.send_tx_wrapper('sell_cards', 'Sell Cards', { cards: card_ids, price, currency: 'USD', fee_pct: splinterlands.get_settings().market_fee }, async tx => {
+		return splinterlands.send_tx_wrapper('sell_cards', 'Sell Cards', { cards: card_ids, price, currency: 'USD', fee_pct: splinterlands.get_settings().market_fee }, async tx => {
 			await splinterlands.load_collection();
 			return tx.result;
 		});
 	}
 
 	async function cancel_sell(market_id) {
-		return await splinterlands.send_tx_wrapper('cancel_sell', 'Cancel Market Sale', { trx_ids: [market_id] }, tx => tx);
+		return splinterlands.send_tx_wrapper('cancel_sell', 'Cancel Market Sale', { trx_ids: [market_id] }, tx => tx);
 	}
 
 	async function find_match(match_type, opponent, settings) {
@@ -302,11 +302,11 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function accept_challenge(id) {
-		return await splinterlands.send_tx_wrapper('accept_challenge', 'Accept Challenge', { id }, tx => tx);
+		return splinterlands.send_tx_wrapper('accept_challenge', 'Accept Challenge', { id }, tx => tx);
 	}
 
 	async function decline_challenge(id) {
-		return await splinterlands.send_tx_wrapper('decline_challenge', 'Decline Challenge', { id }, tx => tx);
+		return splinterlands.send_tx_wrapper('decline_challenge', 'Decline Challenge', { id }, tx => tx);
 	}
 
 	async function open_pack(edition) {
@@ -314,7 +314,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function open_multi(edition, qty) {
-		return await splinterlands.send_tx_wrapper('open_all', 'Open Multiple Packs', { edition, qty }, tx => tx);
+		return splinterlands.send_tx_wrapper('open_all', 'Open Multiple Packs', { edition, qty }, tx => tx);
 	}
 
 	async function purchase(type, qty, currency, data) {
