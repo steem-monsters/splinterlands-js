@@ -609,8 +609,7 @@
 
 			async function eosTransactionTest() {								
 				const data = await splinterlands.Store.start_purchase("credits", 1000, 'EOS');
-				
-				return splinterlands.eos.scatterPay(data.payment_info.amount, data.payment_info.memo);
+				return await splinterlands.eos.scatterPay(data.payment_info.address, data.payment_info.amount, data.payment_info.memo);
 			}
     </script>
 	</body>
