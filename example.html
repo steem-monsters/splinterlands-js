@@ -339,6 +339,12 @@
 					tbody.append(row);
 				});
 
+				console.log("Combine Details:");		
+				let result = splinterlands.Card.get_combine_result(card.owned);
+				console.log(`This will combine ${result.count} ${result.details.name} cards into one at level 
+				${result.level} with ${result.next_level_progress.current} / ${result.next_level_progress.total} cards to 
+				level ${result.level + 1}. This cannot be undone, are you sure you want to continue?`)
+
 				card.market_cards().then(r => {
 					let tbody = $('#tbl_market_details tbody');
 					tbody.empty();

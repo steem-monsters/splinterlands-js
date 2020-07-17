@@ -424,8 +424,8 @@ splinterlands.Card = class {
 			total += card.xp;
 
 			// Get the XP for each base card (gold cards start with XP so don't need to add XP for the base card)
-			if(!gold && card.edition < 4)
-				total += card.base_xp;
+			if(!gold && first_card.edition < 4 && card.details.tier < 4)
+				total += (card.edition == 0 || (card.edition == 2 && card.details.id < 100)) ? splinterlands.get_settings().xp_levels[card.details.rarity - 1][0] : splinterlands.get_settings().beta_xp[card.details.rarity - 1];
 
 			// Stop combining if we got to max level
 			if(total >= card.max_xp)
