@@ -370,6 +370,8 @@ var splinterlands = (function() {
 				return await splinterlands.ops.token_transfer(to, amount, splinterlands.utils.tryParse(memo));
 			case 'tron':
 				return await window.tronWeb.trx.sendTransaction(to, tronWeb.toSun(parseFloat(amount).toFixed(6)));
+			case 'eos':
+				return await splinterlands.eos.scatterPay(to, amount, memo);
 		}
 	}
 
