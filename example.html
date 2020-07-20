@@ -147,6 +147,7 @@
 					<div>
 						<h5>Store:</h5>
 						<div id="paypal_button_container"></div>
+						<button id="btn_eos_test">EOS TEST</button>
 					</div>
 				</div>
       </div>
@@ -617,6 +618,10 @@
 				const data = await splinterlands.Store.start_purchase("credits", 1000, 'EOS');
 				return await splinterlands.eos.scatterPay(data.payment_info.address, data.payment_info.amount, data.payment_info.memo);
 			}
+
+			$('#btn_eos_test').click(() => {
+				eosTransactionTest();
+			});			
     </script>
 	</body>
 </html>
