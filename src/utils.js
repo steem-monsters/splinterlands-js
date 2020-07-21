@@ -202,20 +202,22 @@ window.splinterlands.utils = (function() {
 	}
 	
 	// Checks whether or not a browser payment method is available for the specified token (i.e. Web3 for ETH or TronWeb for TRX)
-	function browser_payment_available(token) {
-		switch(token) {
-			case 'STEEM':
-			case 'SBD':
-			case 'HIVE':
-			case 'HBD':
-				return true;
-			case 'TRX':
-				return (window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) ? true : false;
-			case 'EOS':
-				return true;
-			default:
-				return false;
-		}
+	async function browser_payment_available(token) {
+		return new Promise(resolve => {
+			switch(token) {
+				case 'STEEM':
+				case 'SBD':
+				case 'HIVE':
+				case 'HBD':
+					return resolve(true);
+				case 'TRX':
+					return (window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) ? resolve(true) : resolve(false);
+				case 'EOS':
+					return resolve(splinterlands.eos.hasIdentity());
+				default:
+					return resolve(false);
+			}
+		});
 	}
   
   function get_edition_str(edition) {
