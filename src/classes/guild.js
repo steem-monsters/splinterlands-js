@@ -1,5 +1,5 @@
 splinterlands.Guild = class {
-	constructor(data) {
+	_init(data) {
 		Object.keys(data).forEach(k => this[k] = data[k]);
 
 		this.data = splinterlands.utils.try_parse(data.data);
@@ -9,6 +9,10 @@ splinterlands.Guild = class {
 			this.buildings = Object.keys(buildings).map(k => new splinterlands.GuildBuilding(this.id, k, buildings[k]));
 
 		this.crest = this.data ? this.data.crest : {};
+	}
+
+	constructor(data) {
+		this._init(data);
 	}
 
 	static async list(name, membership_type, language) {
@@ -110,6 +114,11 @@ splinterlands.Guild = class {
 			is_private: is_private
 		};
 		return await splinterlands.api('/guilds/post_announcement', data);
+	}
+
+	async refresh() {
+		let data = await splinterlands.Guild.find(this.id);
+		this._init(data);
 	}
 
 	async delete_announcement(announcement_id) {		
