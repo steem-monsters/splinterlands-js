@@ -383,7 +383,10 @@ window.splinterlands.ops = (function() {
 			decal: decal
 		};
 
-		return splinterlands.send_tx_wrapper('edit_guild', 'Update Guild', guild_data, tx => tx);
+		return splinterlands.send_tx_wrapper('edit_guild', 'Update Guild', guild_data, async tx => {			
+			await splinterlands.get_player().guild.refresh();
+			return tx;
+		});
 	}
 
 	async function guild_request_join(guild_id) {
