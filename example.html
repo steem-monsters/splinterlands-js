@@ -1,628 +1,674 @@
 <html>
-	<head>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="dist/splinterlands.min.css" />
 
-		<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-		<script src="dist/splinterlands.min.js"></script>
-		<script type="text/javascript">
-			$(() =>	setTimeout(init, 500));
+<head>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" href="dist/splinterlands.min.css" />
 
-			async function init() {
-				//await splinterlands.init({ api_url: 'https://steemmonsters.com', ws_url: 'wss://ws.steemmonsters.io' });
-				await splinterlands.init({ api_url: 'https://hive.steemmonsters.io', ws_url: 'wss://hive-ws.steemmonsters.io' });
-				//await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+		integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+	<script src="dist/splinterlands.min.js"></script>
+	<script type="text/javascript">
+		$(() => setTimeout(init, 500));
 
-				if(splinterlands.has_saved_login())
-					savedLogin();
-				
-				// If the steem keychain browser extension is not present, show the password login option
-				if(!window.hive_keychain) {
-					$('#chk_pwd_login').prop('checked', true);
-					$('#div_pwd_login').show();
-          $('#btn_login_keychain').hide();
-				}
-      }
-      
-      async function savedLogin() {
-				ShowLoading();
+		async function init() {
+			//await splinterlands.init({ api_url: 'https://steemmonsters.com', ws_url: 'wss://ws.steemmonsters.io' });
+			await splinterlands.init({
+				api_url: 'https://hive.steemmonsters.io',
+				ws_url: 'wss://hive-ws.steemmonsters.io'
+			});
+			//await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
 
-        let login_response = await splinterlands.login();
+			if (splinterlands.has_saved_login())
+				savedLogin();
 
-        if(!login_response.error)
-					onLogin(login_response);
-					
-				HideLoading();
-      }
-
-			window.addEventListener('splinterlands:version_change', e => {
-				alert(`New Version - ${e.detail}!`);
-			}, false);
-
-			window.addEventListener('splinterlands:purchase_complete', e => {
-				alert(`Purchase Complete - ${JSON.stringify(e.detail, null, 2)}!`);
-			}, false);
-
-			window.addEventListener('splinterlands:socket_connect', e => {
-				console.log(`Socket Connect - ${e.detail}!`);
-			}, false);
-
-			window.addEventListener('splinterlands:socket_disconnect', e => {
-				console.log(`Socket Disconnect - ${e.detail}!`);
-			}, false);
-
-			window.addEventListener('splinterlands:system_message', e => {
-				alert(`SYSTEM MESSAGE: ${e.detail.title} - ${e.detail.message}`);
-			}, false);
-
-			window.addEventListener('splinterlands:maintenance_mode', e => {
-				alert(e.detail.maintenance_mode ? 'Game is down for maintenance.' : 'Game is back up!');
-			}, false);
-		</script>
-
-		<style type="text/css">
-			.modal-backdrop.in {
-				opacity: 0.8;
+			// If the steem keychain browser extension is not present, show the password login option
+			if (!window.hive_keychain) {
+				$('#chk_pwd_login').prop('checked', true);
+				$('#div_pwd_login').show();
+				$('#btn_login_keychain').hide();
 			}
+		}
 
-			.loading {
-				position: fixed;
-				width: 200px;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-			}
+		async function savedLogin() {
+			ShowLoading();
 
-			#tbl_stats_details th img, #tbl_stats_details_summoner th img {
-				width: 40px;
-			}
+			let login_response = await splinterlands.login();
 
-			#tbl_stats_details td img {
-				height: 30px;
-			}
-		</style>
+			if (!login_response.error)
+				onLogin(login_response);
 
-		<script type="text/javascript" src="https://d36mxiodymuqjm.cloudfront.net/libraries/TronWeb.js"></script>
-	</head>
-	<body>
-    <div class="container">
-      <div id="div_login" class="py-3">
-        <input type="text" id="username" placeholder="account name"/>
-        <button id="btn_login_keychain">Log In With Keychain</button>
-        <br/>
-        <div id="div_pwd_login" style="display: none;">
-          <input type="password" id="password" />
-          <button id="btn_login_pwd">Log In With Password</button>
-        </div>
-        <label><input type="checkbox" id="chk_pwd_login"/> Log in with password</label><br/>
-      </div>
+			HideLoading();
+		}
 
-      <div id="div_game" style="display: none;">
-        <div class="py-3" style="display: flex;">
-					<div style="margin-right: 20px;">Logged in as: </div>
-					<div id="player_avatar" style="margin-right: 20px;"></div>
-					<div>@<span id="span_username"></span></div>
+		window.addEventListener('splinterlands:version_change', e => {
+			alert(`New Version - ${e.detail}!`);
+		}, false);
 
-					<div style="display: flex; margin: 0 30px;">
-						<div id="guild_crest"></div>
-						<div id="guild_name"></div>
-					</div>
+		window.addEventListener('splinterlands:purchase_complete', e => {
+			alert(`Purchase Complete - ${JSON.stringify(e.detail, null, 2)}!`);
+		}, false);
 
-          <button id="btn_logout">Log Out</button>
-        </div>
+		window.addEventListener('splinterlands:socket_connect', e => {
+			console.log(`Socket Connect - ${e.detail}!`);
+		}, false);
 
-				<div style="display: flex">
-					<div class="py-1">
-						<h5>Balances:</h5>
-						<div>DEC: <span id="span_balance_dec"></span></div>
-						<div>CREDITS: <span id="span_balance_credits"></span></div>
-						<div>UNTAMED: <span id="span_balance_untamed"></span></div>
-						<div>BETA: <span id="span_balance_beta"></span></div>
-						<div>ALPHA: <span id="span_balance_alpha"></span></div>
-						<div>ORB: <span id="span_balance_orb"></span></div>
-					</div>
-					
-					<div style="text-align: center; width: 300px;">
-						<h5>League:</h5>
-						<img id="img_league" src="" style="height: 75px;" />
-						<div id="league_name"></div>
-						<div id="season_ends"></div>
-					</div>
+		window.addEventListener('splinterlands:socket_disconnect', e => {
+			console.log(`Socket Disconnect - ${e.detail}!`);
+		}, false);
 
-					<div>
-						<h5>Quest:</h5>
-						<div id="quest_info"></div>
-						<button id="btn_claim_quest_rewards" style="display: none;">CLAIM REWARDS</button>
-						<button id="btn_start_quest" style="display: none;">START QUEST</button>
-						<button id="btn_refresh_quest" style="display: none;">NEW QUEST</button>
-					</div>
+		window.addEventListener('splinterlands:system_message', e => {
+			alert(`SYSTEM MESSAGE: ${e.detail.title} - ${e.detail.message}`);
+		}, false);
 
-					<div>
-						<h5>Battle:</h5>
-						<button id="btn_practice">PRACTICE</button>
-						<button id="btn_ranked">RANKED</button>
-						<button id="btn_submit_team" style="display: none;">SUBMIT TEAM</button>
-					</div>
+		window.addEventListener('splinterlands:maintenance_mode', e => {
+			alert(e.detail.maintenance_mode ? 'Game is down for maintenance.' : 'Game is back up!');
+		}, false);
+	</script>
 
-					<div>
-						<h5>Store:</h5>
-						<div id="paypal_button_container"></div>
-						<button id="btn_eos_test">EOS TEST</button>
-					</div>
+	<style type="text/css">
+		.modal-backdrop.in {
+			opacity: 0.8;
+		}
+
+		.loading {
+			position: fixed;
+			width: 200px;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+
+		#tbl_stats_details th img,
+		#tbl_stats_details_summoner th img {
+			width: 40px;
+		}
+
+		#tbl_stats_details td img {
+			height: 30px;
+		}
+	</style>
+
+	<script type="text/javascript" src="https://d36mxiodymuqjm.cloudfront.net/libraries/TronWeb.js"></script>
+</head>
+
+<body>
+	<div class="container">
+		<div id="div_login" class="py-3">
+			<input type="text" id="username" placeholder="account name" />
+			<button id="btn_login_keychain">Log In With Keychain</button>
+			<button id="btn_login_eos">Log In With EOS</button>
+			<br />
+			<div id="div_pwd_login" style="display: none;">
+				<input type="password" id="password" />
+				<button id="btn_login_pwd">Log In With Password</button>
+			</div>
+			<label><input type="checkbox" id="chk_pwd_login" /> Log in with password</label><br />
+		</div>
+
+		<div id="div_game" style="display: none;">
+			<div class="py-3" style="display: flex;">
+				<div style="margin-right: 20px;">Logged in as: </div>
+				<div id="player_avatar" style="margin-right: 20px;"></div>
+				<div>@<span id="span_username"></span></div>
+
+				<div style="display: flex; margin: 0 30px;">
+					<div id="guild_crest"></div>
+					<div id="guild_name"></div>
 				</div>
-      </div>
 
-      <div class="py-1">
-        <table id="tbl_collection" class="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Edition</th>
-              <th>Foil</th>
-              <th>Level</th>
-              <th>Num Cards</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-				</table>
-				
-				<div id="card_details" style="display: none; margin-top: 20px;">
-					<button id="btn_back">&lt; Back</button>
-					<div id="card_list" style="display: flex; justify-content: space-evenly; margin: 20px;"></div>
+				<button id="btn_logout">Log Out</button>
+			</div>
 
-					<div style="margin: 20px;">
-						<button id="btn_details_cards" onclick="showDetailsDiv('cards');">CARDS</button>
-						<button id="btn_details_market" onclick="showDetailsDiv('market');">MARKET</button>
-						<button id="btn_details_stats" onclick="showDetailsDiv('stats');">STATS</button>
-						<button id="btn_details_lore" onclick="showDetailsDiv('lore');">LORE</button>
-					</div>
-
-					<div id="div_details_cards" class="div-details">
-						<table id="tbl_card_details" class="table">
-							<thead>
-								<th></th>
-								<th>Lvl</th>
-								<th>BCX</th>
-								<th>Next Lvl</th>
-								<th>DEC</th>
-								<th>Status</th>
-								<th>Card ID</th>
-							</thead>
-							<tbody></tbody>
-						</table>
-					</div>
-
-					<div id="div_details_market" class="div-details" style="display: none;">
-						<table id="tbl_market_details" class="table">
-							<thead>
-								<th></th>
-								<th>Price</th>
-								<th>LVL</th>
-								<th>BCX</th>
-								<th>$ / BCX</th>
-								<th>Status</th>
-								<th>Card ID</th>
-							</thead>
-							<tbody></tbody>
-						</table>
-					</div>
-
-					<div id="div_details_stats" class="div-details" style="display: none;">
-						<table id="tbl_stats_details" class="table">
-							<thead>
-								<th>Lvl</th>
-								<th>Cards</th>
-								<th id="th_atk"></th>
-								<th id="th_atk2" style="display: none;"></th>
-								<th><img src="https://s3.amazonaws.com/steemmonsters/website/stats/speed.png"/></th>
-								<th><img src="https://s3.amazonaws.com/steemmonsters/website/stats/defense.png"/></th>
-								<th><img src="https://s3.amazonaws.com/steemmonsters/website/stats/health.png"/></th>
-								<th>Abilities</th>
-							</thead>
-							<tbody></tbody>
-						</table>
-
-						<table id="tbl_stats_details_summoner" class="table" style="display: none;">
-							<thead>
-								<th>Lvl</th>
-								<th>Cards</th>
-								<th><img src="https://s3.amazonaws.com/steemmonsters/website/icons/icon-rarity-common.svg"/></th>
-								<th><img src="https://s3.amazonaws.com/steemmonsters/website/icons/icon-rarity-rare.svg"/></th>
-								<th><img src="https://s3.amazonaws.com/steemmonsters/website/icons/icon-rarity-epic.svg"/></th>
-								<th><img src="https://s3.amazonaws.com/steemmonsters/website/icons/icon-rarity-legendary.svg"/></th>
-							</thead>
-							<tbody></tbody>
-						</table>
-					</div>
-
-					<div id="div_details_lore" class="div-details"></div>
+			<div style="display: flex">
+				<div class="py-1">
+					<h5>Balances:</h5>
+					<div>DEC: <span id="span_balance_dec"></span></div>
+					<div>CREDITS: <span id="span_balance_credits"></span></div>
+					<div>UNTAMED: <span id="span_balance_untamed"></span></div>
+					<div>BETA: <span id="span_balance_beta"></span></div>
+					<div>ALPHA: <span id="span_balance_alpha"></span></div>
+					<div>ORB: <span id="span_balance_orb"></span></div>
 				</div>
-      </div>
-    </div>
+
+				<div style="text-align: center; width: 300px;">
+					<h5>League:</h5>
+					<img id="img_league" src="" style="height: 75px;" />
+					<div id="league_name"></div>
+					<div id="season_ends"></div>
+				</div>
+
+				<div>
+					<h5>Quest:</h5>
+					<div id="quest_info"></div>
+					<button id="btn_claim_quest_rewards" style="display: none;">CLAIM REWARDS</button>
+					<button id="btn_start_quest" style="display: none;">START QUEST</button>
+					<button id="btn_refresh_quest" style="display: none;">NEW QUEST</button>
+				</div>
+
+				<div>
+					<h5>Battle:</h5>
+					<button id="btn_practice">PRACTICE</button>
+					<button id="btn_ranked">RANKED</button>
+					<button id="btn_submit_team" style="display: none;">SUBMIT TEAM</button>
+				</div>
+
+				<div>
+					<h5>Store:</h5>
+					<div id="paypal_button_container"></div>
+					<button id="btn_eos_test">EOS TEST</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="py-1">
+			<table id="tbl_collection" class="table">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Edition</th>
+						<th>Foil</th>
+						<th>Level</th>
+						<th>Num Cards</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+
+			<div id="card_details" style="display: none; margin-top: 20px;">
+				<button id="btn_back">&lt; Back</button>
+				<div id="card_list" style="display: flex; justify-content: space-evenly; margin: 20px;"></div>
+
+				<div style="margin: 20px;">
+					<button id="btn_details_cards" onclick="showDetailsDiv('cards');">CARDS</button>
+					<button id="btn_details_market" onclick="showDetailsDiv('market');">MARKET</button>
+					<button id="btn_details_stats" onclick="showDetailsDiv('stats');">STATS</button>
+					<button id="btn_details_lore" onclick="showDetailsDiv('lore');">LORE</button>
+				</div>
+
+				<div id="div_details_cards" class="div-details">
+					<table id="tbl_card_details" class="table">
+						<thead>
+							<th></th>
+							<th>Lvl</th>
+							<th>BCX</th>
+							<th>Next Lvl</th>
+							<th>DEC</th>
+							<th>Status</th>
+							<th>Card ID</th>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+
+				<div id="div_details_market" class="div-details" style="display: none;">
+					<table id="tbl_market_details" class="table">
+						<thead>
+							<th></th>
+							<th>Price</th>
+							<th>LVL</th>
+							<th>BCX</th>
+							<th>$ / BCX</th>
+							<th>Status</th>
+							<th>Card ID</th>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+
+				<div id="div_details_stats" class="div-details" style="display: none;">
+					<table id="tbl_stats_details" class="table">
+						<thead>
+							<th>Lvl</th>
+							<th>Cards</th>
+							<th id="th_atk"></th>
+							<th id="th_atk2" style="display: none;"></th>
+							<th><img src="https://s3.amazonaws.com/steemmonsters/website/stats/speed.png" /></th>
+							<th><img src="https://s3.amazonaws.com/steemmonsters/website/stats/defense.png" /></th>
+							<th><img src="https://s3.amazonaws.com/steemmonsters/website/stats/health.png" /></th>
+							<th>Abilities</th>
+						</thead>
+						<tbody></tbody>
+					</table>
+
+					<table id="tbl_stats_details_summoner" class="table" style="display: none;">
+						<thead>
+							<th>Lvl</th>
+							<th>Cards</th>
+							<th><img
+									src="https://s3.amazonaws.com/steemmonsters/website/icons/icon-rarity-common.svg" />
+							</th>
+							<th><img src="https://s3.amazonaws.com/steemmonsters/website/icons/icon-rarity-rare.svg" />
+							</th>
+							<th><img src="https://s3.amazonaws.com/steemmonsters/website/icons/icon-rarity-epic.svg" />
+							</th>
+							<th><img
+									src="https://s3.amazonaws.com/steemmonsters/website/icons/icon-rarity-legendary.svg" />
+							</th>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+
+				<div id="div_details_lore" class="div-details"></div>
+			</div>
+		</div>
+	</div>
 
 	<script type="text/javascript">
-	  var guildHallBuilding = null;
-	  var testGuild = null;
-      function onLogin(player) {
-        $('#div_login').hide();
-        $('#div_game').show();
-				$('#span_username').text(player.name);
-				//$('#player_profile_img').attr('src', player.profile_image);
+		var guildHallBuilding = null;
+		var testGuild = null;
 
-				$('#player_avatar').append(player.render_avatar(40));
+		function onLogin(player) {
+			$('#div_login').hide();
+			$('#div_game').show();
+			$('#span_username').text(player.name);
+			//$('#player_profile_img').attr('src', player.profile_image);
 
-				if(player.guild) {
-					$('#guild_crest').append(player.guild.render_crest(30));
-					$('#guild_name').text(player.guild.name);
-					guildHallBuilding = new splinterlands.GuildBuilding(player.guild.id, 'guild_hall', player.guild.data);
-					testGuild = new splinterlands.Guild(player.guild);
-				}
+			$('#player_avatar').append(player.render_avatar(40));
 
-        ['DEC', 'CREDITS', 'UNTAMED', 'BETA', 'ALPHA', 'ORB'].forEach(async token => {
-          let balance = await player.get_balance(token);
-          $(`#span_balance_${token.toLowerCase()}`).text(balance);
-				});
-				
-				$('#img_league').attr('src', player.league.image);
-				$('#league_name').text(player.league.name);
-
-				setInterval(() => $('#season_ends').text(`Season ends in: ${countdownStr(new Date(splinterlands.get_settings().season.ends).getTime() - Date.now(), true)}`), 1000);
-
-				showQuestInfo(player.quest);
-        showCollection();
-      }
-
-      function showCollection() {
-        let tbody = $('#tbl_collection tbody');
-
-        splinterlands.group_collection().forEach(card => {
-          let row = $('<tr>');
-
-          row.append(`<td>${card.details.name}</td>`);
-          row.append(`<td>${splinterlands.utils.get_edition_str(card.edition)}</td>`);
-          row.append(`<td>${card.gold ? 'Gold' : 'Regular'}</td>`);
-          row.append(`<td>${card.level || '--'}</td>`);
-          row.append(`<td>${card.owned.length}</td>`);
-
-          let img_td = $('<td></td>');
-          img_td.append(card.render('xs'));
-					row.append(img_td);
-					
-					row.click(() => showCardDetails(card.card_detail_id, card.edition, card.gold));
-
-          tbody.append(row);
-        });
-			}
-			
-			function showDetailsDiv(type) {
-				$('.div-details').hide();
-				$(`#div_details_${type}`).show();
+			if (player.guild) {
+				$('#guild_crest').append(player.guild.render_crest(30));
+				$('#guild_name').text(player.guild.name);
+				guildHallBuilding = new splinterlands.GuildBuilding(player.guild.id, 'guild_hall', player.guild.data);
+				testGuild = new splinterlands.Guild(player.guild);
 			}
 
-			async function showCardDetails(card_detail_id, edition, gold) {
-				let card = splinterlands.group_collection().find(c => c.card_detail_id == card_detail_id && c.edition == edition && c.gold == gold);
-				showDetailsDiv('cards');
+			['DEC', 'CREDITS', 'UNTAMED', 'BETA', 'ALPHA', 'ORB'].forEach(async token => {
+				let balance = await player.get_balance(token);
+				$(`#span_balance_${token.toLowerCase()}`).text(balance);
+			});
 
-				$('#tbl_collection').hide();
-				$('#card_details').show();
-				$('#card_list').empty();
+			$('#img_league').attr('src', player.league.image);
+			$('#league_name').text(player.league.name);
 
-				splinterlands.group_collection_by_card(card.card_detail_id).forEach(c => {
-					let div = $('<div></div>');
+			setInterval(() => $('#season_ends').text(
+				`Season ends in: ${countdownStr(new Date(splinterlands.get_settings().season.ends).getTime() - Date.now(), true)}`
+				), 1000);
 
-					if(card.edition != c.edition || card.gold != c.gold)
-						div.css('opacity', '0.5');
+			showQuestInfo(player.quest);
+			showCollection();
+		}
 
-					div.append(c.render());
-					$('#card_list').append(div);
-				});
+		function showCollection() {
+			let tbody = $('#tbl_collection tbody');
 
-				let tbody = $('#tbl_card_details tbody');
+			splinterlands.group_collection().forEach(card => {
+				let row = $('<tr>');
+
+				row.append(`<td>${card.details.name}</td>`);
+				row.append(`<td>${splinterlands.utils.get_edition_str(card.edition)}</td>`);
+				row.append(`<td>${card.gold ? 'Gold' : 'Regular'}</td>`);
+				row.append(`<td>${card.level || '--'}</td>`);
+				row.append(`<td>${card.owned.length}</td>`);
+
+				let img_td = $('<td></td>');
+				img_td.append(card.render('xs'));
+				row.append(img_td);
+
+				row.click(() => showCardDetails(card.card_detail_id, card.edition, card.gold));
+
+				tbody.append(row);
+			});
+		}
+
+		function showDetailsDiv(type) {
+			$('.div-details').hide();
+			$(`#div_details_${type}`).show();
+		}
+
+		async function showCardDetails(card_detail_id, edition, gold) {
+			let card = splinterlands.group_collection().find(c => c.card_detail_id == card_detail_id && c.edition ==
+				edition && c.gold == gold);
+			showDetailsDiv('cards');
+
+			$('#tbl_collection').hide();
+			$('#card_details').show();
+			$('#card_list').empty();
+
+			splinterlands.group_collection_by_card(card.card_detail_id).forEach(c => {
+				let div = $('<div></div>');
+
+				if (card.edition != c.edition || card.gold != c.gold)
+					div.css('opacity', '0.5');
+
+				div.append(c.render());
+				$('#card_list').append(div);
+			});
+
+			let tbody = $('#tbl_card_details tbody');
+			tbody.empty();
+
+			card.owned.forEach(c => {
+				let row = $('<tr>');
+
+				row.append(`<td><input type="checkbox"/></td>`);
+				row.append(`<td>${c.level}</td>`);
+				row.append(`<td>${c.bcx}</td>`);
+
+				if (c.next_level_progress.total <= 0)
+					row.append(`<td>MAX</td>`);
+				else
+					row.append(`<td>${c.next_level_progress.current} / ${c.next_level_progress.total}</td>`);
+
+				row.append(`<td>${c.dec}</td>`);
+				row.append(`<td></td>`);
+				row.append(`<td>${c.uid}</td>`);
+
+				tbody.append(row);
+			});
+
+			console.log("Combine Details:");
+			let result = splinterlands.Card.get_combine_result(card.owned);
+			console.log(`This will combine ${result.count} ${result.details.name} cards into one at level 
+				${result.level} with ${result.next_level_progress.current} / ${result.next_level_progress.total} cards to 
+				level ${result.level + 1}. This cannot be undone, are you sure you want to continue?`)
+
+			card.market_cards().then(r => {
+				let tbody = $('#tbl_market_details tbody');
 				tbody.empty();
 
-				card.owned.forEach(c => {
+				r.forEach(c => {
 					let row = $('<tr>');
 
 					row.append(`<td><input type="checkbox"/></td>`);
-					row.append(`<td>${c.level}</td>`);
+					row.append(`<td>$${parseFloat(c.buy_price).toFixed(2)}</td>`);
 					row.append(`<td>${c.bcx}</td>`);
-
-					if(c.next_level_progress.total <= 0)
-						row.append(`<td>MAX</td>`);
-					else
-						row.append(`<td>${c.next_level_progress.current} / ${c.next_level_progress.total}</td>`);
-
-					row.append(`<td>${c.dec}</td>`);
+					row.append(`<td>${c.level}</td>`);
+					row.append(`<td>$${(parseFloat(c.buy_price) / c.bcx).toFixed(3)}</td>`);
 					row.append(`<td></td>`);
 					row.append(`<td>${c.uid}</td>`);
 
 					tbody.append(row);
 				});
+			});
 
-				console.log("Combine Details:");		
-				let result = splinterlands.Card.get_combine_result(card.owned);
-				console.log(`This will combine ${result.count} ${result.details.name} cards into one at level 
-				${result.level} with ${result.next_level_progress.current} / ${result.next_level_progress.total} cards to 
-				level ${result.level + 1}. This cannot be undone, are you sure you want to continue?`)
+			if (card.details.type == 'Monster') {
+				$('#tbl_stats_details').show();
+				$('#tbl_stats_details_summoner').hide();
+				tbody = $('#tbl_stats_details tbody');
+				tbody.empty();
 
-				card.market_cards().then(r => {
-					let tbody = $('#tbl_market_details tbody');
-					tbody.empty();
-				
-					r.forEach(c => {
-						let row = $('<tr>');
+				let attack_types = card.details.attack_types;
 
-						row.append(`<td><input type="checkbox"/></td>`);
-						row.append(`<td>$${parseFloat(c.buy_price).toFixed(2)}</td>`);
-						row.append(`<td>${c.bcx}</td>`);
-						row.append(`<td>${c.level}</td>`);
-						row.append(`<td>$${(parseFloat(c.buy_price) / c.bcx).toFixed(3)}</td>`);
-						row.append(`<td></td>`);
-						row.append(`<td>${c.uid}</td>`);
+				if (attack_types.length == 0)
+					attack_types.push('melee');
 
-						tbody.append(row);
-					});
-				});
+				$('#th_atk').empty();
+				$('#th_atk').append(`<img src="${splinterlands.utils.get_stat_image(attack_types[0])}"/>`);
 
-				if(card.details.type == 'Monster') {
-					$('#tbl_stats_details').show();
-					$('#tbl_stats_details_summoner').hide();
-					tbody = $('#tbl_stats_details tbody');
-					tbody.empty();
-
-					let attack_types = card.details.attack_types;
-
-					if(attack_types.length == 0)
-						attack_types.push('melee');
-
-					$('#th_atk').empty();
-					$('#th_atk').append(`<img src="${splinterlands.utils.get_stat_image(attack_types[0])}"/>`);
-
-					if(attack_types.length > 1) {
-						$('#th_atk2').show();
-						$('#th_atk2').append(`<img src="${splinterlands.utils.get_stat_image(attack_types[1])}"/>`);
-					} else {
-						$('#th_atk2').hide();
-						$('#th_atk2').empty();
-					}
-
-					for(let i = 0; i < card.max_level; i++) {
-						let row = $('<tr>');
-
-						row.append(`<td>${i+1}</td>`);
-						row.append(`<td>${card.cards_to_level(i+1) == 0 ? 'N/A' : card.cards_to_level(i+1)}</td>`);
-						row.append(`<td>${card.details.stats[attack_types[0]][i]}</td>`);
-
-						if(attack_types.length > 1)
-							row.append(`<td>${card.details.stats[attack_types[1]][i]}</td>`);
-
-						row.append(`<td>${card.details.stats.speed[i]}</td>`);
-						row.append(`<td>${card.details.stats.armor[i]}</td>`);
-						row.append(`<td>${card.details.stats.health[i]}</td>`);
-
-						let abilities = '';
-						card.details.abilities_by_level(i + 1).forEach(ability => {
-							abilities += `<img src="${splinterlands.utils.get_ability_image(ability, true)}"/>`;									
-						});
-
-						row.append(`<td>${abilities}</td>`);
-
-						tbody.append(row);
-					}
+				if (attack_types.length > 1) {
+					$('#th_atk2').show();
+					$('#th_atk2').append(`<img src="${splinterlands.utils.get_stat_image(attack_types[1])}"/>`);
 				} else {
-					$('#tbl_stats_details').hide();
-					$('#tbl_stats_details_summoner').show();
-					tbody = $('#tbl_stats_details_summoner tbody');
-					tbody.empty();
-
-					for(let i = 0; i < card.max_level; i++) {
-						let row = $('<tr>');
-
-						row.append(`<td>${i+1}</td>`);
-						row.append(`<td>${card.cards_to_level(i+1) == 0 ? 'N/A' : card.cards_to_level(i+1)}</td>`);
-						row.append(`<td>${card.details.level_limit_by_level_rarity(i + 1, 1)}</td>`);
-						row.append(`<td>${card.details.level_limit_by_level_rarity(i + 1, 2)}</td>`);
-						row.append(`<td>${card.details.level_limit_by_level_rarity(i + 1, 3)}</td>`);
-						row.append(`<td>${card.details.level_limit_by_level_rarity(i + 1, 4)}</td>`);
-
-						tbody.append(row);
-					}
+					$('#th_atk2').hide();
+					$('#th_atk2').empty();
 				}
 
-				$('#div_details_lore').empty();
-				$('#div_details_lore').text(await card.lore());
-			}
+				for (let i = 0; i < card.max_level; i++) {
+					let row = $('<tr>');
 
-      $('#btn_login_keychain').click(async () => {
-				ShowLoading();
-				let login_response = await splinterlands.login($('#username').val());
-				HideLoading();
+					row.append(`<td>${i+1}</td>`);
+					row.append(`<td>${card.cards_to_level(i+1) == 0 ? 'N/A' : card.cards_to_level(i+1)}</td>`);
+					row.append(`<td>${card.details.stats[attack_types[0]][i]}</td>`);
 
-        if(login_response.error) {
-          alert(`Error logging in: ${login_response.error}`);
-          return;
-        }
+					if (attack_types.length > 1)
+						row.append(`<td>${card.details.stats[attack_types[1]][i]}</td>`);
 
-        onLogin(login_response);
-			});
-			
-			$('#btn_login_pwd').click(async () => {
-				ShowLoading();
-				let login_response = await splinterlands.login($('#username').val(), $('#password').val());
-				HideLoading();
+					row.append(`<td>${card.details.stats.speed[i]}</td>`);
+					row.append(`<td>${card.details.stats.armor[i]}</td>`);
+					row.append(`<td>${card.details.stats.health[i]}</td>`);
 
-        if(login_response.error) {
-          alert(`Error logging in: ${login_response.error}`);
-          return;
-        }
+					let abilities = '';
+					card.details.abilities_by_level(i + 1).forEach(ability => {
+						abilities += `<img src="${splinterlands.utils.get_ability_image(ability, true)}"/>`;
+					});
 
-        onLogin(login_response);
-      });
+					row.append(`<td>${abilities}</td>`);
 
-      $('#chk_pwd_login').click(() => {
-        if($('#chk_pwd_login').prop('checked')) {
-          $('#div_pwd_login').show();
-          $('#btn_login_keychain').hide();
-        } else {
-          $('#div_pwd_login').hide();
-          $('#btn_login_keychain').show();
-        }
-      });
+					tbody.append(row);
+				}
+			} else {
+				$('#tbl_stats_details').hide();
+				$('#tbl_stats_details_summoner').show();
+				tbody = $('#tbl_stats_details_summoner tbody');
+				tbody.empty();
 
-      $('#btn_logout').click(() => { 
-        splinterlands.logout();
-        $('#div_login').show();
-				$('#div_game').hide();
-				clearInterval(quest_interval);
-			});
+				for (let i = 0; i < card.max_level; i++) {
+					let row = $('<tr>');
 
-			$('#btn_refresh_quest').click(async () => {
-				ShowLoading();
-				let result = await splinterlands.ops.refresh_quest();
-				console.log(result);
+					row.append(`<td>${i+1}</td>`);
+					row.append(`<td>${card.cards_to_level(i+1) == 0 ? 'N/A' : card.cards_to_level(i+1)}</td>`);
+					row.append(`<td>${card.details.level_limit_by_level_rarity(i + 1, 1)}</td>`);
+					row.append(`<td>${card.details.level_limit_by_level_rarity(i + 1, 2)}</td>`);
+					row.append(`<td>${card.details.level_limit_by_level_rarity(i + 1, 3)}</td>`);
+					row.append(`<td>${card.details.level_limit_by_level_rarity(i + 1, 4)}</td>`);
 
-				if(result && result.quest)
-					showQuestInfo(result.quest);
-					
-				HideLoading();
-			});
-
-			$('#btn_start_quest').click(async () => {
-				ShowLoading();
-				let result = await splinterlands.ops.start_quest();
-				console.log(result);
-
-				if(result && result.quest)
-					showQuestInfo(result.quest);
-					
-				HideLoading();
-			});
-
-			$('#btn_claim_quest_rewards').click(async () => {
-				ShowLoading();
-				let result = await splinterlands.get_player().quest.claim_rewards();
-				console.log(result);
-
-				// TODO: Show cards
-
-				if(result && result.quest)
-					showQuestInfo(result.quest);
-
-				HideLoading();
-			});
-
-			var quest_interval = -1;
-			function showQuestInfo(quest) {
-				clearInterval(quest_interval);
-
-				$('#quest_info').empty();
-				$('#btn_start_quest').hide();
-				$('#btn_refresh_quest').hide();
-				$('#btn_claim_quest_rewards').hide();
-
-				if(quest.can_start)
-					$('#btn_start_quest').show();
-				
-				if(quest.can_refresh)
-					$('#btn_refresh_quest').show();
-
-				if(!quest.claimed)	{
-					if(quest.completed)
-						$('#btn_claim_quest_rewards').show();
-
-					if(quest.details)
-						$('#quest_info').html(`${quest.details.name}<br/>${quest.details.objective_short}<br/>Progress: ${quest.completed_items} / ${quest.total_items}`);
-				} else if(quest.next > 0) {
-					quest_interval = setInterval(() => $("#quest_info").text(`Quest available in: ${countdownStr(quest.next)}`), 1000);
+					tbody.append(row);
 				}
 			}
 
-			function padLeft(nr, n, str) {
-				if (String(nr).length > n) return String(nr);
-				return Array(n - String(nr).length + 1).join(str || '0') + nr;
+			$('#div_details_lore').empty();
+			$('#div_details_lore').text(await card.lore());
+		}
+
+		$('#btn_login_keychain').click(async () => {
+			ShowLoading();
+			let login_response = await splinterlands.login($('#username').val());
+			HideLoading();
+
+			if (login_response.error) {
+				alert(`Error logging in: ${login_response.error}`);
+				return;
 			}
 
-			function countdownStr(ts, days) {
-				if(ts <= 0)
-					return '00:00:00' + (days ? ':00' : '');
+			onLogin(login_response);
+		});
 
-				let time_str = '';
+		$('#btn_login_pwd').click(async () => {
+			ShowLoading();
+			let login_response = await splinterlands.login($('#username').val(), $('#password').val());
+			HideLoading();
 
-				if(days)
-					time_str += padLeft(Math.floor(ts / (24 * 60 * 60 * 1000)), 2, '0') + ':';
-
-				time_str += padLeft(Math.floor((ts % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)), 2, '0') + ':';
-				time_str += padLeft(Math.floor((ts % (60 * 60 * 1000)) / 60000), 2, '0') + ':';
-				time_str += padLeft(Math.floor((ts % 60000) / 1000), 2, '0');
-				return time_str;
+			if (login_response.error) {
+				alert(`Error logging in: ${login_response.error}`);
+				return;
 			}
 
-			function ShowLoading() {
-				let loading = $('<div class="modal-backdrop fade in loading-backdrop"><img src="https://s3.amazonaws.com/steemmonsters/website/loading.gif" class="loading" /></div>');
-				loading.appendTo('body');
+			onLogin(login_response);
+		});
+
+		$('#btn_login_eos').click(async () => {
+			ShowLoading();
+			let login_response = await splinterlands.eos_login();
+			HideLoading();
+
+			if (login_response.error) {
+				alert(`Error logging in: ${login_response.error}`);
+				return;
 			}
 
-			function HideLoading() { $('.loading-backdrop').remove(); }
+			onLogin(login_response);
+		});
 
-			$('#btn_practice').click(async () => {
-				try {
-					$('#btn_practice, #btn_ranked').hide();
-					ShowLoading();
+		
 
-					await splinterlands.ops.find_match('Practice');
-					console.log('Find match transaction submitted...');
+		$('#chk_pwd_login').click(() => {
+			if ($('#chk_pwd_login').prop('checked')) {
+				$('#div_pwd_login').show();
+				$('#btn_login_keychain').hide();
+			} else {
+				$('#div_pwd_login').hide();
+				$('#btn_login_keychain').show();
+			}
+		});
 
-					let match = await splinterlands.wait_for_match();
-					console.log(`Match found against @${match.opponent_player}!`);
+		$('#btn_logout').click(() => {
+			splinterlands.logout();
+			$('#div_login').show();
+			$('#div_game').hide();
+			clearInterval(quest_interval);
+		});
 
-					HideLoading();
-					$('#btn_submit_team').show();
+		$('#btn_refresh_quest').click(async () => {
+			ShowLoading();
+			let result = await splinterlands.ops.refresh_quest();
+			console.log(result);
 
-					let result = await splinterlands.wait_for_result();
-					console.log('Battle finished!');
-					console.log(result);
+			if (result && result.quest)
+				showQuestInfo(result.quest);
 
-					HideLoading();
+			HideLoading();
+		});
 
-					$('#btn_submit_team').hide();
-					$('#btn_practice, #btn_ranked').show();
-				} catch (err) { 
-					HideLoading();
-					alert('Error: ' + err.error);
-					$('#btn_submit_team').hide();
-					$('#btn_practice, #btn_ranked').show();
-				}
-			});
+		$('#btn_start_quest').click(async () => {
+			ShowLoading();
+			let result = await splinterlands.ops.start_quest();
+			console.log(result);
 
-			$('#btn_submit_team').click(async () => {
+			if (result && result.quest)
+				showQuestInfo(result.quest);
+
+			HideLoading();
+		});
+
+		$('#btn_claim_quest_rewards').click(async () => {
+			ShowLoading();
+			let result = await splinterlands.get_player().quest.claim_rewards();
+			console.log(result);
+
+			// TODO: Show cards
+
+			if (result && result.quest)
+				showQuestInfo(result.quest);
+
+			HideLoading();
+		});
+
+		var quest_interval = -1;
+
+		function showQuestInfo(quest) {
+			clearInterval(quest_interval);
+
+			$('#quest_info').empty();
+			$('#btn_start_quest').hide();
+			$('#btn_refresh_quest').hide();
+			$('#btn_claim_quest_rewards').hide();
+
+			if (quest.can_start)
+				$('#btn_start_quest').show();
+
+			if (quest.can_refresh)
+				$('#btn_refresh_quest').show();
+
+			if (!quest.claimed) {
+				if (quest.completed)
+					$('#btn_claim_quest_rewards').show();
+
+				if (quest.details)
+					$('#quest_info').html(
+						`${quest.details.name}<br/>${quest.details.objective_short}<br/>Progress: ${quest.completed_items} / ${quest.total_items}`
+						);
+			} else if (quest.next > 0) {
+				quest_interval = setInterval(() => $("#quest_info").text(`Quest available in: ${countdownStr(quest.next)}`),
+					1000);
+			}
+		}
+
+		function padLeft(nr, n, str) {
+			if (String(nr).length > n) return String(nr);
+			return Array(n - String(nr).length + 1).join(str || '0') + nr;
+		}
+
+		function countdownStr(ts, days) {
+			if (ts <= 0)
+				return '00:00:00' + (days ? ':00' : '');
+
+			let time_str = '';
+
+			if (days)
+				time_str += padLeft(Math.floor(ts / (24 * 60 * 60 * 1000)), 2, '0') + ':';
+
+			time_str += padLeft(Math.floor((ts % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)), 2, '0') + ':';
+			time_str += padLeft(Math.floor((ts % (60 * 60 * 1000)) / 60000), 2, '0') + ':';
+			time_str += padLeft(Math.floor((ts % 60000) / 1000), 2, '0');
+			return time_str;
+		}
+
+		function ShowLoading() {
+			let loading = $(
+				'<div class="modal-backdrop fade in loading-backdrop"><img src="https://s3.amazonaws.com/steemmonsters/website/loading.gif" class="loading" /></div>'
+				);
+			loading.appendTo('body');
+		}
+
+		function HideLoading() {
+			$('.loading-backdrop').remove();
+		}
+
+		$('#btn_practice').click(async () => {
+			try {
+				$('#btn_practice, #btn_ranked').hide();
+				ShowLoading();
+
+				await splinterlands.ops.find_match('Practice');
+				console.log('Find match transaction submitted...');
+
+				let match = await splinterlands.wait_for_match();
+				console.log(`Match found against @${match.opponent_player}!`);
+
+				HideLoading();
+				$('#btn_submit_team').show();
+
+				let result = await splinterlands.wait_for_result();
+				console.log('Battle finished!');
+				console.log(result);
+
+				HideLoading();
+
 				$('#btn_submit_team').hide();
-				let match = splinterlands.get_match();
-				let summoner = splinterlands.get_battle_summoners(match)[0];
-				let monsters = [splinterlands.get_battle_monsters(match, summoner)[0].uid];
-
-				ShowLoading();
-
-				try { 
-					await splinterlands.ops.submit_team(match, summoner.uid, monsters); 
-					console.log('Team Submitted...');
-				} catch(e) { alert('Error: ' + e.error); }
-			});
-
-			$('#btn_back').click(() => {
-				$('#tbl_collection').show();
-				$('#card_details').hide();
-			});
-
-			async function eosTransactionTest() {								
-				const data = await splinterlands.Store.start_purchase("credits", 1000, 'EOS');
-				//return await splinterlands.eos.scatterPay(data.payment_info.address, data.payment_info.amount, data.payment_info.memo);
-				return await splinterlands.browser_payment(data.payment_info.address, data.payment_info.amount, data.payment_info.currency, data.payment_info.memo);
+				$('#btn_practice, #btn_ranked').show();
+			} catch (err) {
+				HideLoading();
+				alert('Error: ' + err.error);
+				$('#btn_submit_team').hide();
+				$('#btn_practice, #btn_ranked').show();
 			}
+		});
 
-			$('#btn_eos_test').click(() => {
-				eosTransactionTest();
-			});			
-    </script>
-	</body>
+		$('#btn_submit_team').click(async () => {
+			$('#btn_submit_team').hide();
+			let match = splinterlands.get_match();
+			let summoner = splinterlands.get_battle_summoners(match)[0];
+			let monsters = [splinterlands.get_battle_monsters(match, summoner)[0].uid];
+
+			ShowLoading();
+
+			try {
+				await splinterlands.ops.submit_team(match, summoner.uid, monsters);
+				console.log('Team Submitted...');
+			} catch (e) {
+				alert('Error: ' + e.error);
+			}
+		});
+
+		$('#btn_back').click(() => {
+			$('#tbl_collection').show();
+			$('#card_details').hide();
+		});
+
+		async function eosTransactionTest() {
+			const data = await splinterlands.Store.start_purchase("credits", 1000, 'EOS');
+			//return await splinterlands.eos.scatterPay(data.payment_info.address, data.payment_info.amount, data.payment_info.memo);
+			return await splinterlands.browser_payment(data.payment_info.address, data.payment_info.amount, data
+				.payment_info.currency, data.payment_info.memo);
+		}
+
+		$('#btn_eos_test').click(() => {
+			eosTransactionTest();
+		});
+	</script>
+</body>
+
 </html>

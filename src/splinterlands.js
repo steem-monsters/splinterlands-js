@@ -135,6 +135,19 @@ var splinterlands = (function() {
 		return await login(response.username, response.posting_key);
 	}
 
+	async function eos_login() {
+		let params = await splinterlands.eos.scatterAuth();		
+		if(params.error)
+			return({ "error" : params.message });
+		
+		let response = await api('/players/login_eos', params);	
+		if(response.error)
+			return(response);
+		
+		return (await login(response.username, response.posting_key));			
+	}
+
+
 	async function login(username, key) {
 		if(!username) {
 			username = localStorage.getItem('splinterlands:username');
@@ -731,6 +744,7 @@ var splinterlands = (function() {
 		get_transaction: (sm_id) => _transactions[sm_id],
 		use_keychain: () => _use_keychain,
 		get_match: () => _match,
-		set_match
+		set_match,
+		eos_login
 	};
 })();

@@ -53,21 +53,6 @@ window.splinterlands.eos = (function() {
 		});
 	}
 
-	async function scatterPay(to, amount, memo) { 
-		await scatterInit();
-		return await sendFromScatter(to, amount, memo);
-	}
-
-	async function hasIdentity() {
-		let account = null; 
-		try {
-			await scatterInit();		
-			account = await getScatterIdentity(config.scatter.eos_network, 'eos');
-		} catch(e) { return false }
-
-		return (account != null);
-	}
-
 	// auto-populate a transfer in Scatter Desktop wallet
 	async function sendFromScatter(to, amount, memo) {
 		try {
@@ -80,5 +65,36 @@ window.splinterlands.eos = (function() {
 		} catch (err) { return { error: err }; }
 	}	
 
-	return { scatterPay, hasIdentity };
+
+	/**
+	 * Public functions
+	 */
+	async function hasIdentity() {
+		let account = null; 
+		try {
+			await scatterInit();		
+			account = await getScatterIdentity(config.scatter.eos_network, 'eos');
+		} catch(e) { return false }
+
+		return (account != null);
+	}
+
+	async function scatterAuth() {
+		let account = null; 
+		try {
+			await scatterInit();		
+			account = await getScatterIdentity(config.scatter.eos_network, 'eos');
+
+			let ts = Math.floor(Date.now() / 1000);
+			let msg = `Login: ${account.name} ${ts}`;
+			return { address: account.name, ts, msg, sig: await scatterConn.getArbitrarySignature(account.publicKey, msg) };
+		} catch(e) { return e }
+	}
+
+	async function scatterPay(to, amount, memo) { 
+		await scatterInit();
+		return await sendFromScatter(to, amount, memo);
+	}
+
+	return { hasIdentity, scatterAuth, scatterPay  };
 })();
