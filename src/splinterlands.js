@@ -626,7 +626,8 @@ var splinterlands = (function() {
 			password_pub_key: password_pub_key,
 			subscribe: subscribe,
 			is_test: splinterlands.get_settings().test_acct_creation,
-			ref: localStorage.getItem('splinterlands:ref')
+			ref: localStorage.getItem('splinterlands:ref'),			
+			ref_url: localStorage.getItem('splinterlands:url')
 		};
 
 		let response = await api('/players/create_email', params);
@@ -638,6 +639,33 @@ var splinterlands = (function() {
 
 		return response;
 	}
+
+	async function create_account_eos(username, email, subscribe) {
+		let account = await splinterlands.eos.getIdentity();
+
+		let params = { 
+			login_type: 'eos',
+			purchase_id: 'new-' + splinterlands.utils.randomStr(6),	// We need to set a purchase ID even though not making a purchase for backwards compatibility
+			name: username, 
+			email: email,
+			address: account.name, 
+			password_pub_key: account.publicKey,
+			subscribe: subscribe,
+			is_test: splinterlands.get_settings().test_acct_creation,
+			ref: localStorage.getItem('splinterlands:ref'),
+			ref_url: localStorage.getItem('splinterlands:url'),
+			browser_id: _browser_id
+		};
+
+		let response = await api('/players/create_email', params);
+
+		if(response && !response.error) {
+			log_event('sign_up');
+			return await email_login(email, password);
+		}
+
+		return response;
+	}	
 
 	async function redeem_promo_code(code, purchase_id) {
 		let response = await api('/purchases/start_code', { code, purchase_id });
@@ -745,6 +773,7 @@ var splinterlands = (function() {
 		use_keychain: () => _use_keychain,
 		get_match: () => _match,
 		set_match,
-		eos_login
+		eos_login,
+		create_account_eos
 	};
 })();

@@ -69,15 +69,15 @@ window.splinterlands.eos = (function() {
 	/**
 	 * Public functions
 	 */
-	async function hasIdentity() {
+	async function getIdentity() {
 		let account = null; 
 		try {
 			await scatterInit();		
 			account = await getScatterIdentity(config.scatter.eos_network, 'eos');
-		} catch(e) { return false }
-
-		return (account != null);
-	}
+		
+			return account;
+		} catch(e) { return e }
+	}	 
 
 	async function scatterAuth() {
 		let account = null; 
@@ -91,10 +91,12 @@ window.splinterlands.eos = (function() {
 		} catch(e) { return e }
 	}
 
-	async function scatterPay(to, amount, memo) { 
-		await scatterInit();
-		return await sendFromScatter(to, amount, memo);
+	async function scatterPay(to, amount, memo) {
+		try { 
+			await scatterInit();
+			return await sendFromScatter(to, amount, memo);
+		} catch(e) { return e }
 	}
 
-	return { hasIdentity, scatterAuth, scatterPay  };
+	return { getIdentity, scatterAuth, scatterPay  };
 })();

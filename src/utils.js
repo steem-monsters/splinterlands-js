@@ -203,7 +203,7 @@ window.splinterlands.utils = (function() {
 	
 	// Checks whether or not a browser payment method is available for the specified token (i.e. Web3 for ETH or TronWeb for TRX)
 	async function browser_payment_available(token) {
-		return new Promise(resolve => {
+		return new Promise(async (resolve) =>  {
 			switch(token) {
 				case 'STEEM':
 				case 'SBD':
@@ -213,7 +213,8 @@ window.splinterlands.utils = (function() {
 				case 'TRX':
 					return (window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) ? resolve(true) : resolve(false);
 				case 'EOS':
-					return resolve(splinterlands.eos.hasIdentity());
+					let account = await splinterlands.eos.getIdentity();
+					return resolve(account.name != null);
 				default:
 					return resolve(false);
 			}
