@@ -79,6 +79,16 @@ window.splinterlands.eos = (function() {
 		} catch(e) { return e }
 	}	 
 
+	async function hasIdentity() {
+		let account = null; 
+		try {
+			await scatterInit();		
+			account = await getScatterIdentity(config.scatter.eos_network, 'eos');
+		
+			return (account.name != null);
+		} catch(e) { return false }
+	}	 
+
 	async function scatterAuth() {
 		let account = null; 
 		try {
@@ -98,5 +108,5 @@ window.splinterlands.eos = (function() {
 		} catch(e) { return e }
 	}
 
-	return { getIdentity, scatterAuth, scatterPay  };
+	return { getIdentity, hasIdentity, scatterAuth, scatterPay  };
 })();

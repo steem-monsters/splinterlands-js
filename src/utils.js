@@ -213,8 +213,7 @@ window.splinterlands.utils = (function() {
 				case 'TRX':
 					return (window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) ? resolve(true) : resolve(false);
 				case 'EOS':
-					let account = await splinterlands.eos.getIdentity();
-					return resolve(account.name != null);
+					return resolve(splinterlands.eos.hasIdentity());
 				default:
 					return resolve(false);
 			}
