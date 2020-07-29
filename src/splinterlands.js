@@ -661,7 +661,7 @@ var splinterlands = (function() {
 
 		if(response && !response.error) {
 			log_event('sign_up');
-			return await email_login(email, password);
+			return await eos_login();
 		}
 
 		return response;
