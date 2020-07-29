@@ -14,7 +14,7 @@ splinterlands.Potion = class {
 	}
 
 	get image_url() {
-		return `https://s3.amazonaws.com/steemmonsters/website/ui_elements/shop/potions/potion_${this.id}.png`;
+		return `https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/shop/potions/potion_${this.id}.png`;
 	}
 
 	static async get_active(type) {

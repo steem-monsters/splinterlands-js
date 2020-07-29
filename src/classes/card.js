@@ -269,7 +269,7 @@ splinterlands.Card = class {
 
     if(this.gold && this.is_alpha) {
       let name_bg_img = document.createElement('img');
-      name_bg_img.setAttribute('src', 'https://s3.amazonaws.com/steemmonsters/website/gold_name_bg.png');
+      name_bg_img.setAttribute('src', 'https://d36mxiodymuqjm.cloudfront.net/website/gold_name_bg.png');
       name_bg.appendChild(name_bg_img);
     }
 
@@ -307,7 +307,7 @@ splinterlands.Card = class {
     mana.setAttribute('class', 'sl-stat-mana');
 
     let mana_img = document.createElement('img');
-    mana_img.setAttribute('src', 'https://s3.amazonaws.com/steemmonsters/website/stats/stat_bg_mana.png');
+    mana_img.setAttribute('src', 'https://d36mxiodymuqjm.cloudfront.net/website/stats/stat_bg_mana.png');
     mana.appendChild(mana_img);
 
     let mana_text = document.createElement('div');
@@ -360,7 +360,7 @@ splinterlands.Card = class {
     stat_element.setAttribute('class', `sl-stat-${stat} ${is_second ? 'sl-second-attack' : ''}`);
 
     let img = document.createElement('img');
-    img.setAttribute('src', `https://s3.amazonaws.com/steemmonsters/website/stats/${stat}.png`);
+    img.setAttribute('src', `https://d36mxiodymuqjm.cloudfront.net/website/stats/${stat}.png`);
     stat_element.appendChild(img);
 
     let text = document.createElement('div');

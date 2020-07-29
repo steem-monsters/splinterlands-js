@@ -39,7 +39,7 @@ splinterlands.League = class {
 	}
 
 	get image() {
-		return `https://s3.amazonaws.com/steemmonsters/website/icons/leagues/league_${this.id}.png`;
+		return `https://d36mxiodymuqjm.cloudfront.net/website/icons/leagues/league_${this.id}.png`;
 	}
 
 	get min_rating() {

@@ -2,24 +2,24 @@ if(!window.splinterlands)
 	window.splinterlands = {};
 
 window.splinterlands.utils = (function() {
-	UNTAMED_CARD_URL = 'https://s3.amazonaws.com/steemmonsters/cards_untamed/';
-  BETA_CARD_URL = 'https://s3.amazonaws.com/steemmonsters/cards_beta/';
-	ALPHA_CARD_URL = 'https://s3.amazonaws.com/steemmonsters/cards_v2.2/';
+	UNTAMED_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_untamed/';
+  BETA_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_beta/';
+	ALPHA_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_v2.2/';
 	SUMMONER_CARD_URL_MOBILE = 'https://steemmonsters.s3.amazonaws.com/cards_battle_mobile/Summoners/';
 
 	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL];
 	
 	BATTLE_CARD_URLS = [
-		'https://s3.amazonaws.com/steemmonsters/cards_battle_alpha/',
-		'https://s3.amazonaws.com/steemmonsters/cards_battle_beta/',
-		'https://s3.amazonaws.com/steemmonsters/cards_battle_alpha/',
-		'https://s3.amazonaws.com/steemmonsters/cards_battle_beta/',
-		'https://s3.amazonaws.com/steemmonsters/cards_battle_untamed/'
+		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_alpha/',
+		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_beta/',
+		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_alpha/',
+		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_beta/',
+		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_untamed/'
 	];
 
 	BATTLE_CARD_URLS_MOBILE = [
-		'https://s3.amazonaws.com/steemmonsters/cards_battle_mobile/',
-		'https://s3.amazonaws.com/steemmonsters/cards_battle_mobile/'
+		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_mobile/',
+		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_mobile/'
 	];
 
 	rpc_index = 0;
@@ -267,7 +267,7 @@ window.splinterlands.utils = (function() {
 	}
 
 	function get_ability_image(ability, small) {
-		return `https://s3.amazonaws.com/steemmonsters/website/abilities${small ? '/small' : ''}/ability_${ability.toLowerCase().replace(' ', '-')}.png`;
+		return `https://d36mxiodymuqjm.cloudfront.net/website/abilities${small ? '/small' : ''}/ability_${ability.toLowerCase().replace(' ', '-')}.png`;
 	}
 
 	function get_stat_image(stat) {
@@ -277,9 +277,9 @@ window.splinterlands.utils = (function() {
 			stat = 'defense';
 
 		if(['melee', 'ranged', 'magic'].includes(stat))
-			return `https://s3.amazonaws.com/steemmonsters/website/stats/${stat}-attack.png`;
+			return `https://d36mxiodymuqjm.cloudfront.net/website/stats/${stat}-attack.png`;
 		else
-			return `https://s3.amazonaws.com/steemmonsters/website/stats/${stat}.png`;
+			return `https://d36mxiodymuqjm.cloudfront.net/website/stats/${stat}.png`;
 	}
 
 	function lookup_effect(effect) { 
@@ -290,16 +290,16 @@ window.splinterlands.utils = (function() {
 			return {};
 		}
 
-		obj.img = `https://s3.amazonaws.com/steemmonsters/website/abilities/ability_${obj.ability.toLowerCase().replace(/\s/g, '-')}.png`;
-		obj.img_sm = `https://s3.amazonaws.com/steemmonsters/website/abilities/small/ability_${obj.ability.toLowerCase().replace(/\s/g, '-')}.png`;
+		obj.img = `https://d36mxiodymuqjm.cloudfront.net/website/abilities/ability_${obj.ability.toLowerCase().replace(/\s/g, '-')}.png`;
+		obj.img_sm = `https://d36mxiodymuqjm.cloudfront.net/website/abilities/small/ability_${obj.ability.toLowerCase().replace(/\s/g, '-')}.png`;
 		return obj;
 	}
 
 	function get_abilities() {
 		if(!_abilities[0].img) {
 			_abilities.forEach(a => {
-				a.img = `https://s3.amazonaws.com/steemmonsters/website/abilities/ability_${a.name.toLowerCase().replace(/\s/g, '-')}.png`;
-				a.img_sm = `https://s3.amazonaws.com/steemmonsters/website/abilities/small/ability_${a.name.toLowerCase().replace(/\s/g, '-')}.png`;
+				a.img = `https://d36mxiodymuqjm.cloudfront.net/website/abilities/ability_${a.name.toLowerCase().replace(/\s/g, '-')}.png`;
+				a.img_sm = `https://d36mxiodymuqjm.cloudfront.net/website/abilities/small/ability_${a.name.toLowerCase().replace(/\s/g, '-')}.png`;
 			});
 		}
 
