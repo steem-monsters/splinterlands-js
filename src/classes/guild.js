@@ -44,14 +44,14 @@ splinterlands.Guild = class {
 		let banners = ['black', 'blue', 'gold', 'green', 'mint', 'orange', 'pink', 'purple', 'red', 'silver', 'teal', 'yellow'];
 		let banner = banners.includes(this.crest.banner) ? this.crest.banner : 'black';
 
-		return `https://steemmonsters.s3.amazonaws.com/website/guilds/banners/bg_banner_${banner}.png`;
+		return `https://d36mxiodymuqjm.cloudfront.net/website/guilds/banners/bg_banner_${banner}.png`;
 	}
 
 	get crest_decal_image() {
 		let decals = ['axe', 'bolt', 'book', 'globe', 'hand', 'helm', 'shield', 'skull', 'staff', 'sword', 'tree', 'wolf'];
 		let decal = decals.includes(this.crest.decal) ? this.crest.decal : null;
 
-		return `https://steemmonsters.s3.amazonaws.com/website/guilds/decals/img_guild_${decal}.png`;
+		return `https://d36mxiodymuqjm.cloudfront.net/website/guilds/decals/img_guild_${decal}.png`;
 	}
 
 	async get_members() {
@@ -84,7 +84,7 @@ splinterlands.Guild = class {
 			rel_container.setAttribute('class', 'sl-rel-pos');
 
 			let decal_img = document.createElement('img');
-			decal_img.setAttribute('src', `https://steemmonsters.s3.amazonaws.com/website/guilds/decals/img_guild_${decal}.png`);
+			decal_img.setAttribute('src', `https://d36mxiodymuqjm.cloudfront.net/website/guilds/decals/img_guild_${decal}.png`);
 			decal_img.setAttribute('style', `position: absolute; width: ${decal_size}px; height: ${decal_size}px; left: ${decal_left}; top: ${decal_top};`);
 			rel_container.appendChild(decal_img);
 			
@@ -92,7 +92,7 @@ splinterlands.Guild = class {
 		}
 		
 		let banner_img = document.createElement('img');
-		banner_img.setAttribute('src', `https://steemmonsters.s3.amazonaws.com/website/guilds/banners/bg_banner_${banner}.png`);
+		banner_img.setAttribute('src', `https://d36mxiodymuqjm.cloudfront.net/website/guilds/banners/bg_banner_${banner}.png`);
 		banner_img.setAttribute('style', `width: ${size}px; height: ${size}px;`);
 		crest_container.appendChild(banner_img);
 

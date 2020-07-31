@@ -57,7 +57,7 @@ splinterlands.Player = class {
 	}
 
 	get avatar_frame() {
-		return `https://steemmonsters.s3.amazonaws.com/website/icons/avatars/avatar-frame_${this.league.group_name.toLowerCase()}.png`
+		return `https://d36mxiodymuqjm.cloudfront.net/website/icons/avatars/avatar-frame_${this.league.group_name.toLowerCase()}.png`
 	}
 	
 	get display_name() {

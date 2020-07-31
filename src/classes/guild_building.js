@@ -51,6 +51,6 @@ splinterlands.GuildBuilding = class {
 	}
 
 	get image_url() {
-		return `https://steemmonsters.s3.amazonaws.com/website/guilds/hall/${this.type}_level-${this.level}.png`
+		return `https://d36mxiodymuqjm.cloudfront.net/website/guilds/hall/${this.type}_level-${this.level}.png`
 	}
 }

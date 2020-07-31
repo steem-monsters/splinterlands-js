@@ -5,7 +5,7 @@ window.splinterlands.utils = (function() {
 	UNTAMED_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_untamed/';
   BETA_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_beta/';
 	ALPHA_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_v2.2/';
-	SUMMONER_CARD_URL_MOBILE = 'https://steemmonsters.s3.amazonaws.com/cards_battle_mobile/Summoners/';
+	SUMMONER_CARD_URL_MOBILE = 'https://d36mxiodymuqjm.cloudfront.net/cards_battle_mobile/Summoners/';
 
 	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL];
 	

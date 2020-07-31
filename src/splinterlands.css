@@ -1,11 +1,11 @@
 @font-face {
   font-family: ruba;
-  src: url(https://steemmonsters.s3.amazonaws.com/website/fonts/ruba_oblique-webfont.woff);
+  src: url(https://d36mxiodymuqjm.cloudfront.net/website/fonts/ruba_oblique-webfont.woff);
 }
 
 @font-face {
   font-family: nanami-heavy;
-  src: url(https://steemmonsters.s3.amazonaws.com/website/fonts/nanami-heavyoblique-webfont.woff);
+  src: url(https://d36mxiodymuqjm.cloudfront.net/website/fonts/nanami-heavyoblique-webfont.woff);
 }
 
 .sl-rel-pos {
