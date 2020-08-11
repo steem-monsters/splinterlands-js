@@ -310,11 +310,17 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function open_pack(edition) {
-		return splinterlands.send_tx_wrapper('open_pack', 'Open Pack', { edition }, tx => tx.result.cards.map(c => new splinterlands.Card(c)));
+		return splinterlands.send_tx_wrapper('open_pack', 'Open Pack', { edition }, async tx => {
+			await splinterlands.load_collection();
+			return tx.result.cards.map(c => new splinterlands.Card(c));
+		});
 	}
 
 	async function open_multi(edition, qty) {
-		return splinterlands.send_tx_wrapper('open_all', 'Open Multiple Packs', { edition, qty }, tx => tx);
+		return splinterlands.send_tx_wrapper('open_all', 'Open Multiple Packs', { edition, qty }, async tx => {
+			await splinterlands.load_collection();
+			return tx;
+		});
 	}
 
 	async function purchase(type, qty, currency, data) {
