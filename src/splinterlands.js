@@ -141,8 +141,10 @@ var splinterlands = (function() {
 			return({ "error" : params.message });
 		
 		let response = await api('/players/login_eos', params);	
-		if(response.error)
+		if(response.error) {
+			response.address = params.address;
 			return(response);
+		}			
 		
 		return (await login(response.username, response.posting_key));			
 	}
@@ -376,8 +378,8 @@ var splinterlands = (function() {
 					splinterlands.utils.popup_center(sc_url, `${currency} Payment`, 500, 560);
 				}
 				break;
-			case 'steem_engine':
-				var result = await splinterlands.utils.steem_engine_transfer(to, currency, amount, memo);
+			case 'hive_engine':
+				var result = await splinterlands.utils.hive_engine_transfer(to, currency, amount, memo);
 				return !result.success ? { success: false, error: result.error } : result;
 			case 'internal':
 				return await splinterlands.ops.token_transfer(to, amount, splinterlands.utils.tryParse(memo));
@@ -390,8 +392,8 @@ var splinterlands = (function() {
 
 	async function external_deposit(wallet_type, to, amount, currency, memo) {
 		switch(wallet_type) {
-			case 'steem_engine':
-				var result = await splinterlands.utils.steem_engine_transfer(to, currency, amount, memo);
+			case 'hive_engine':
+				var result = await splinterlands.utils.hive_engine_transfer(to, currency, amount, memo);
 				return !result.success ? { success: false, error: result.error } : result;
 			case 'tron':
 				if(currency != 'DEC')

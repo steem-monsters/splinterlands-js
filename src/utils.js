@@ -3,7 +3,7 @@ if(!window.splinterlands)
 
 window.splinterlands.utils = (function() {
 	UNTAMED_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_untamed/';
-  BETA_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_beta/';
+  	BETA_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_beta/';
 	ALPHA_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_v2.2/';
 	SUMMONER_CARD_URL_MOBILE = 'https://d36mxiodymuqjm.cloudfront.net/cards_battle_mobile/Summoners/';
 
@@ -141,26 +141,26 @@ window.splinterlands.utils = (function() {
 	}
 
 	function popup_center(url, title, w, h) {
-    // Fixes dual-screen position                         Most browsers      Firefox
-    var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
-    var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
+		// Fixes dual-screen position                         Most browsers      Firefox
+		var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
+		var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
 
-    var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
-    var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+		var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+		var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
 
-    var left = ((width / 2) - (w / 2)) + dualScreenLeft;
-    var top = ((height / 2) - (h / 2)) + dualScreenTop;
-    var newWindow = window.open(url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+		var left = ((width / 2) - (w / 2)) + dualScreenLeft;
+		var top = ((height / 2) - (h / 2)) + dualScreenTop;
+		var newWindow = window.open(url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
 
-    // Puts focus on the newWindow
-    if (window.focus) {
-        newWindow.focus();
-    }
+		// Puts focus on the newWindow
+		if (window.focus) {
+			newWindow.focus();
+		}
 
-    return newWindow;
+		return newWindow;
 	}
 	
-	async function steem_engine_transfer(to, token, quantity, memo) {
+	async function hive_engine_transfer(to, token, quantity, memo) {
 		var transaction_data = {
 			"contractName": "tokens",
 			"contractAction": "transfer",
@@ -173,13 +173,14 @@ window.splinterlands.utils = (function() {
 		};
 
 		if(window.steem_keychain) {
-			var result = await new Promise(resolve => steem_keychain.requestCustomJson(splinterlands.get_player().name, splinterlands.get_settings().ssc.chain_id, 'Active', JSON.stringify(transaction_data), 'Transfer Token: ' + token, r => resolve(r)));
+			var result = await new Promise(resolve => steem_keychain.requestCustomJson(splinterlands.get_player().name, splinterlands.get_settings().ssc.hive_chain_id, 'Active', JSON.stringify(transaction_data), 'Transfer Token: ' + token, r => resolve(r)));
 			
-      if(!result.success)
+			if(!result.success)
 				return { success: false, error: result.error };
-    } else {
-			var url = 'https://steemconnect.com/sign/custom-json?';
-			url += 'required_posting_auths=' + encodeURI('[]');
+
+		} else {
+			var url = 'https://hivesigner.com/sign/custom-json?authority=active';
+			url += '&required_posting_auths=' + encodeURI('[]');
 			url += '&required_auths=' + encodeURI('["' + splinterlands.get_player().name + '"]');
 			url += '&id=' + splinterlands.get_settings().ssc.chain_id;
 			url += '&json=' + encodeURI(JSON.stringify(transaction_data));
@@ -191,8 +192,8 @@ window.splinterlands.utils = (function() {
 	}
 
 	function sc_custom_json(id, title, data, use_active) {
-		let url = 'https://steemconnect.com/sign/custom-json?';
-		url += 'required_posting_auths=' + encodeURI('[' + (use_active ? '' : `"${splinterlands.get_player().name}"`) + ']');
+		let url = 'https://hivesigner.com/sign/custom-json?authority=active';
+		url += '&required_posting_auths=' + encodeURI('[' + (use_active ? '' : `"${splinterlands.get_player().name}"`) + ']');
 		url += '&required_auths=' + encodeURI('[' + (use_active ? `"${splinterlands.get_player().name}"` : '') + ']');
 		url += '&id=' + id;
 		url += '&json=' + encodeURI(JSON.stringify(data));
@@ -688,7 +689,7 @@ window.splinterlands.utils = (function() {
 		format_tx_id,
 		format_tx_data,
 		popup_center,
-    steem_engine_transfer,
+		hive_engine_transfer,
 		get_edition_str,
 		param,
 		try_parse,
