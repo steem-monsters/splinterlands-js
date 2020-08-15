@@ -76,7 +76,13 @@ window.splinterlands.eos = (function() {
 			account = await getScatterIdentity(config.scatter.eos_network, 'eos');
 		
 			return account;
-		} catch(e) { return e }
+		} catch(e) { 
+			console.log(e); 
+			if(typeof e === 'string')
+				return ({ "error" : true, "message": e });
+			else 
+				return e; 
+		}
 	}	 
 
 	async function hasIdentity() {
@@ -86,7 +92,13 @@ window.splinterlands.eos = (function() {
 			account = await getScatterIdentity(config.scatter.eos_network, 'eos');
 		
 			return (account.name != null);
-		} catch(e) { return false }
+		} catch(e) { 			
+			console.log(e); 
+			if(typeof e === 'string')
+				return ({ "error" : true, "message": e });
+			else 
+				return e; 
+		}
 	}	 
 
 	async function scatterAuth() {
@@ -98,14 +110,26 @@ window.splinterlands.eos = (function() {
 			let ts = Math.floor(Date.now() / 1000);
 			let msg = `Login: ${account.name} ${ts}`;
 			return { address: account.name, ts, msg, sig: await scatterConn.getArbitrarySignature(account.publicKey, msg) };
-		} catch(e) { return e }
+		} catch(e) {
+			console.log(e); 
+			if(typeof e === 'string')
+				return ({ "error" : true, "message": e });
+			else 
+				return e;
+		}
 	}
 
 	async function scatterPay(to, amount, memo) {
 		try { 
 			await scatterInit();
 			return await sendFromScatter(to, amount, memo);
-		} catch(e) { return e }
+		} catch(e) { 			
+			console.log(e); 
+			if(typeof e === 'string')
+				return ({ "error" : true, "message": e });
+			else 
+				return e; 
+		}
 	}
 
 	return { getIdentity, hasIdentity, scatterAuth, scatterPay  };
