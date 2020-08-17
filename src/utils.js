@@ -208,6 +208,7 @@ window.splinterlands.utils = (function() {
 			switch(token) {
 				case 'STEEM':
 				case 'SBD':
+					return resolve(false);
 				case 'HIVE':
 				case 'HBD':
 					return resolve(true);
