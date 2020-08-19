@@ -2,10 +2,10 @@ splinterlands.Store = class {
 	static get payment_tokens() { 
 		return [
 			{ name: 'HIVE', symbol: 'HIVE' },
-			{ name: 'STEEM', symbol: 'STEEM' },
+			//{ name: 'STEEM', symbol: 'STEEM' },
 			{ name: 'Tron', symbol: 'TRX' },
 			{ name: 'Hive Dollars', symbol: 'HBD' },
-			{ name: 'Steem Dollars', symbol: 'SBD' },
+			//{ name: 'Steem Dollars', symbol: 'SBD' },
 			{ name: 'Bitcoin', symbol: 'BTC' },
 			{ name: 'Ether', symbol: 'ETH' },
 			{ name: 'Litecoin', symbol: 'LTC' },
