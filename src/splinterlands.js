@@ -12,6 +12,7 @@ var splinterlands = (function() {
 	let _session_id = null;
 	let _match = null;
 	let _url = null;
+	let _init_url_search_params = null; //Query string app started with
 
 	async function init(config) { 
 		_config = config;
@@ -36,6 +37,10 @@ var splinterlands = (function() {
 
 		// Load market data
 		await load_market();
+
+		//hack to handle Angular query string issues
+		let urlHash = (window.location.hash) ? window.location.hash : window.location.search ;
+		_init_url_search_params = new URLSearchParams(urlHash.substring(urlHash.indexOf('?')));	
 	}
 
 	function set_url(url) { 
@@ -776,6 +781,7 @@ var splinterlands = (function() {
 		get_match: () => _match,
 		set_match,
 		eos_login,
-		create_account_eos
+		create_account_eos,
+		get_init_url_search_params: () => _init_url_search_params,
 	};
 })();
