@@ -443,6 +443,11 @@ window.splinterlands.utils = (function() {
 			"ability": "Last Stand",
 			"pastTense": "Last Stand",
 			"desc": "+50% to all stats"
+		},
+		"Crippled": {
+			"ability": "Cripple",
+			"pastTense": "Crippled",
+			"desc": "-1 MAX HEALTH"
 		}
 	};
 
@@ -676,6 +681,20 @@ window.splinterlands.utils = (function() {
 			"desc": "Reduces the Health of all enemy Monsters.",
 			"effect_name": "Weakened",
 			"effect_desc": "-1 to HEALTH"
+		},
+		{
+			"name": "Cripple",
+			"desc": "Each time an enemy is hit by a Monster with Cripple it loses one max health.",
+			"effect_name": "Crippled",
+			"effect_desc": "-1 to MAX HEALTH"
+		},
+		{
+			"name": "Void Armor",
+			"desc": "Magic attacks hit this Monster's armor before its Health."
+		},
+		{
+			"name": "Immunity",
+			"desc": "This monster is immune to negative status effects."
 		}
 	];
 
