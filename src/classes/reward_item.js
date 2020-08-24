@@ -16,7 +16,15 @@ splinterlands.RewardItem = class {
 				let potion = splinterlands.Potion.get_potion(this.potion_type);
 				return `${this.quantity} ${potion.name} Potion Charge${this.quantity > 1 ? 's' : ''}`;
 			case "pack":
-				return this.quantity + ' ' + (this.edition == 2 ? 'Essence Orb' : 'Untamed Edition Booster Pack');
+				let packtext = 'Untamed Edition Booster Pack';
+				if (this.edition == 2) {
+					packtext = 'Essence Orb';
+				} else if (this.edition == 5) {
+					packtext = 'ΛZMΛRÉ Dice';
+				} else {					
+					packtext = 'Untamed Edition Booster Pack';					
+				}	
+				return this.quantity + ' ' + packtext;
 		}
 	}
 
@@ -29,8 +37,13 @@ splinterlands.RewardItem = class {
 			case "potion": 
 				return splinterlands.Potion.get_potion(this.potion_type).image_url;
 			case "pack":
-				return this.edition == 2 ? 'https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/open_packs/img_essence-orb%402x.png' : 'https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/shop/img_pack_untamed.png';
-		}
-		
+				if (this.edition == 2) {
+					return 'https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/open_packs/img_essence-orb%402x.png';
+				} else if (this.edition == 5) {
+					return 'https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/open_packs/img_azmare-dice%402x.png';
+				} else {					
+					return 'https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/shop/img_pack_untamed.png';					
+				}								
+		}		
 	}
 }

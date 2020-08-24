@@ -23,9 +23,10 @@ splinterlands.Store = class {
 	static get booster_price() { return splinterlands.get_settings().booster_pack_price; }
 	static get starter_price() { return splinterlands.get_settings().starter_pack_price; }
 	static get orb_price() { return splinterlands.get_settings().dec.orb_cost; }
+	static get dice_price() { return splinterlands.get_settings().dec.dice_cost; }
 
 	static pack_purchase_info(edition, qty) {
-		if(![2,4].includes(edition))
+		if(![2,4,5].includes(edition))
 			return { error: 'Invalid pack edition specified.' };
 
 		if(edition == 4) {
@@ -43,6 +44,14 @@ splinterlands.Store = class {
 				bonus: Math.floor(qty >= 100 ? qty * 0.1 : (qty >= 20 ? qty * 0.05 : 0)),
 				total_usd: +(qty * splinterlands.Store.orb_price / 1000).toFixed(2),
 				total_dec: Math.floor(splinterlands.utils.guild_discounted_cost(qty * splinterlands.Store.orb_price))
+			}
+		} else if (edition == 5) {
+			return {
+				edition,
+				qty,
+				bonus: Math.floor(qty >= 100 ? qty * 0.1 : (qty >= 20 ? qty * 0.05 : 0)),
+				total_usd: +(qty * splinterlands.Store.dice_price / 1000).toFixed(2),
+				total_dec: Math.floor(splinterlands.utils.guild_discounted_cost(qty * splinterlands.Store.dice_price))
 			}
 		}
 	}
@@ -97,15 +106,25 @@ splinterlands.Store = class {
 		return new splinterlands.Purchase(await splinterlands.api('/purchases/start', params));
 	}
 
-	static async airdrop_info() {
-		let purchases = await splinterlands.api('/players/pack_purchases', { edition: 4 });
-		let available = await splinterlands.Store.get_available_packs(4);
+	static async airdrop_info(edition) {
+		if(!edition)
+			edition = 4;
+		let purchases = await splinterlands.api('/players/pack_purchases', { edition: edition });
+		let available = await splinterlands.Store.get_available_packs(edition);
 
-		return {
-			total_purchased: 100000 - (available % 100000),
-			total_remaining: available % 100000,
-			player_purchased: purchases ? parseInt(purchases.packs) + parseInt(purchases.bonus_packs) : 0
-		};
+		if(edition === 5)
+			return {
+				total_purchased: 50000 - (available % 50000),
+				total_remaining: available % 50000,
+				player_purchased: purchases ? parseInt(purchases.packs) + parseInt(purchases.bonus_packs) : 0
+			};
+		else
+			return {
+				total_purchased: 100000 - (available % 100000),
+				total_remaining: available % 100000,
+				player_purchased: purchases ? parseInt(purchases.packs) + parseInt(purchases.bonus_packs) : 0
+			};
+		
 	}
 
 	static async paypal_button(type, get_qty) {
