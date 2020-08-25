@@ -7,13 +7,14 @@ window.splinterlands.utils = (function() {
 	ALPHA_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_v2.2/';
 	SUMMONER_CARD_URL_MOBILE = 'https://d36mxiodymuqjm.cloudfront.net/cards_battle_mobile/Summoners/';
 
-	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL];
+	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL, UNTAMED_CARD_URL];
 	
 	BATTLE_CARD_URLS = [
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_alpha/',
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_beta/',
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_alpha/',
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_beta/',
+		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_untamed/',
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_untamed/'
 	];
 
@@ -223,7 +224,7 @@ window.splinterlands.utils = (function() {
 	}
   
   function get_edition_str(edition) {
-    return ['Alpha', 'Beta', 'Promo', 'Reward', 'Untamed'][edition];
+    return ['Alpha', 'Beta', 'Promo', 'Reward', 'Untamed', 'Dice'][edition];
 	}
 	
 	function param(object) {
