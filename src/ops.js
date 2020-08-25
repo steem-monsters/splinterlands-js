@@ -335,8 +335,14 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function withdraw_dec(qty, wallet) {
-		let to_account = (wallet == 'tron') ? 'sm-dec-tron' : (wallet == 'ethereum' ? 'sl-eth' : splinterlands.get_settings().account);
-		return splinterlands.send_tx_wrapper('token_transfer', 'Withdraw DEC', { type: 'withdraw', to: to_account, qty, token: 'DEC' }, tx => tx);
+		let accounts = {
+			tron: 'sm-dec-tron',
+			ethereum: 'sl-eth',
+			hive_engine: 'sl-hive',
+			steem_engine: 'sl-steem'
+		}
+
+		return splinterlands.send_tx_wrapper('token_transfer', 'Withdraw DEC', { type: 'withdraw', to: accounts[wallet] || 'sl-hive', qty, token: 'DEC' }, tx => tx);
 	}
 
 	async function guild_join(guild_id) {
