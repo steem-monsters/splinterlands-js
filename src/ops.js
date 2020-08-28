@@ -324,11 +324,17 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function purchase(type, qty, currency, data) {
-		if(type == 'orb') {
+		if(type.toLowerCase() == 'orb') {
 			if(!currency || currency.toUpperCase() != 'DEC')
 				return new Promise((resolve, reject) => reject({ error: 'Invalid currency specified. Essence Orbs may only be purchased with DEC.' }));
 
 			return splinterlands.send_tx_wrapper('purchase_orbs', 'Purchase Essence Orbs', { qty }, tx => tx);
+		}
+		if(type.toLowerCase() == 'dice') {
+			if(!currency || currency.toUpperCase() != 'DEC')
+				return new Promise((resolve, reject) => reject({ error: 'Invalid currency specified. ΛZMΛRÉ Dice may only be purchased with DEC.' }));
+
+			return splinterlands.send_tx_wrapper('purchase_dice', 'Purchase ΛZMΛRÉ Dice', { qty }, tx => tx);
 		}
 
 		return splinterlands.send_tx_wrapper('purchase', 'Purchase', { type, qty, currency, data }, tx => tx);
