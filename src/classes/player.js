@@ -2,7 +2,7 @@ splinterlands.Player = class {
 	constructor(data) {
 		Object.keys(data).forEach(k => this[k] = data[k]);
 
-    this.league = new splinterlands.League(data.rating);
+    	this.league = new splinterlands.League(data.rating, data.league);
 		this.quest = new splinterlands.Quest(data.quest || {});
 
 		if(!this.name && this.player)

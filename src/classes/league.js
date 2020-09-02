@@ -1,23 +1,8 @@
 splinterlands.League = class {
-	constructor(rating) {
+	constructor(rating, league_id) {
 		this.rating = rating;
-	}
-
-	get id() {
-		if(this.rating < 100)
-			return 0;
-
-		if(this.rating >= 4700)
-			return 15;
-
-		if(this.rating >= 4200)
-			return 14;
-
-		if(this.rating >= 3700)
-			return 13;
-
-		return Math.min(parseInt((this.rating - 100) / 300) + 1, 15);
-	}
+		this.id = league_id;
+	}	
 
 	get level() {
 		return Math.max(Math.min(Math.floor((this.id - 1) / 3) + 1, 4), 0);
