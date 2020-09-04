@@ -1,7 +1,7 @@
 splinterlands.League = class {
 	constructor(rating, league_id) {
-		this.rating = rating;
 		this.id = league_id;
+		this.rating = rating || this.min_rating;
 	}	
 
 	get level() {
@@ -70,6 +70,6 @@ splinterlands.League = class {
 	}
 
 	static list() {
-		return [0, 100, 400, 700, 1000, 1300, 1600, 1900, 2200, 2500, 2800, 3100, 3400, 3700, 4200, 4700].map(r => new splinterlands.League(r));
+		return [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map(r => new splinterlands.League(null, r));
 	}
 }

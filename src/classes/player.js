@@ -39,7 +39,7 @@ splinterlands.Player = class {
 		let data = await splinterlands.api('/players/refresh');
 		Object.keys(data).forEach(k => this[k] = data[k]);
 
-		this.league = new splinterlands.League(data.rating);
+		this.league = new splinterlands.League(data.rating, data.league);
 		this.quest = new splinterlands.Quest(data.quest || {});
 
 		if(data.guild)
@@ -157,9 +157,9 @@ splinterlands.Player = class {
 		});
 	}
 
-	update_rating(new_rating) {
+	update_rating(new_rating, new_league) {
 		this.rating = new_rating;
-		this.league = new splinterlands.League(new_rating);
+		this.league = new splinterlands.League(new_rating, new_league);
 	}
 
 	async request_keys() {
