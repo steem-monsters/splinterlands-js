@@ -4,6 +4,23 @@ splinterlands.League = class {
 		this.rating = rating || this.min_rating;
 	}	
 
+	//Used for backwards compatibility
+	get old_id() {
+		if(this.rating < 100)
+			return 0;
+
+		if(this.rating >= 4700)
+			return 15;
+
+		if(this.rating >= 4200)
+			return 14;
+
+		if(this.rating >= 3700)
+			return 13;
+
+		return Math.min(parseInt((this.rating - 100) / 300) + 1, 15);	
+	}
+
 	get level() {
 		return Math.max(Math.min(Math.floor((this.id - 1) / 3) + 1, 4), 0);
 	}
@@ -11,20 +28,32 @@ splinterlands.League = class {
 	get name() {
 		if(this.id == 0)
 			return this.group_name;
-			
-		var tier = (this.id - 1) % 3;
-		return this.group_name + ' ' + (tier == 0 ? 'III' : (tier == 1 ? 'II' : 'I'));
+		
+		if(this.id == null) {
+			var tier = (this.old_id - 1) % 3;
+			return this.group_name + ' ' + (tier == 0 ? 'III' : (tier == 1 ? 'II' : 'I'));
+		} else {
+			var tier = (this.id - 1) % 3;
+			return this.group_name + ' ' + (tier == 0 ? 'III' : (tier == 1 ? 'II' : 'I'));
+		}
+		
 	}
 
 	get group_name() {
 		if(this.id == 0)
 			return 'Novice';
-			
-		return this.id < 4 ? 'Bronze' : (this.id < 7 ? 'Silver' : (this.id < 10 ? 'Gold' : (this.id < 13 ? 'Diamond' : 'Champion')));
+
+		if(this.id == null) 
+			return this.old_id < 4 ? 'Bronze' : (this.old_id < 7 ? 'Silver' : (this.old_id < 10 ? 'Gold' : (this.old_id < 13 ? 'Diamond' : 'Champion')));
+		else 
+			return this.id < 4 ? 'Bronze' : (this.id < 7 ? 'Silver' : (this.id < 10 ? 'Gold' : (this.id < 13 ? 'Diamond' : 'Champion')));
 	}
 
 	get image() {
-		return `https://d36mxiodymuqjm.cloudfront.net/website/icons/leagues/league_${this.id}.png`;
+		if(this.id == null) 
+			return `https://d36mxiodymuqjm.cloudfront.net/website/icons/leagues/league_${this.old_id}.png`;
+		else 
+			return `https://d36mxiodymuqjm.cloudfront.net/website/icons/leagues/league_${this.id}.png`;
 	}
 
 	get min_rating() {
