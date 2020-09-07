@@ -171,4 +171,31 @@ splinterlands.Player = class {
 
 		return await splinterlands.api('/players/request_keys');
 	}
+
+	get points_until_next_league() {
+		return Math.max(this.league.max_rating - this.rating, 0);
+	}
+
+	get power_progress() {
+		let progress = +((this.collection_power - this.league.min_power) / (this.league.max_power - this.league.min_power) * 100).toFixed(2); 
+		
+		if(progress < 0)
+			return 0;			
+		else if(progress > 100)
+			return 100;
+		else 
+			return progress;
+	}
+
+	get rating_progress() {
+		let progress = +((this.rating - this.league.min_rating) / (this.league.max_rating - this.league.min_rating) * 100).toFixed(2); 
+		
+		if(progress < 0)
+			return 0;			
+		else if(progress > 100)
+			return 100;
+		else 
+			return progress;
+	}
+
 }

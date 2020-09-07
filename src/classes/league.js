@@ -82,8 +82,15 @@ splinterlands.League = class {
 		return this.id * 300 + 100;
 	}
 
-	get progress() {
-		return +((this.rating - this.min_rating) / (this.max_rating - this.min_rating) * 100).toFixed(2);
+	get min_power() {		
+		return splinterlands.get_settings().leagues[this.id].min_power
+	}
+
+	get max_power() {		
+		if(this.id >= 15)
+			return -1;
+
+		return splinterlands.get_settings().leagues[this.id + 1].min_power
 	}
 
 	get rating_reset() {
