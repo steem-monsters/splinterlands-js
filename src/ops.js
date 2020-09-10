@@ -439,6 +439,12 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx_wrapper('guild_contribution', 'Guild Contribution', { guild_id, amount }, tx => tx);
 	}
 
+	async function league_advance() {
+		return splinterlands.send_tx_wrapper('sm_advance_league', 'Advance League', { notify: true }, async tx => {			
+			await splinterlands.get_player().refresh();
+			return tx;
+		});
+	}
 
 
 	return {
@@ -479,6 +485,7 @@ window.splinterlands.ops = (function() {
 		guild_promote_member,
 		guild_demote_member,
 		guild_kick_member,
-		guild_contribution
+		guild_contribution,
+		league_advance
 	};
 })();

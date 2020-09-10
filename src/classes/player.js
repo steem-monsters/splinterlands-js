@@ -2,7 +2,11 @@ splinterlands.Player = class {
 	constructor(data) {
 		Object.keys(data).forEach(k => this[k] = data[k]);
 
-    	this.league = new splinterlands.League(data.rating, data.league);
+		this.league = new splinterlands.League(data.rating, data.league);		
+		this.next_tier = (!this.league.is_max_league) ? 
+						new splinterlands.League(null, data.league+1) : 
+						new splinterlands.League(null, data.league);
+		
 		this.quest = new splinterlands.Quest(data.quest || {});
 
 		if(!this.name && this.player)
@@ -196,6 +200,14 @@ splinterlands.Player = class {
 			return 100;
 		else 
 			return progress;
+	}
+
+	get is_eligible_to_advance() {
+		return (!this.league.is_max_league && this.power_progress === 0 && this.rating_progress === 0)
+	}
+
+	async check_messages(type) {
+		return await splinterlands.api('/players/messages', { type: type });
 	}
 
 }
