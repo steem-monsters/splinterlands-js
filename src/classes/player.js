@@ -180,6 +180,10 @@ splinterlands.Player = class {
 		return Math.max(this.league.max_rating - this.rating, 0);
 	}
 
+	get power_until_next_league() {
+		return Math.max(this.league.max_power - this.collection_power, 0);
+	}
+
 	get power_progress() {
 		let progress = +((this.collection_power - this.league.min_power) / (this.league.max_power - this.league.min_power) * 100).toFixed(2); 
 		
@@ -203,7 +207,7 @@ splinterlands.Player = class {
 	}
 
 	get is_eligible_to_advance() {
-		return (!this.league.is_max_league && this.power_progress === 0 && this.rating_progress === 0)
+		return (!this.league.is_max_league && this.points_until_next_league === 0 && this.power_until_next_league === 0)
 	}
 
 	async check_messages(type) {
