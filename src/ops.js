@@ -440,7 +440,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function league_advance() {
-		return splinterlands.send_tx_wrapper('sm_advance_league', 'Advance League', { notify: true }, async tx => {			
+		return splinterlands.send_tx_wrapper('advance_league', 'Advance League', { notify: true }, async tx => {			
 			await splinterlands.get_player().refresh();
 			return tx;
 		});
