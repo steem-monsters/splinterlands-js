@@ -214,4 +214,21 @@ splinterlands.Player = class {
 		return await splinterlands.api('/players/messages', { type: type });
 	}
 
+	get max_cp_league() {
+		var num = 0;
+	
+		for(var index = 0; index < splinterlands.get_settings().leagues.length; index++) {
+			if(this.collection_power >= splinterlands.get_settings().leagues[index].min_power) {
+				num = index;
+			} else {
+				break;
+			}
+		}
+	
+		return num;		
+	}
+
+	get max_cp_league_name() {
+		return splinterlands.get_settings().leagues[this.max_cp_league].name;
+	}
 }
