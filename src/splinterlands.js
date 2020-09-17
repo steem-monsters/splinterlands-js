@@ -750,8 +750,8 @@ var splinterlands = (function() {
 		return response;
 	}
 
-	async function get_leaderboard(season) {
-		let leaderboard = await api('/players/leaderboard_with_player', { season });
+	async function get_leaderboard(season, leaderboard_id, page) {
+		let leaderboard = await api('/players/leaderboard_with_player', { season, leaderboard: leaderboard_id, page });
 
 		if(leaderboard.leaderboard)
 			leaderboard.leaderboard = leaderboard.leaderboard.map(p => new splinterlands.Player(p));
