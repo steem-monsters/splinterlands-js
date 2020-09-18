@@ -785,3 +785,8 @@ var splinterlands = (function() {
 		get_init_url_search_params: () => _init_url_search_params,
 	};
 })();
+
+window.startWrappedApp = function() {
+	splinterlands.is_mobile_app = true;
+	return true;
+}
