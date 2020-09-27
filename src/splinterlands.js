@@ -432,17 +432,28 @@ var splinterlands = (function() {
 	}
 
 	async function load_collection(player) {
-		if(!player && _player)
-			player = _player.name;
-
-		_collection = (await api(`/cards/collection/${player}`)).cards.map(c => new splinterlands.Card(c));
-		_collection_grouped = null;
-
-		// If this is the current player's collection, add any "starter" cards
-		if(player == _player.name) {
-			get_card_details().filter(d => d.rarity < 3 && d.available_editions.includes(_player.starter_edition) && !_collection.find(c => c.card_detail_id == d.id))
-				.forEach(c => _collection.push(splinterlands.utils.get_starter_card(c.id, _player.starter_edition)));
+		if(player && _player && player !== _player.name) { //If getting collection of another player
+			console.log("Updating Collection: ", player);
+			_collection = (await api(`/cards/collection/${player}`)).cards.map(c => new splinterlands.Card(c));
+			_collection_grouped = null;		
+		} else {
+			if(_player.has_collection_power_changed) {
+				console.log("Updating Collection current player");
+				if(!player && _player)
+					player = _player.name;
+	
+				_collection = (await api(`/cards/collection/${player}`)).cards.map(c => new splinterlands.Card(c));
+				_collection_grouped = null;
+	
+				// If this is the current player's collection, add any "starter" cards				
+				get_card_details().filter(d => d.rarity < 3 && d.available_editions.includes(_player.starter_edition) && !_collection.find(c => c.card_detail_id == d.id))
+					.forEach(c => _collection.push(splinterlands.utils.get_starter_card(c.id, _player.starter_edition)));
+					
+				_player.has_collection_power_changed = false;
+			}
 		}
+
+		
 
 		return _collection;
 	}
