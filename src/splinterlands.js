@@ -294,7 +294,13 @@ var splinterlands = (function() {
 
 		let broadcast_promise = null;
 
-		if(_use_keychain) {
+		if(_player.use_proxy) {
+			broadcast_promise = new Promise(resolve => {
+				splinterlands.utils.post(`${_config.tx_broadcast_url}/proxy`, { player: _player.name, access_token: _player.token, id, json: data })
+					.then(r => resolve({ type: 'broadcast', method: 'proxy', success: true, trx_id: r.id }))
+					.catch(err => resolve({ type: 'broadcast', method: 'proxy', success: true, error: err }));
+			});
+		} else if(_use_keychain) {
 			broadcast_promise = new Promise(resolve => hive_keychain.requestCustomJson(_player.name, id, active_auth ? 'Active' : 'Posting', data_str, display_name, response => {
 				resolve({ 
 					type: 'broadcast',

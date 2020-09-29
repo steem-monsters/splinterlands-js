@@ -34,6 +34,23 @@ window.splinterlands.utils = (function() {
 		console.log(`SWITCHED TO NEW RPC NODE: ${rpc_node}`);
 	}
 
+	async function post(url, data) {
+		return new Promise((resolve, reject) => {
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', url, true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+
+			xhr.onload = function() {
+				if (xhr.status === 200)
+					resolve(try_parse(xhr.responseText));
+				else
+					reject('Request failed.  Returned status of ' + xhr.status);
+			};
+
+			xhr.send(JSON.stringify(data));
+		});
+	}
+
 	function parse_payment(payment_str) {
 		return {
 			amount: parseFloat(payment_str),
@@ -730,6 +747,7 @@ window.splinterlands.utils = (function() {
 		sc_custom_json,
 		getURLParameter,
 		guild_discounted_cost,
-		switch_rpc
+		switch_rpc,
+		post
 	 };
 })();
