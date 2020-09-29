@@ -154,7 +154,6 @@ var splinterlands = (function() {
 		return (await login(response.username, response.posting_key));			
 	}
 
-
 	async function login(username, key) {
 		if(!username) {
 			username = localStorage.getItem('splinterlands:username');
@@ -625,6 +624,18 @@ var splinterlands = (function() {
 			}).filter(c => c).sort((a, b) => a.stats.mana - b.stats.mana);
 	}
 
+	async function create_blockchain_account(username) {
+		try {
+			let result = await api('/players/create_blockchain_account', { name: username, is_test: splinterlands.get_settings().test_acct_creation });
+
+			if(result.error)
+				return result;
+
+			await send_tx_wrapper('upgrade_account', 'Upgrade Account', { account_name: username }, tx => tx);
+			return await login(result.username, result.posting_key);
+		} catch (err) { return err; }
+	}
+
 	async function create_account_email(username, email, password, subscribe) {
 		// Make sure the email address is all lowercase
 		email = email.toLowerCase();
@@ -776,7 +787,7 @@ var splinterlands = (function() {
 		init, api, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
 		log_event, load_market, browser_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password,
 		load_market_cards, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
-		get_leaderboard, get_global_chat, set_url, external_deposit,
+		get_leaderboard, get_global_chat, set_url, external_deposit, create_blockchain_account,
 		get_config: () => _config,
 		get_settings: () => _settings,
 		get_player: () => _player,
