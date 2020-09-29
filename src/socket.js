@@ -190,6 +190,11 @@ window.splinterlands.socket = (function() {
 
 		rating_update: function(data) {
 			splinterlands.get_player().update_rating(data.new_rating, data.new_league);
+			
+			if(data.new_collection_power !== undefined && splinterlands.get_player().collection_power != data.new_collection_power) {
+				splinterlands.get_player().collection_power = data.new_collection_power;
+				splinterlands.get_player().has_collection_power_changed = true;
+			}
 
 			// Emit a rating_update event
 			window.dispatchEvent(new CustomEvent('splinterlands:rating_update', { detail: data }));
@@ -198,6 +203,10 @@ window.splinterlands.socket = (function() {
 		quest_progress: function(data) {
 			splinterlands.get_player().quest = new splinterlands.Quest(data);
 			window.dispatchEvent(new CustomEvent('splinterlands:quest_progress', { detail: splinterlands.get_player().quest }));
+		},
+
+		received_gifts: function(data) {
+			window.dispatchEvent(new CustomEvent('splinterlands:received_gifts', { detail: data }));
 		},
 
 		system_message: function(data) {

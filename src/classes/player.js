@@ -19,6 +19,8 @@ splinterlands.Player = class {
 
 		if(this.season_reward)
 			this.season_reward = new splinterlands.Season(this.season_reward);
+
+		this.has_collection_power_changed = true;
 	}
 
 	async load_balances() {
