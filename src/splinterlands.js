@@ -647,7 +647,7 @@ var splinterlands = (function() {
 		} catch (err) { return err; }
 	}
 
-	async function create_account_email(username, email, password, subscribe) {
+	async function create_account_email(email, password, subscribe) {
 		// Make sure the email address is all lowercase
 		email = email.toLowerCase();
 
@@ -656,7 +656,6 @@ var splinterlands = (function() {
 
 		let params = { 
 			purchase_id: 'new-' + splinterlands.utils.randomStr(6),	// We need to set a purchase ID even though not making a purchase for backwards compatibility
-			name: username.toLowerCase(), 
 			email: encodeURIComponent(email), 
 			password_pub_key: password_pub_key,
 			subscribe: subscribe,
@@ -675,13 +674,12 @@ var splinterlands = (function() {
 		return response;
 	}
 
-	async function create_account_eos(username, email, subscribe) {
+	async function create_account_eos(email, subscribe) {
 		let account = await splinterlands.eos.getIdentity();
 
 		let params = { 
 			login_type: 'eos',
 			purchase_id: 'new-' + splinterlands.utils.randomStr(6),	// We need to set a purchase ID even though not making a purchase for backwards compatibility
-			name: username, 
 			email: email,
 			address: account.name, 
 			password_pub_key: account.publicKey,
