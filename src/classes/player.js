@@ -233,4 +233,10 @@ splinterlands.Player = class {
 	get max_cp_league_name() {
 		return splinterlands.get_settings().leagues[this.max_cp_league].name;
 	}
+
+	get pending_season_rewards() {
+		let max_league = this.season_max_league || 0;
+
+		return (max_league > 0 ? splinterlands.get_settings().season.reward_packs[max_league] : '0');				
+	}
 }
