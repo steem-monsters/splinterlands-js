@@ -1,3 +1,5 @@
+window.steem = window.hive;
+
 var splinterlands = (function() {
 	let _config = {};
 	let _player = null;
