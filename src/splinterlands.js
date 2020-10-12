@@ -647,7 +647,7 @@ var splinterlands = (function() {
 		} catch (err) { return err; }
 	}
 
-	async function create_account_email(email, password, subscribe) {
+	async function create_account_email(email, password, subscribe, captcha_token) {
 		// Make sure the email address is all lowercase
 		email = email.toLowerCase();
 
@@ -661,7 +661,8 @@ var splinterlands = (function() {
 			subscribe: subscribe,
 			is_test: splinterlands.get_settings().test_acct_creation,
 			ref: localStorage.getItem('splinterlands:ref'),			
-			ref_url: localStorage.getItem('splinterlands:url')
+			ref_url: localStorage.getItem('splinterlands:url'),
+			captcha_token: captcha_token
 		};
 
 		let response = await api('/players/create_email', params);
@@ -674,7 +675,7 @@ var splinterlands = (function() {
 		return response;
 	}
 
-	async function create_account_eos(email, subscribe) {
+	async function create_account_eos(email, subscribe, captcha_token) {
 		let account = await splinterlands.eos.getIdentity();
 
 		let params = { 
@@ -687,7 +688,8 @@ var splinterlands = (function() {
 			is_test: splinterlands.get_settings().test_acct_creation,
 			ref: localStorage.getItem('splinterlands:ref'),
 			ref_url: localStorage.getItem('splinterlands:url'),
-			browser_id: _browser_id
+			browser_id: _browser_id,
+			captcha_token: captcha_token
 		};
 
 		let response = await api('/players/create_email', params);

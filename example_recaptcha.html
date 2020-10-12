@@ -1,0 +1,155 @@
+<html>
+  <head>
+    <title>reCAPTCHA demo: Simple page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" href="dist/splinterlands.min.css" />
+
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+		integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+	<script src="dist/splinterlands.min.js"></script>
+	<script type="text/javascript">
+    $(() => setTimeout(init, 500));
+    
+    var QA_SITE_KEY = "6LeeD-gUAAAAAGlDpNYa0ZZsA3Q3hlMkd726pKBx";
+    
+    async function init() {
+			//await splinterlands.init({ api_url: 'https://steemmonsters.com', ws_url: 'wss://ws.steemmonsters.io' });
+			await splinterlands.init({
+				api_url: 'https://hive.steemmonsters.io',
+				ws_url: 'wss://hive-ws.steemmonsters.io'
+			});
+			//await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
+
+			if (splinterlands.has_saved_login())
+				savedLogin();
+    }
+
+    var captchaOnloadCallback = function() {
+      pwCaptchaId = grecaptcha.render('pw-captcha', { 'sitekey' : QA_SITE_KEY });
+    };
+
+    async function savedLogin() {
+			ShowLoading();
+
+			let login_response = await splinterlands.login();
+
+			if (!login_response.error)
+				onLogin(login_response);
+
+			HideLoading();
+		}
+  </script>
+  <style type="text/css">
+    .modal-backdrop.in {
+      opacity: 0.8;
+    }
+
+    .loading {
+      position: fixed;
+      width: 200px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+  </head>
+  <body>
+
+    <div id="div_login" class="py-3">
+			<input type="text" id="email" placeholder="Email" />
+			<br />
+			<div id="div_pwd_login" >
+				<input type="password" id="password" />
+				<button id="btn_create_account_password">Create account with password</button>
+			</div>			
+		</div>
+
+		<div id="div_game" style="display: none;">
+			<div class="py-3" style="display: flex;">
+				<div style="margin-right: 20px;">Logged in as: </div>
+				<div id="player_avatar" style="margin-right: 20px;"></div>
+				<div>@<span id="span_username"></span></div>
+
+				<button id="btn_logout">Log Out</button>
+			</div>
+
+			<div style="display: flex">
+				<div class="py-1">
+					<h5>Balances:</h5>
+					<div>DEC: <span id="span_balance_dec"></span></div>
+					<div>CREDITS: <span id="span_balance_credits"></span></div>
+					<div>UNTAMED: <span id="span_balance_untamed"></span></div>
+					<div>BETA: <span id="span_balance_beta"></span></div>
+					<div>ALPHA: <span id="span_balance_alpha"></span></div>
+					<div>ORB: <span id="span_balance_orb"></span></div>
+				</div>
+			</div>
+		</div>
+
+
+
+    <div id="pw-captcha" class="col-sm-10 col-sm-offset-1" style="padding-top: 10px;"></div>
+
+    <script>
+    function onLogin(player) {
+			$('#div_login').hide();
+			$('#div_game').show();
+			$('#span_username').text(player.name);
+
+			$('#player_avatar').append(player.render_avatar(40));
+
+			['DEC', 'CREDITS', 'UNTAMED', 'BETA', 'ALPHA', 'ORB'].forEach(async token => {
+				let balance = await player.get_balance(token);
+				$(`#span_balance_${token.toLowerCase()}`).text(balance);
+      });			
+      
+      $('#pw-captcha').hide();
+    }
+
+    $('#btn_create_account_password').click(async () => {
+      let captcha_token = grecaptcha.getResponse(pwCaptchaId);
+      
+      //Captcha missing message
+      if(!captcha_token) {
+        alert("You look human, but as a courtesy please prove you're not a robot anyway.")
+        grecaptcha.reset(pwCaptchaId);
+        return;
+			}
+
+			ShowLoading();      
+      let response = await splinterlands.create_account_email($('#email').val(), $('#password').val(), true, captcha_token);
+			HideLoading();
+
+			if (response.error) {
+				alert(`Error creating account: ${response.error}`);
+				return;
+      }
+      
+      console.log(response)
+      grecaptcha.reset(pwCaptchaId)
+      onLogin(response);
+      
+    });
+    
+    $('#btn_logout').click(() => {
+			splinterlands.logout();
+			$('#div_login').show();
+      $('#div_game').hide();
+      $('#pw-captcha').show();
+		});
+    
+    function ShowLoading() {
+			let loading = $(
+				'<div class="modal-backdrop fade in loading-backdrop"><img src="https://d36mxiodymuqjm.cloudfront.net/website/loading.gif" class="loading" /></div>'
+				);
+			loading.appendTo('body');
+		}
+
+		function HideLoading() {
+			$('.loading-backdrop').remove();
+		}
+    </script>
+    <script src="https://www.google.com/recaptcha/api.js?onload=captchaOnloadCallback&render=explicit" async defer></script>
+  </body>
+</html>
