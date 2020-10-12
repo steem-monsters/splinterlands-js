@@ -154,7 +154,6 @@ var splinterlands = (function() {
 		return (await login(response.username, response.posting_key));			
 	}
 
-
 	async function login(username, key) {
 		if(!username) {
 			username = localStorage.getItem('splinterlands:username');
@@ -294,7 +293,13 @@ var splinterlands = (function() {
 
 		let broadcast_promise = null;
 
-		if(_use_keychain) {
+		if(_player.use_proxy) {
+			broadcast_promise = new Promise(resolve => {
+				splinterlands.utils.post(`${_config.tx_broadcast_url}/proxy`, { player: _player.name, access_token: _player.token, id, json: data })
+					.then(r => resolve({ type: 'broadcast', method: 'proxy', success: true, trx_id: r.id }))
+					.catch(err => resolve({ type: 'broadcast', method: 'proxy', success: true, error: err }));
+			});
+		} else if(_use_keychain) {
 			broadcast_promise = new Promise(resolve => hive_keychain.requestCustomJson(_player.name, id, active_auth ? 'Active' : 'Posting', data_str, display_name, response => {
 				resolve({ 
 					type: 'broadcast',
@@ -630,7 +635,19 @@ var splinterlands = (function() {
 			}).filter(c => c).sort((a, b) => a.stats.mana - b.stats.mana);
 	}
 
-	async function create_account_email(username, email, password, subscribe) {
+	async function create_blockchain_account(username) {
+		try {
+			let result = await api('/players/create_blockchain_account', { name: username, is_test: splinterlands.get_settings().test_acct_creation });
+
+			if(result.error)
+				return result;
+
+			await send_tx_wrapper('upgrade_account', 'Upgrade Account', { account_name: username }, tx => tx);
+			return await login(result.username, result.posting_key);
+		} catch (err) { return err; }
+	}
+
+	async function create_account_email(email, password, subscribe) {
 		// Make sure the email address is all lowercase
 		email = email.toLowerCase();
 
@@ -639,7 +656,6 @@ var splinterlands = (function() {
 
 		let params = { 
 			purchase_id: 'new-' + splinterlands.utils.randomStr(6),	// We need to set a purchase ID even though not making a purchase for backwards compatibility
-			name: username.toLowerCase(), 
 			email: encodeURIComponent(email), 
 			password_pub_key: password_pub_key,
 			subscribe: subscribe,
@@ -658,13 +674,12 @@ var splinterlands = (function() {
 		return response;
 	}
 
-	async function create_account_eos(username, email, subscribe) {
+	async function create_account_eos(email, subscribe) {
 		let account = await splinterlands.eos.getIdentity();
 
 		let params = { 
 			login_type: 'eos',
 			purchase_id: 'new-' + splinterlands.utils.randomStr(6),	// We need to set a purchase ID even though not making a purchase for backwards compatibility
-			name: username, 
 			email: email,
 			address: account.name, 
 			password_pub_key: account.publicKey,
@@ -781,7 +796,7 @@ var splinterlands = (function() {
 		init, api, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
 		log_event, load_market, browser_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password,
 		load_market_cards, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
-		get_leaderboard, get_global_chat, set_url, external_deposit,
+		get_leaderboard, get_global_chat, set_url, external_deposit, create_blockchain_account,
 		get_config: () => _config,
 		get_settings: () => _settings,
 		get_player: () => _player,

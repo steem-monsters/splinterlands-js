@@ -234,6 +234,10 @@ splinterlands.Player = class {
 		return splinterlands.get_settings().leagues[this.max_cp_league].name;
 	}
 
+	get need_to_set_username() {
+		return (this.starter_pack_purchase && this.use_proxy);
+	}
+	
 	get pending_season_rewards() {
 		let max_league = this.season_max_league || 0;
 

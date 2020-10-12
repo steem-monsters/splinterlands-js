@@ -12,12 +12,14 @@
 		$(() => setTimeout(init, 500));
 
 		async function init() {
-			//await splinterlands.init({ api_url: 'https://steemmonsters.com', ws_url: 'wss://ws.steemmonsters.io' });
-			await splinterlands.init({
-				api_url: 'https://hive.steemmonsters.io',
-				ws_url: 'wss://hive-ws.steemmonsters.io'
-			});
-			//await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001' });
+			// Prod
+			//await splinterlands.init({ api_url: 'https://steemmonsters.com', ws_url: 'wss://ws.steemmonsters.io', tx_broadcast_url: 'https://broadcast.splinterlands.io' });
+
+			// QA
+			//await splinterlands.init({ api_url: 'https://hive.steemmonsters.io', 	ws_url: 'wss://hive-ws.steemmonsters.io', tx_broadcast_url: 'http://localhost:3333' });
+			
+			// Local
+			await splinterlands.init({ api_url: 'http://localhost:3000', ws_url: 'ws://localhost:3001', tx_broadcast_url: 'http://localhost:3333' });
 
 			if (splinterlands.has_saved_login())
 				savedLogin();
