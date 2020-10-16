@@ -282,8 +282,9 @@ window.splinterlands.utils = (function() {
 	}
 
 	async function account_exists(name) {
-		let existing_account = await steem.api.getAccountsAsync([name]);
-		return existing_account && existing_account.length > 0;
+		let res = await splinterlands.api('/players/exists', { name });
+
+		return res.exists;
 	}
 
 	function get_ability_image(ability, small) {
