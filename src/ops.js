@@ -4,6 +4,7 @@ if(!window.splinterlands)
 window.splinterlands.ops = (function() {
 	async function combine_cards(card_ids) {
 		return splinterlands.send_tx_wrapper('combine_cards', 'Combine Cards', { cards: card_ids }, async tx => {
+			splinterlands.get_player().has_collection_power_changed = true;
 			await splinterlands.load_collection();
 			return tx.result;
 		});
@@ -11,6 +12,7 @@ window.splinterlands.ops = (function() {
 
 	async function combine_all(card_detail_id, gold, edition) {
 		return splinterlands.send_tx_wrapper('combine_all', 'Combine Cards', { card_detail_id, gold, edition }, async tx => {
+			splinterlands.get_player().has_collection_power_changed = true;
 			await splinterlands.load_collection();
 			return tx.result;
 		});
@@ -18,6 +20,7 @@ window.splinterlands.ops = (function() {
 
 	async function burn_cards(card_ids) {
 		return splinterlands.send_tx_wrapper('burn_cards', 'Convert to DEC', { cards: card_ids }, async tx => {
+			splinterlands.get_player().has_collection_power_changed = true;
 			await splinterlands.load_collection();
 			return tx.result;
 		});
@@ -33,6 +36,7 @@ window.splinterlands.ops = (function() {
 
 	async function gift_cards(card_ids, to) {
 		return splinterlands.send_tx_wrapper('gift_cards', 'Transfer Cards', { cards: card_ids, to }, async tx => {
+			splinterlands.get_player().has_collection_power_changed = true;
 			await splinterlands.load_collection();
 			return tx.result;
 		});
