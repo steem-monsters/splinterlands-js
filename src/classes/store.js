@@ -9,7 +9,9 @@ splinterlands.Store = class {
 			{ name: 'Bitcoin', symbol: 'BTC' },
 			{ name: 'Ether', symbol: 'ETH' },
 			{ name: 'Litecoin', symbol: 'LTC' },
-			{ name: 'EOS', symbol: 'EOS' }
+			{ name: 'EOS', symbol: 'EOS' },
+			{ name: 'WAX', symbol: 'WAXP' },
+			{ name: 'Electroneum', symbol: 'ETN' }
 		];
 	}
 
