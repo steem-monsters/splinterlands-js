@@ -403,7 +403,7 @@ splinterlands.Card = class {
 	}
 	
 	async lore() { return await splinterlands.load_card_lore(this.card_detail_id); }
-	async market_cards() { return await splinterlands.load_market_cards(this.card_detail_id, this.gold, this.edition); }
+	async market_cards() { return await splinterlands.Market.load_market_cards(this.card_detail_id, this.gold, this.edition); }
 
 	static get_combine_result(cards) {
 		// Filter out any cards that are uncombinable (max level or on the market/delegated)

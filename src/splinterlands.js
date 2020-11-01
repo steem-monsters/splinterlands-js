@@ -477,12 +477,6 @@ var splinterlands = (function() {
 		return _potions;
 	}
 
-	async function load_market_cards(card_detail_id, gold, edition) {
-		let cards = await api('/market/for_sale_by_card', { card_detail_id, gold, edition });
-		cards = cards.map(c => new splinterlands.Card(c));
-		return cards;
-	}
-
 	let _lore = {};
 	async function load_card_lore(card_detail_id) {
 		if(!_lore[card_detail_id])
@@ -798,8 +792,7 @@ var splinterlands = (function() {
 
 	return { 
 		init, api, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
-		log_event, load_market, browser_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password,
-		load_market_cards, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
+		log_event, load_market, browser_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
 		get_leaderboard, get_global_chat, set_url, external_deposit, create_blockchain_account,
 		get_config: () => _config,
 		get_settings: () => _settings,
