@@ -632,6 +632,8 @@ var splinterlands = (function() {
 	}
 
 	async function create_blockchain_account(username) {
+		username = username.toLowerCase();
+
 		try {
 			let result = await api('/players/create_blockchain_account', { name: username, is_test: splinterlands.get_settings().test_acct_creation });
 
