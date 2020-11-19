@@ -57,7 +57,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function market_purchase(market_ids, price, currency) {
-		return splinterlands.send_tx_wrapper('market_purchase', 'Market Purchase', {  items: market_ids, price: price + 0.01, currency }, async tx => {
+		return splinterlands.send_tx_wrapper('market_purchase', 'Market Purchase', {  items: market_ids, price: price + 0.01, currency: currency.toUpperCase() }, async tx => {
 			splinterlands.get_player().has_collection_power_changed = true;
 			await splinterlands.load_collection();
 			return tx.result;
