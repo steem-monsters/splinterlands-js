@@ -43,6 +43,11 @@ var splinterlands = (function() {
 		//hack to handle Angular query string issues
 		let urlHash = (window.location.hash) ? window.location.hash : window.location.search ;
 		_init_url_search_params = new URLSearchParams(urlHash.substring(urlHash.indexOf('?')));	
+
+		// Init MetaMask library
+		if (window.ethereum) {
+			window.web3 = new Web3(window.ethereum);
+		}
 	}
 
 	function set_url(url) { 
@@ -149,7 +154,21 @@ var splinterlands = (function() {
 		
 		let response = await api('/players/login_eos', params);	
 		if(response.error) {
-			response.address = params.address;
+			response.address = params.address; //Needed to show account name for new account popup
+			return(response);
+		}			
+		
+		return (await login(response.username, response.posting_key));			
+	}
+
+	async function eth_login() {
+		let params = await splinterlands.ethereum.web3Auth();		
+		if(params.error)
+			return({ "error" : params.message });
+		
+		let response = await api('/players/login_eth', params);	
+		if(response.error) {
+			response.address = params.address; //Needed to show account name for new account popup
 			return(response);
 		}			
 		
@@ -700,6 +719,33 @@ var splinterlands = (function() {
 		return response;
 	}	
 
+	async function create_account_eth(email, subscribe, captcha_token) {
+		let account = await splinterlands.ethereum.getIdentity();
+
+		let params = { 
+			login_type: 'ethereum',
+			purchase_id: 'new-' + splinterlands.utils.randomStr(6),	// We need to set a purchase ID even though not making a purchase for backwards compatibility
+			email: email,
+			address: account.publicKey, 
+			password_pub_key: account.publicKey,
+			subscribe: subscribe,
+			is_test: splinterlands.get_settings().test_acct_creation,
+			ref: localStorage.getItem('splinterlands:ref'),
+			ref_url: localStorage.getItem('splinterlands:url'),
+			browser_id: _browser_id,
+			captcha_token: captcha_token
+		};
+
+		let response = await api('/players/create_eth', params);
+
+		if(response && !response.error) {
+			log_event('sign_up');
+			return await eth_login();
+		}
+
+		return response;
+	}	
+
 	async function redeem_promo_code(code, purchase_id) {
 		let response = await api('/purchases/start_code', { code, purchase_id });
 
@@ -808,6 +854,8 @@ var splinterlands = (function() {
 		eos_login,
 		create_account_eos,
 		get_init_url_search_params: () => _init_url_search_params,
+		eth_login,
+		create_account_eth
 	};
 })();
 
