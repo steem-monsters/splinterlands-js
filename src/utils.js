@@ -234,6 +234,8 @@ window.splinterlands.utils = (function() {
 					return (window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58) ? resolve(true) : resolve(false);
 				case 'EOS':
 					return resolve(splinterlands.eos.hasIdentity());
+				case 'ETH':
+					return resolve(!!window.web3);
 				default:
 					return resolve(false);
 			}

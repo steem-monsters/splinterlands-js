@@ -418,6 +418,8 @@ var splinterlands = (function() {
 				return await window.tronWeb.trx.sendTransaction(to, tronWeb.toSun(parseFloat(amount).toFixed(6)));
 			case 'eos':
 				return await splinterlands.eos.scatterPay(to, amount, memo);
+			case 'eth':
+				return await splinterlands.ethereum.web3Pay(to, amount);
 		}
 	}
 
