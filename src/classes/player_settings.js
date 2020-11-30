@@ -15,11 +15,11 @@ splinterlands.PlayerSettings = class {
 		localStorage.setItem('splinterlands:is_sound_muted', is_muted);	
 	}
 
-	static get team_select_sort() {
-		return localStorage.getItem('splinterlands:team_select_sort');	
+	static get team_create_sort() {
+		return localStorage.getItem('splinterlands:team_create_sort');	
 	}
 
-	static set_team_select_sort(sort_option) {
-		return localStorage.getItem('splinterlands:team_select_sort', sort_option);	
+	static set_team_create_sort(sort_option) {
+		localStorage.setItem('splinterlands:team_create_sort', sort_option);	
 	}
 }
