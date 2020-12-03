@@ -130,7 +130,7 @@ var splinterlands = (function() {
 
 	async function email_login(email, password) {
 		// Make sure the email address is all lowercase
-		email = email.toLowerCase();
+		email = email.trim().toLowerCase();
 
 		let params = { email: encodeURIComponent(email) };
 		let password_key = steem.auth.getPrivateKeys(email, password).owner;
