@@ -235,6 +235,13 @@ window.splinterlands.utils = (function() {
 				case 'EOS':
 					return resolve(splinterlands.eos.hasIdentity());
 				case 'ETH':
+				case 'GAME':
+				case 'BAT':
+				case 'UNI':
+				case 'SAND':
+				case 'GALA':
+				case 'ENJ':
+				case 'DAI':
 					return resolve(!!window.web3);
 				default:
 					return resolve(false);

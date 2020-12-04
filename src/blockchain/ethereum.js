@@ -2,6 +2,36 @@ if(!window.splinterlands)
 	window.splinterlands = {};
 
 window.splinterlands.ethereum = (function() {
+	let tokenContracts = { 
+		GAME: { 
+			address: '0x63f88A2298a5c4AEE3c216Aa6D926B184a4b2437',
+			precision: 18
+		},
+		BAT: { 
+			address: '0x0D8775F648430679A709E98d2b0Cb6250d2887EF',
+			precision: 18
+		},
+		UNI: {
+			address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+			precision: 18
+		},
+		SAND: {
+			address: '0x3845badAde8e6dFF049820680d1F14bD3903a5d0',
+			precision: 18
+		},
+		GALA: {
+			address: '0x15D4c048F83bd7e37d49eA4C83a07267Ec4203dA',
+			precision: 8
+		},
+		ENJ: {
+			address: '0xf629cbd94d3791c9250152bd8dfbdf380e2a3b9c',
+			precision: 18
+		},
+		DAI: {
+			address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+			precision: 18
+		}
+	};
 
 	// auto-populate a transfer in Ethereum web3 wallet
 	async function sendFromWeb3(to, amount) {
@@ -36,6 +66,123 @@ window.splinterlands.ethereum = (function() {
 				return e; 
 		}
 	}	
+
+	async function checkAllowance(token) {
+		try {
+			if(!window.web3 || !window.web3.eth.accounts.givenProvider.selectedAddress)
+				return ({ "error" : true, "message": 'Ethereum wallet not found. Please make sure Metamask or another browser-based Ethereum wallet is installed and unlocked.' });
+				
+			if(!tokenContracts[token])
+				return ({ "error" : true, "message": 'Invalid or unsupported token symbol specified.' });
+				
+			let player_address = window.web3.eth.accounts.givenProvider.selectedAddress;
+			let contract_addr = tokenContracts[token].address;
+
+			let contract = new window.web3.eth.Contract(JSON.parse(splinterlands.get_settings().ethereum.contracts.crystals.abi.result), contract_addr);
+			let allowance = await contract.methods.allowance(player_address, splinterlands.get_settings().ethereum.contracts.payments.address).call({ from: player_address });
+
+			console.log(allowance);
+
+			return (web3.utils.toBN(allowance) >= web3.utils.toBN('0xffffffffffffffffffffffffffffffffffffffffffffffffffffff'));
+		} catch(e) {
+			console.log(e); 
+			if(typeof e === 'string')
+				return ({ "error" : true, "message": e });
+			else 
+				return e; 
+		}
+	}
+
+	async function approveToken(token) {
+		try {
+			if(!window.web3 || !window.web3.eth.accounts.givenProvider.selectedAddress)
+				return ({ "error" : true, "message": 'Ethereum wallet not found. Please make sure Metamask or another browser-based Ethereum wallet is installed and unlocked.' });
+			
+			if(!tokenContracts[token])
+				return ({ "error" : true, "message": 'Invalid or unsupported token symbol specified.' });
+
+			let player_address = window.web3.eth.accounts.givenProvider.selectedAddress;
+			let contract = new window.web3.eth.Contract(JSON.parse(splinterlands.get_settings().ethereum.contracts.crystals.abi.result), tokenContracts[token].address);
+			let confirm_sent = false;
+
+			contract.methods.approve(splinterlands.get_settings().ethereum.contracts.payments.address, web3.utils.toBN('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff').toString())
+				.send({ from: player_address })
+				.on('transactionHash', (hash) => { return { type: 'approval', status: 'broadcast', data: { hash }} })
+				.on('confirmation', (confirmationNumber, receipt) => {
+					if(!confirm_sent) {
+						confirm_sent = true;
+						return { type: 'approval', status: 'confirmed', data: { confirmationNumber, receipt } };
+					}
+
+					resolve(receipt);
+				})
+				.on('error', (error, receipt) => {
+					if(typeof error === 'string')
+						return ({ "error" : true, "message": error });
+					else 
+						return error;
+				});
+		} catch(e) { 
+			console.log(e); 
+			if(typeof e === 'string')
+				return ({ "error" : true, "message": e });
+			else 
+				return e;
+		}
+	}
+
+	function payToken(token, amount, purchase_id) { 
+		try {
+			if(!window.web3 || !window.web3.eth.accounts.givenProvider.selectedAddress)
+				return ({ "error" : true, "message": 'Ethereum wallet not found. Please make sure Metamask or another browser-based Ethereum wallet is installed and unlocked.' });
+
+			if(!tokenContracts[token])
+				return ({ "error" : true, "message": 'Invalid or unsupported token symbol specified.' });
+
+			let player_address = window.web3.eth.accounts.givenProvider.selectedAddress;
+			let payments_addr = splinterlands.get_settings().ethereum.contracts.payments.address;
+			let bn_amount = web3.utils.toBN(amount).mul(web3.utils.toBN(10).pow(web3.utils.toBN(tokenContracts[token].precision - 3)));
+			let confirm_sent = false;
+
+			let contract = new window.web3.eth.Contract(JSON.parse(splinterlands.get_settings().ethereum.contracts.payments.abi.result), payments_addr);
+			contract.methods.payToken(tokenContracts[token].address, bn_amount.toString(), purchase_id)
+				.send({ from: player_address })
+				.on('transactionHash', (hash) => { return { type: 'payment', status: 'broadcast', data: { hash } } })
+				.on('confirmation', (confirmationNumber, receipt) => {
+					if(!confirm_sent) {
+						confirm_sent = true;
+						return { type: 'payment', status: 'confirmed', data: { confirmationNumber, receipt } };
+					}
+
+					return receipt;
+				})
+				.on('error', (error, receipt) => {
+					if(typeof error === 'string')
+						return ({ "error" : true, "message": error });
+					else 
+						return error;
+				});
+		} catch (error) {
+			console.log(e); 
+			if(typeof e === 'string')
+				return ({ "error" : true, "message": e });
+			else 
+				return e;
+		}
+	}
+
+	async function web3connect() {
+		if(!window.web3 || !window.ethereum)
+			return null;
+
+		if(window.web3.eth.accounts.givenProvider.selectedAddress)
+			return window.web3.eth.accounts.givenProvider.selectedAddress;
+
+		try {
+			const addresses = await window.web3.givenProvider.enable();
+			return addresses ? addresses[0] : null;
+		} catch (err) { return null; }
+	}
 
 
 	/**
@@ -103,5 +250,17 @@ window.splinterlands.ethereum = (function() {
 		}
 	}
 
-	return { sendTransaction, hasWeb3Obj, getIdentity, web3Auth, web3Pay };
+	async function erc20Payment(token, amount, purchase_id) {
+		let address = await web3connect();
+
+		if(!address)
+			return ({ "error" : true, "message": 'Ethereum wallet not found. Please make sure Metamask or another browser-based Ethereum wallet is installed and unlocked.' });
+
+		if(!(await checkAllowance(token)))
+			await approveToken(token);
+
+		await payToken(token, amount, purchase_id);
+	}
+
+	return { sendTransaction, hasWeb3Obj, getIdentity, web3Auth, web3Pay, erc20Payment };
 })();

@@ -419,7 +419,9 @@ var splinterlands = (function() {
 			case 'eos':
 				return await splinterlands.eos.scatterPay(to, amount, memo);
 			case 'eth':
-				return await splinterlands.ethereum.web3Pay(to, amount);
+				return await splinterlands.ethereum.web3Pay(to, amount);				
+			case 'erc20':			
+				return await splinterlands.ethereum.erc20Payment(currency.toUpperCase(), amount, memo);
 		}
 	}
 
