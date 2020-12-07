@@ -1,6 +1,6 @@
 splinterlands.Store = class {
 	static get payment_tokens() { 
-		return [
+		let currencies = [
 			{ name: 'HIVE', symbol: 'HIVE' },
 			{ name: 'STEEM', symbol: 'STEEM' },
 			{ name: 'Tron', symbol: 'TRX' },
@@ -13,6 +13,17 @@ splinterlands.Store = class {
 			{ name: 'WAX', symbol: 'WAXP' },
 			{ name: 'Electroneum', symbol: 'ETN' }
 		];
+
+		if(splinterlands.ethereum.hasWeb3Obj()) {
+			currencies.push({ name: 'Basic Attention Token', symbol: 'BAT' })
+			currencies.push({ name: 'Enjin Coin', symbol: 'ENJ' })
+			currencies.push({ name: 'Uniswap', symbol: 'UNI' })
+			currencies.push({ name: 'SAND', symbol: 'SAND' })
+			currencies.push({ name: 'GALA', symbol: 'GALA' })
+			currencies.push({ name: 'GAME', symbol: 'GAME' })
+		}
+
+		return currencies;
 	}
 
 	static async get_available_packs(edition) {
@@ -75,7 +86,7 @@ splinterlands.Store = class {
 	}
 
 	static get currencies() {
-		return [
+		let currencies = [
 			{ name: 'HIVE', symbol: 'HIVE' },
 			{ name: 'STEEM', symbol: 'STEEM' },
 			{ name: 'Tron', symbol: 'TRX' },
@@ -87,7 +98,18 @@ splinterlands.Store = class {
 			{ name: 'Binance Coin', symbol: 'BNB' },
 			{ name: 'KuCoin Shares', symbol: 'KCS' },
 			{ name: 'EOS', symbol: 'EOS' }
-		]
+		];
+		
+		if(splinterlands.ethereum.hasWeb3Obj()) {
+			currencies.push({ name: 'Basic Attention Token', symbol: 'BAT' })
+			currencies.push({ name: 'Enjin Coin', symbol: 'ENJ' })
+			currencies.push({ name: 'Uniswap', symbol: 'UNI' })
+			currencies.push({ name: 'SAND', symbol: 'SAND' })
+			currencies.push({ name: 'GALA', symbol: 'GALA' })
+			currencies.push({ name: 'GAME', symbol: 'GAME' })
+		}
+
+		return currencies;
 	}
 
 	static async start_purchase(type, qty, currency, merchant, data) {
