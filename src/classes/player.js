@@ -243,4 +243,12 @@ splinterlands.Player = class {
 
 		return (max_league > 0 ? splinterlands.get_settings().season.reward_packs[max_league] : '0');				
 	}
+
+	async get_player_property(property) {
+		return await splinterlands.api(`/player_properties/${property}`);
+	}
+
+	async set_player_property(property, value) {
+		return await splinterlands.api_post(`/player_properties/${property}`, { value });
+	}
 }

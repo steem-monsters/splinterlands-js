@@ -83,6 +83,25 @@ var splinterlands = (function() {
 		});
 	}
 
+	function api_post(url, data) {
+		if (data == null || data == undefined) data = {};
+
+		data.v = new Date().getTime();
+
+		if (_player) {
+			data.token = _player.token;
+			data.username = _player.name;
+		}
+
+		return fetch(_config.api_url + url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			body: splinterlands.utils.param(data),
+		});		
+	}
+
 	async function log_event(event_name, data) {
 		let params = {
 			browser_id: _browser_id,
@@ -843,7 +862,7 @@ var splinterlands = (function() {
 	}
 
 	return { 
-		init, api, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
+		init, api, api_post, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
 		log_event, load_market, browser_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
 		get_leaderboard, get_global_chat, set_url, external_deposit, create_blockchain_account,
 		get_config: () => _config,
