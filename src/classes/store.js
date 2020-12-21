@@ -277,6 +277,22 @@ splinterlands.Store = class {
 			return result;
 		}
 	}
+
+	static async iOS_validate(product_id, uid, reciept_data) {
+		splinterlands.log_event('mobile_purchase_ios', { product_id: product_id, uid: uid, purchase_token: encodeURIComponent(reciept_data) });
+
+		let result = await splinterlands.api('/purchases/iospurchase', { product_id: product_id, uid: uid, purchase_token: encodeURIComponent(reciept_data) });
+			
+		if(result && !result.error) {
+			window.dispatchEvent(new CustomEvent('splinterlands:purchase_approved', { detail: result }));
+
+			return result;
+		} else {
+			splinterlands.log_event('mobile_purchase_failed_ios', { result })
+
+			return result;
+		}
+	}
 }
 
 splinterlands.Purchase = class {
