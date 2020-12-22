@@ -83,7 +83,7 @@ var splinterlands = (function() {
 		});
 	}
 
-	function api_post(url, data) {
+	async function api_post(url, data) {
 		if (data == null || data == undefined) data = {};
 
 		data.v = new Date().getTime();
@@ -93,13 +93,19 @@ var splinterlands = (function() {
 			data.username = _player.name;
 		}
 
-		return fetch(_config.api_url + url, {
+		let response = await fetch(_config.api_url + url, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
 			},
 			body: splinterlands.utils.param(data),
-		});		
+		});
+		
+		if(response.ok) {
+			return response.json();
+		} else {
+			return Promise.reject(`Request failed.  Returned status of ${response.status}: ${response.statusText}`);
+		}
 	}
 
 	async function log_event(event_name, data) {

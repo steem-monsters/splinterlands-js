@@ -279,9 +279,12 @@ splinterlands.Store = class {
 	}
 
 	static async iOS_validate(product_id, uid, reciept_data) {
-		splinterlands.log_event('mobile_purchase_ios', { product_id: product_id, uid: uid, purchase_token: encodeURIComponent(reciept_data) });
+		//Apple's reciept data is too large for a query string to handle
+		splinterlands.log_event('mobile_purchase_ios', { product_id: product_id, uid: uid, reciept_data: encodeURIComponent(reciept_data.substr(0, 50) + "...") });
 
-		let result = await splinterlands.api('/purchases/iospurchase', { product_id: product_id, uid: uid, purchase_token: encodeURIComponent(reciept_data) });
+		let query = { "product_id": product_id, "uid": uid };
+
+		let result = await splinterlands.api_post('/purchases/iospurchase?' + splinterlands.utils.param(query), { "reciept_data": reciept_data });
 			
 		if(result && !result.error) {
 			window.dispatchEvent(new CustomEvent('splinterlands:purchase_approved', { detail: result }));
