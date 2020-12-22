@@ -269,6 +269,9 @@ var splinterlands = (function() {
 		await load_collection();
 
 		log_event('log_in');
+		if(splinterlands.is_mobile_app) {
+			_player.set_player_property('app', `mobile_${splinterlands.mobile_OS}`);
+		}
 
 		// Check if the player is currently involved in a match
 		if(_player.outstanding_match && _player.outstanding_match.id) {
@@ -888,7 +891,13 @@ var splinterlands = (function() {
 	};
 })();
 
-window.startWrappedApp = function() {
+window.startWrappedApp = function(mobile_os) {
 	splinterlands.is_mobile_app = true;
+	if(!mobile_os) {
+		splinterlands.mobile_OS = "android"
+	}
+	else {
+		splinterlands.mobile_OS = mobile_os
+	}
 	return true;
 }
