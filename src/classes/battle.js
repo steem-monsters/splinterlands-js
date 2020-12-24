@@ -37,4 +37,15 @@ splinterlands.Battle = class {
 	}
 
 	static async load(id) { return new splinterlands.Battle(await splinterlands.api('/battle/result', { id })); }
+
+	static async get_tutorial_battle(player_name) {
+		const res = await fetch(`${splinterlands.get_settings().asset_url}website/battle/tutorial/tutorial_battle.json`);
+
+		let tutorialBattleData = await res.text();
+		tutorialBattleData = JSON.parse(tutorialBattleData.replace(/\%\{PLAYER\}/g, player_name));
+		tutorialBattleData.details = JSON.parse(tutorialBattleData.details);
+		tutorialBattleData.settings = JSON.parse(tutorialBattleData.settings);		
+
+        return new splinterlands.Battle(tutorialBattleData);
+	}
 }
