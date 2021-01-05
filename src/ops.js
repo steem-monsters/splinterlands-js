@@ -158,6 +158,9 @@ window.splinterlands.ops = (function() {
 			splinterlands.get_player().season_reward = null;
 			await splinterlands.load_collection();
 
+			// Mark reward as revealed
+			await splinterlands.api('/players/rewards_revealed', { reward_tx_id: tx.id });
+
 			// New reward system
 			if(tx.result.rewards)
 				return { rewards: tx.result.rewards.map(r => new splinterlands.RewardItem(r)) };
@@ -199,6 +202,9 @@ window.splinterlands.ops = (function() {
 					ret_val.cards = card_rewards.map(c => new splinterlands.Card(c.card));
 			} else
 				ret_val.cards = tx.result.cards.map(c => new splinterlands.Card(c))
+
+			// Mark reward as revealed
+			await splinterlands.api('/players/rewards_revealed', { reward_tx_id: tx.id });
 
 			return ret_val;
 		});
