@@ -33,7 +33,7 @@ splinterlands.Battle = class {
 	}
 	
 	get ruleset_images() {
-		return this.ruleset ? this.ruleset.map(r => splinterlands.utils.asset_url(`website/icons/rulesets/img_combat-rule_${r.toLowerCase().replace(/[^a-zA-Z]+/g, '_')}.png`)) : "";
+		return this.ruleset ? this.ruleset.map(r => splinterlands.utils.asset_url(`website/icons/rulesets/new/img_combat-rule_${r.toLowerCase().replace(/[^a-zA-Z]+/g, '_')}_150.png`)) : "";
 	}
 
 	static async load(id) { return new splinterlands.Battle(await splinterlands.api('/battle/result', { id })); }
