@@ -723,6 +723,22 @@ window.splinterlands.utils = (function() {
 		{
 			"name": "Immunity",
 			"desc": "This monster is immune to negative status effects."
+		},
+		{
+			"name": "Dispel",
+			"desc": "When this monster hits an enemy, it clears all positive status effects on that enemy."
+		},
+		{
+			"name": "Phase",
+			"desc": "Magic attacks can miss this Monster (using the same hit/miss calculation as for Melee and Ranged attacks)."
+		},
+		{
+			"name": "True Strike",
+			"desc": "This Monster's attacks cannot miss."
+		},
+		{
+			"name": "Close Range",
+			"desc": "Monsters with the Close Range ability can perform ranged attacks from the first position."
 		}
 	];
 
