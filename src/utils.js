@@ -200,7 +200,7 @@ window.splinterlands.utils = (function() {
 			var url = 'https://hivesigner.com/sign/custom-json?authority=active';
 			url += '&required_posting_auths=' + encodeURI('[]');
 			url += '&required_auths=' + encodeURI('["' + splinterlands.get_player().name + '"]');
-			url += '&id=' + splinterlands.get_settings().ssc.chain_id;
+			url += '&id=' + splinterlands.get_settings().ssc.hive_chain_id;
 			url += '&json=' + encodeURI(JSON.stringify(transaction_data));
 
 			popup_center(url, `${token} Payment`, 500, 760);
