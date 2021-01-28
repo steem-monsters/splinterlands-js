@@ -127,6 +127,9 @@ splinterlands.Store = class {
 		if(data)
 			params.data = data;
 
+		if(splinterlands.is_mobile_app)
+			params.app = splinterlands.mobile_OS;
+
 		return new splinterlands.Purchase(await splinterlands.api('/purchases/start', params));
 	}
 
