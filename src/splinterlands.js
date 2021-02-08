@@ -891,13 +891,13 @@ var splinterlands = (function() {
 	};
 })();
 
-window.startWrappedApp = function(mobile_os) {
+window.startWrappedApp = function(is_android, version) {
 	splinterlands.is_mobile_app = true;
-	if(!mobile_os) {
-		splinterlands.mobile_OS = "android"
+	if(is_android == null || is_android) {
+		splinterlands.mobile_OS = "android_" + version;
 	}
 	else {
-		splinterlands.mobile_OS = mobile_os
+		splinterlands.mobile_OS = "iOS_" + version;
 	}
 	return true;
 }
