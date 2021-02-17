@@ -281,13 +281,13 @@ splinterlands.Store = class {
 		}
 	}
 
-	static async iOS_validate(product_id, uid, reciept_data) {
-		//Apple's reciept data is too large for a query string to handle
-		splinterlands.log_event('mobile_purchase_ios', { product_id: product_id, uid: uid, reciept_data: encodeURIComponent(reciept_data.substr(0, 50) + "...") });
+	static async iOS_validate(product_id, uid, receipt_data) {
+		//Apple's receipt data is too large for a query string to handle
+		splinterlands.log_event('mobile_purchase_ios', { product_id: product_id, uid: uid, receipt_data: encodeURIComponent(receipt_data.substr(0, 50) + "...") });
 
 		let query = { "product_id": product_id, "uid": uid };
 
-		let result = await splinterlands.api_post('/purchases/iospurchase?' + splinterlands.utils.param(query), { "reciept_data": reciept_data });
+		let result = await splinterlands.api_post('/purchases/iospurchase?' + splinterlands.utils.param(query), { "receipt-data": receipt_data });
 			
 		if(result && !result.error) {
 			window.dispatchEvent(new CustomEvent('splinterlands:purchase_approved', { detail: result }));
