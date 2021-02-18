@@ -893,11 +893,14 @@ var splinterlands = (function() {
 
 window.startWrappedApp = function(is_android, version) {
 	splinterlands.is_mobile_app = true;
+	splinterlands.mobile_OS_ver = version;
+
 	if(is_android == null || is_android) {
-		splinterlands.mobile_OS = "android_" + version;
+		splinterlands.mobile_OS = "android";
 	}
 	else {
-		splinterlands.mobile_OS = "iOS_" + version;
+		splinterlands.mobile_OS = "iOS";
 	}
+	
 	return true;
 }
