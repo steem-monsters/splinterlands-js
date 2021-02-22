@@ -892,7 +892,8 @@ var splinterlands = (function() {
 })();
 
 window.startWrappedApp = function(is_android, version) {
-	splinterlands.is_mobile_app = true;
+	splinterlands.is_android = (is_android == null || !!is_android);
+	splinterlands.is_mobile_app = true; 
 	splinterlands.mobile_OS_ver = version;
 
 	if(is_android == null || is_android) {
