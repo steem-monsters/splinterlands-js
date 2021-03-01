@@ -251,4 +251,8 @@ splinterlands.Player = class {
 	async set_player_property(property, value) {
 		return await splinterlands.api_post(`/player_properties/${property}`, { value });
 	}
+
+	async external_cards(blockchain) { 
+		return await splinterlands.ec_api('/players/external_cards', { player: this.name, blockchain }); 
+	}
 }

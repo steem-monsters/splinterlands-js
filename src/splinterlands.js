@@ -18,6 +18,11 @@ var splinterlands = (function() {
 
 	async function init(config) { 
 		_config = config;
+
+		if(!_config.ec_api_url) {
+			_config.ec_api_url = "https://ec-api.splinterlands.com"
+		}
+
 		steem.api.setOptions({ transport: 'http', uri: 'https://api.hive.blog', url: 'https://api.hive.blog' });
 
 		// Load the browser id and create a new session id
@@ -73,6 +78,30 @@ var splinterlands = (function() {
 
 			var xhr = new XMLHttpRequest();
 			xhr.open('GET', _config.api_url + url + '?' + splinterlands.utils.param(data));
+			xhr.onload = function() {
+				if (xhr.status === 200)
+					resolve(splinterlands.utils.try_parse(xhr.responseText));
+				else
+					reject('Request failed.  Returned status of ' + xhr.status);
+			};
+			xhr.send();
+		});
+	}
+
+	function ec_api(url, data) {
+		return new Promise((resolve, reject) => {
+			if (data == null || data == undefined) data = {};
+
+			// Add a dummy timestamp parameter to prevent IE from caching the requests.
+			data.v = new Date().getTime();
+
+			if (_player) {
+				data.token = _player.token;
+				data.username = _player.name;
+			}
+
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', _config.ec_api_url + url + '?' + splinterlands.utils.param(data));
 			xhr.onload = function() {
 				if (xhr.status === 200)
 					resolve(splinterlands.utils.try_parse(xhr.responseText));
@@ -191,7 +220,7 @@ var splinterlands = (function() {
 		if(params.error)
 			return({ "error" : params.message });
 		
-		let response = await api('/players/login_eth', params);	
+		let response = await ec_api('/players/login_eth', params);	
 		if(response.error) {
 			response.address = params.address; //Needed to show account name for new account popup
 			return(response);
@@ -871,7 +900,7 @@ var splinterlands = (function() {
 	}
 
 	return { 
-		init, api, api_post, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
+		init, api, ec_api, api_post, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
 		log_event, load_market, browser_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
 		get_leaderboard, get_global_chat, set_url, external_deposit, create_blockchain_account,
 		get_config: () => _config,

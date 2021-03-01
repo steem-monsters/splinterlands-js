@@ -251,7 +251,7 @@ splinterlands.Store = class {
 						resolve({ address: splinterlands.get_settings().account, browser_payment_available: true });
 						break;
 					case 'tron':
-						let address = await splinterlands.api('/purchases/get_payment_address', { type: 'dec_deposit', currency: 'TRX', data: '' });
+						let address = await splinterlands.ec_api('/purchases/get_payment_address', { type: 'dec_deposit', currency: 'TRX', data: '' });
 						resolve({ address: address.wallet_address, browser_payment_available: splinterlands.tron.browser_payment_available() });
 						break;
 					case 'ethereum':
