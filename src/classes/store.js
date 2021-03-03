@@ -119,6 +119,11 @@ splinterlands.Store = class {
 		if(!['HIVE', 'HBD', 'DEC'].includes(currency))
 			currency = 'HIVE';
 
+		if(orig_currency === 'WAXP')
+			orig_currency = 'WAX';
+
+		console.log("orig_currency: ", orig_currency)
+
 		let params = { player, type, qty, currency, orig_currency };
 
 		if(merchant)
