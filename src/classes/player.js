@@ -253,6 +253,8 @@ splinterlands.Player = class {
 	}
 
 	async external_cards(blockchain) { 
-		return await splinterlands.ec_api('/players/external_cards', { player: this.name, blockchain }); 
+		let res = await splinterlands.ec_api('/players/external_cards', { player: this.name, blockchain }); 
+		res.cards = res.cards.map(c => new splinterlands.Card(c));
+		return res;
 	}
 }
