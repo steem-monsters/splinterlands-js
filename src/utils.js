@@ -384,78 +384,78 @@ window.splinterlands.utils = (function() {
 	let effects = {
 		"Stun": {
 			"ability": "Stun",
-					"pastTense": "Stunned",
-					"desc": "Stunned monsters skip their next turn."
+			"pastTense": "Stunned",
+			"desc": "Stunned monsters skip their next turn."
 		},
 		"Enrage": {
 			"ability": "Enrage",
-					"pastTense": "Enraged",
-					"desc": "Enraged monsters get increased speed and attack damage when not at full health."
+			"pastTense": "Enraged",
+			"desc": "Enraged monsters get increased speed and attack damage when not at full health."
 		},
 		"Poison": {
 			"ability": "Poison",
-					"pastTense": "Poisoned",
-					"desc": "Poisoned monsters take 2 damage at the start of each round."
+			"pastTense": "Poisoned",
+			"desc": "Poisoned monsters take 2 damage at the start of each round."
 		},
 		"Slow": {
 			"ability": "Slow",
-					"pastTense": "Slowed",
-					"desc": "-1 to SPEED"
+			"pastTense": "Slowed",
+			"desc": "-1 to SPEED"
 		},
 		"Protected": {
 			"ability": "Protect",
-					"pastTense": "Protected",
-					"desc": "+2 to ARMOR"
+			"pastTense": "Protected",
+			"desc": "+2 to ARMOR"
 		},
 		"Inspired": {
 			"ability": "Inspire",
-					"pastTense": "Inspired",
-					"desc": "+1 to MELEE ATTACK"
+			"pastTense": "Inspired",
+			"desc": "+1 to MELEE ATTACK"
 		},
 		"Weakened": {
 			"ability": "Weaken",
-					"pastTense": "Weakened",
-					"desc": "-1 to HEALTH"
+			"pastTense": "Weakened",
+			"desc": "-1 to HEALTH"
 		},
 		"Silenced": {
 			"ability": "Silence",
-					"pastTense": "Silenced",
-					"desc": "-1 to MAGIC ATTACK"
+			"pastTense": "Silenced",
+			"desc": "-1 to MAGIC ATTACK"
 		},
 		"Swiftened": {
 			"ability": "Swiftness",
-					"pastTense": "Swiftened",
-					"desc": "+1 to SPEED"
+			"pastTense": "Swiftened",
+			"desc": "+1 to SPEED"
 		},
 		"Strengthened": {
 			"ability": "Strengthen",
-					"pastTense": "Strengthened",
-					"desc": "+1 to HEALTH"
+			"pastTense": "Strengthened",
+			"desc": "+1 to HEALTH"
 		},
 		"Shielded": {
 			"ability": "Divine Shield",
-					"pastTense": "Shielded",
-					"desc": "The first time this monster takes damage it is ignored."
+			"pastTense": "Shielded",
+			"desc": "The first time this monster takes damage it is ignored."
 		},
 		"Demoralized": {
 			"ability": "Demoralize",
-					"pastTense": "Demoralized",
-					"desc": "-1 to MELEE ATTACK"
+			"pastTense": "Demoralized",
+			"desc": "-1 to MELEE ATTACK"
 		},
 		"Afflicted": {
 			"ability": "Affliction",
-					"pastTense": "Afflicted",
-					"desc": "This monster may not be healed."
+			"pastTense": "Afflicted",
+			"desc": "This monster may not be healed."
 		},
 		"Blinded": {
 			"ability": "Blind",
-					"pastTense": "Blinded",
-					"desc": "Reduced chance of hitting with MELEE and RANGED attacks."
+			"pastTense": "Blinded",
+			"desc": "Reduced chance of hitting with MELEE and RANGED attacks."
 		},
 		"Headwinds": {
 			"ability": "Headwinds",
-					"pastTense": "Headwinds",
-					"desc": "-1 to RANGED ATTACK"
+			"pastTense": "Headwinds",
+			"desc": "-1 to RANGED ATTACK"
 		},
 		"Snared": {
 			"ability": "Snare",
@@ -479,8 +479,8 @@ window.splinterlands.utils = (function() {
 		},
 		"Halved": {
 			"ability": "Halving",
-					"pastTense": "Halved",
-					"desc": "Attack stats cut in half"
+			"pastTense": "Halved",
+			"desc": "Attack stats cut in half"
 		},
 	};
 
