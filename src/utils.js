@@ -34,6 +34,9 @@ window.splinterlands.utils = (function() {
 		console.log(`SWITCHED TO NEW RPC NODE: ${rpc_node}`);
 	}
 
+	function get_rpc_nodes(list) { return rpc_nodes; }
+	function set_rpc_nodes(list) { rpc_nodes = list; }
+
 	async function post(url, data) {
 		return new Promise((resolve, reject) => {
 			var xhr = new XMLHttpRequest();
@@ -779,6 +782,8 @@ window.splinterlands.utils = (function() {
 		getURLParameter,
 		guild_discounted_cost,
 		switch_rpc,
-		post
+		post,
+		get_rpc_nodes,
+		set_rpc_nodes
 	 };
 })();

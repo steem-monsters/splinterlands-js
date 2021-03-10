@@ -53,6 +53,14 @@ var splinterlands = (function() {
 		if (window.ethereum) {
 			window.web3 = new Web3(window.ethereum);
 		}
+
+		let rpc_list = splinterlands.get_settings().rpc_nodes;
+
+		if(rpc_list && Array.isArray(rpc_list) && rpc_list.length > 0) {
+			splinterlands.utils.set_rpc_nodes(rpc_list);
+			steem.api.setOptions({ transport: 'http', uri: rpc_list[0], url: rpc_list[0] });
+			console.log(`Set Hive RPC node to: ${rpc_list[0]}`);
+		}
 	}
 
 	function set_url(url) { 
