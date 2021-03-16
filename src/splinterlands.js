@@ -541,8 +541,8 @@ var splinterlands = (function() {
 				_collection_grouped = null;
 	
 				// If this is the current player's collection, add any "starter" cards				
-				get_card_details().filter(d => d.rarity < 3 && d.available_editions.includes(_player.starter_edition) && !_collection.find(c => c.card_detail_id == d.id))
-					.forEach(c => _collection.push(splinterlands.utils.get_starter_card(c.id, _player.starter_edition)));
+				get_card_details().filter(d => d.is_starter_card && !_collection.find(c => c.card_detail_id == d.id))
+					.forEach(c => _collection.push(splinterlands.utils.get_starter_card(c.id, c.starter_edition)));
 					
 				_player.has_collection_power_changed = false;
 			}
@@ -651,8 +651,8 @@ var splinterlands = (function() {
 				(!o.delegated_to || o.delegated_to == _player.name));
 
 			// Add "starter" card
-			if(!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.rarity < 3 && d.available_editions.includes(_player.starter_edition))
-				card = splinterlands.utils.get_starter_card(d.id, _player.starter_edition);
+			if(!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
+				card = splinterlands.utils.get_starter_card(d.id, c.starter_edition);
 
 			if(card) {
 				card = new splinterlands.Card(Object.assign({}, card));
@@ -695,8 +695,8 @@ var splinterlands = (function() {
 					(!o.delegated_to || o.delegated_to == _player.name));
 
 				// Add "starter" card
-				if(!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.rarity < 3 && d.available_editions.includes(_player.starter_edition))
-					card = splinterlands.utils.get_starter_card(d.id, _player.starter_edition);
+				if(!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
+					card = splinterlands.utils.get_starter_card(d.id, c.starter_edition);
 
 				if(card) {
 					card = new splinterlands.Card(Object.assign({}, card));
