@@ -652,7 +652,7 @@ var splinterlands = (function() {
 
 			// Add "starter" card
 			if(!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
-				card = splinterlands.utils.get_starter_card(d.id, c.starter_edition);
+				card = splinterlands.utils.get_starter_card(d.id, d.starter_edition);
 
 			if(card) {
 				card = new splinterlands.Card(Object.assign({}, card));
@@ -696,7 +696,7 @@ var splinterlands = (function() {
 
 				// Add "starter" card
 				if(!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
-					card = splinterlands.utils.get_starter_card(d.id, c.starter_edition);
+					card = splinterlands.utils.get_starter_card(d.id, d.starter_edition);
 
 				if(card) {
 					card = new splinterlands.Card(Object.assign({}, card));
