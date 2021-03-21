@@ -145,7 +145,7 @@ window.splinterlands.utils = (function() {
 		if(!data)
 			data = {};
 
-		data.app = `steemmonsters/${splinterlands.get_settings().version}`;
+		data.app = `sl-mobile/${splinterlands.get_settings().version}`;
 
 		// Generate a random ID for this transaction so we can look it up later
 		if(!data.sm_id)
