@@ -310,6 +310,10 @@ var splinterlands = (function() {
 			_player.set_player_property('app', `mobile_${splinterlands.mobile_OS}`);
 		}
 
+		splinterlands.utils.loadScript("https://platform.twitter.com/oct.js", () => {
+			twttr.conversion.trackPid('o5rpo', { tw_sale_amount: 0, tw_order_quantity: 0 });
+		});
+
 		// Check if the player is currently involved in a match
 		if(_player.outstanding_match && _player.outstanding_match.id) {
 			// Set it as the currently active match
@@ -755,6 +759,10 @@ var splinterlands = (function() {
 
 		if(response && !response.error) {
 			log_event('sign_up');
+
+			splinterlands.utils.loadScript("https://platform.twitter.com/oct.js", () => {
+				twttr.conversion.trackPid('o4d37', { tw_sale_amount: 0, tw_order_quantity: 0 });
+			});
 			return await email_login(email, password);
 		}
 
@@ -782,6 +790,11 @@ var splinterlands = (function() {
 
 		if(response && !response.error) {
 			log_event('sign_up');
+
+			splinterlands.utils.loadScript("https://platform.twitter.com/oct.js", () => {
+				twttr.conversion.trackPid('o4d37', { tw_sale_amount: 0, tw_order_quantity: 0 });
+			});
+
 			return await eos_login();
 		}
 
@@ -809,6 +822,11 @@ var splinterlands = (function() {
 
 		if(response && !response.error) {
 			log_event('sign_up');
+
+			splinterlands.utils.loadScript("https://platform.twitter.com/oct.js", () => {
+				twttr.conversion.trackPid('o4d37', { tw_sale_amount: 0, tw_order_quantity: 0 });
+			});
+
 			return await eth_login();
 		}
 

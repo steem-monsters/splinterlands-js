@@ -93,8 +93,13 @@ window.splinterlands.socket = (function() {
 				clearTimeout(trx.timeout);
 				trx.resolve(data);
 			} else {
-				if(data.type == 'starter_pack')
+				if(data.type == 'starter_pack') {
 					splinterlands.get_player().starter_pack_purchase = true;
+
+					splinterlands.utils.loadScript("https://platform.twitter.com/oct.js", () => {
+						twttr.conversion.trackPid('o4d35', { tw_sale_amount: 10, tw_order_quantity: 1 });
+					});
+				}
 					
 				// TODO: Send starter_purchase event here?
 
