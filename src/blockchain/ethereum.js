@@ -182,11 +182,6 @@ window.splinterlands.ethereum = (function() {
 	/**
 	 * Public functions
 	 */
-	async function sendTransaction(signed_tx) {
-		// Broadcast the transaction
-		return await splinterlands.api('/transactions/broadcast_eth_tx', { signed_tx });
-	}
-
 	function hasWeb3Obj() {
 		return (!!window.web3);
 	}
@@ -260,5 +255,5 @@ window.splinterlands.ethereum = (function() {
 		await payToken(token, amount, purchase_id, status_update_callback);
 	}
 
-	return { sendTransaction, hasWeb3Obj, getIdentity, web3Auth, web3Pay, erc20Payment };
+	return { hasWeb3Obj, getIdentity, web3Auth, web3Pay, erc20Payment };
 })();
