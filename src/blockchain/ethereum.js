@@ -166,14 +166,17 @@ window.splinterlands.ethereum = (function() {
 	}
 
 	async function web3connect() {
-		if(!window.web3 || !window.ethereum)
+		if(!window.ethereum)
 			return null;
 
-		if(window.web3.eth.accounts.givenProvider.selectedAddress)
-			return window.web3.eth.accounts.givenProvider.selectedAddress;
+		try {
+			let accounts = await ethereum.request({ method: 'eth_accounts' });
+			if(accounts && Array.isArray(accounts) && accounts.length > 0)
+				return accounts[0];
+		} catch (err) {}
 
 		try {
-			const addresses = await window.web3.givenProvider.enable();
+			const addresses = await window.ethereum.enable();
 			return addresses ? addresses[0] : null;
 		} catch (err) { return null; }
 	}

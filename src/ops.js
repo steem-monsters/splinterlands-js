@@ -363,7 +363,8 @@ window.splinterlands.ops = (function() {
 			tron: 'sm-dec-tron',
 			ethereum: 'sl-eth',
 			hive_engine: 'sl-hive',
-			steem_engine: 'sl-steem'
+			steem_engine: 'sl-steem',
+			bsc: 'sl-bsc'
 		}
 
 		return splinterlands.send_tx_wrapper('token_transfer', 'Withdraw DEC', { type: 'withdraw', to: accounts[wallet] || 'sl-hive', qty, token: 'DEC' }, tx => tx);

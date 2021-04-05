@@ -505,6 +505,11 @@ var splinterlands = (function() {
 
 				let token = splinterlands.utils.get_token('DEC-TRON');
 				return await splinterlands.tron.sendToken(to, amount, token.token_id);
+			case 'bsc':
+				if(currency != 'DEC')
+					return { success: false, error: 'Invalid currency specified.' };
+
+				return await splinterlands.bsc.bscDeposit(amount, splinterlands.get_player().name);
 		}
 	}
 

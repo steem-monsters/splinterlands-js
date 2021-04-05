@@ -262,6 +262,9 @@ splinterlands.Store = class {
 					case 'ethereum':
 						resolve({ address: splinterlands.get_settings().ethereum.contracts.crystals.address, browser_payment_available: false });
 						break;
+					case 'bsc':
+						resolve({ address: '0xe9d7023f2132d55cbd4ee1f78273cb7a3e74f10a', browser_payment_available: false });
+						break;
 					default:
 						reject({ error: 'Missing or invalid "wallet_type" parameter.' });
 						break;
