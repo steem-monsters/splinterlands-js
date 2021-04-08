@@ -171,6 +171,10 @@ window.splinterlands.socket = (function() {
 			window.dispatchEvent(new CustomEvent('splinterlands:chat_message', { detail: Object.assign({ type: 'guild' }, data) }));
 		},
 
+		guild_update: function(data) {
+			window.dispatchEvent(new CustomEvent('splinterlands:guild_update', { detail: data }));
+		},
+
 		global_chat: function(data) {
 			if(data.player_info) {
 				data.player = new splinterlands.Player(data.player_info);
