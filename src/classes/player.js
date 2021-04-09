@@ -250,4 +250,8 @@ splinterlands.Player = class {
 		res.cards = res.cards.map(c => new splinterlands.Card(c));
 		return res;
 	}
+
+	async dec_balances() {
+		return await splinterlands.ec_api('/players/dec_balances');
+	}
 }
