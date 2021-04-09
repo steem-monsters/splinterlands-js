@@ -367,7 +367,19 @@ window.splinterlands.ops = (function() {
 			bsc: 'sl-bsc'
 		}
 
-		return splinterlands.send_tx_wrapper('token_transfer', 'Withdraw DEC', { type: 'withdraw', to: accounts[wallet] || 'sl-hive', qty, token: 'DEC' }, tx => tx);
+		let player_wallet = null;
+		if(['tron', 'ethereum', 'bsc'].some(type => type == wallet)) {
+			player_wallet = await splinterlands.api('/players/wallets', { type: wallet });
+
+			if(!player_wallet) {
+				return new Promise((resolve, reject) => reject({ error: `Please link a ${wallet} wallet before withdrawing.` }));
+			}
+
+		} else {
+			player_wallet = { address: splinterlands.get_player().name };
+		}
+
+		return splinterlands.send_tx_wrapper('token_transfer', 'Withdraw DEC', { type: 'withdraw', to: accounts[wallet] || 'sl-hive', qty, token: 'DEC', memo: player_wallet.address }, tx => tx);
 	}
 
 	async function guild_join(guild_id) {
