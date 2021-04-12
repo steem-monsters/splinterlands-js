@@ -384,6 +384,15 @@ window.splinterlands.utils = (function() {
 
 	function asset_url(path) { return splinterlands.get_settings().asset_url + path; }
 
+	function server_date(date_str, subtract_seconds) {
+		let date = new Date(new Date(date_str).getTime() + splinterlands.get_server_time_offset());
+	
+		if(subtract_seconds)
+			date = new Date(date.getTime() - subtract_seconds * 1000);
+	
+		return date;
+	}
+
 	let effects = {
 		"Stun": {
 			"ability": "Stun",
@@ -784,6 +793,7 @@ window.splinterlands.utils = (function() {
 		switch_rpc,
 		post,
 		get_rpc_nodes,
-		set_rpc_nodes
+		set_rpc_nodes,
+		server_date
 	 };
 })();

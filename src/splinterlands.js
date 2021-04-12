@@ -15,6 +15,7 @@ var splinterlands = (function() {
 	let _match = null;
 	let _url = null;
 	let _init_url_search_params = null; //Query string app started with
+	let _server_time_offset = 0;
 
 	async function init(config) { 
 		_config = config;
@@ -947,7 +948,8 @@ var splinterlands = (function() {
 		create_account_eos,
 		get_init_url_search_params: () => _init_url_search_params,
 		eth_login,
-		create_account_eth
+		create_account_eth,
+		get_server_time_offset: () => _server_time_offset
 	};
 })();
 

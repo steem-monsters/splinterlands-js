@@ -47,6 +47,9 @@ window.splinterlands.socket = (function() {
 
 		var message = JSON.parse(m.data);
 
+		if(message && message.server_time)
+			splinterlands._server_time_offset = Date.now() - message.server_time;
+
 		if(message.id && _message_handlers[message.id])
 			_message_handlers[message.id](message.data);
 
