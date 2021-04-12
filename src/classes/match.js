@@ -12,6 +12,9 @@ splinterlands.Match = class {
 			this.allowed_cards = this.settings ? this.settings.allowed_cards : null;
 		}
 
+		if(this.submit_expiration_date)
+			this.submit_expiration_date = splinterlands.utils.server_date(this.submit_expiration_date, 20);
+
 		return this;
 	}
 
