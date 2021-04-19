@@ -113,7 +113,8 @@ window.splinterlands.socket = (function() {
 		match_found: function(data) {
 			let match = splinterlands.get_match();
 
-			if(match && match.id == data.id) {
+			//(match.id == data.opponent) check is for challenges 
+			if(match && (match.id == data.id || match.id == data.opponent)) {
 				match = splinterlands.set_match(data);
 
 				if(match.on_match)
@@ -223,6 +224,18 @@ window.splinterlands.socket = (function() {
 
 		system_message: function(data) {
 			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: data }));
+		},
+
+		challenge: function(data) {
+			data.data = JSON.parse(data.data);
+			console.log("Challenge: ", data);
+
+			window.dispatchEvent(new CustomEvent('splinterlands:challenge', { detail: data }));
+		},
+
+		challenge_declined: function(data) {
+			console.log("challenge_declined: ", data)
+			window.dispatchEvent(new CustomEvent('splinterlands:challenge_declined', { detail: data }));
 		}
 	};
 

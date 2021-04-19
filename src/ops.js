@@ -320,7 +320,10 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function accept_challenge(id) {
-		return splinterlands.send_tx_wrapper('accept_challenge', 'Accept Challenge', { id }, tx => tx);
+		splinterlands.set_match({ id, status: 0 });
+		return splinterlands.send_tx_wrapper('accept_challenge', 'Accept Challenge', { id }, tx => {
+			console.log("accept_challenge tx: ", tx);			
+		});
 	}
 
 	async function decline_challenge(id) {
