@@ -480,6 +480,10 @@ window.splinterlands.ops = (function() {
 		});
 	}
 
+	async function set_active_authority(is_active) {
+		return splinterlands.send_tx_wrapper('update_authority', 'Update Authority', { require_active_auth: is_active }, async tx => tx);
+	}
+
 
 	return {
 		combine_cards,
@@ -521,6 +525,7 @@ window.splinterlands.ops = (function() {
 		guild_demote_member,
 		guild_kick_member,
 		guild_contribution,
-		league_advance
+		league_advance,
+		set_active_authority
 	};
 })();
