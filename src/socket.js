@@ -105,6 +105,14 @@ window.splinterlands.socket = (function() {
 				}
 					
 				// TODO: Send starter_purchase event here?
+				snapyr.track(
+					"purchase_complete",
+					{
+						purchase_amount_usd: parseFloat(data.amount_usd),
+						type: data.type
+					},
+					() => {console.log("SNAPYR: purchase_complete", parseFloat(data.amount_usd), data.type);}
+				);
 
 				window.dispatchEvent(new CustomEvent('splinterlands:purchase_complete', { detail: data }));
 			}
@@ -146,6 +154,15 @@ window.splinterlands.socket = (function() {
 
 		battle_result: async function(data) {
 			let match = splinterlands.get_match();
+
+			snapyr.track(
+				"battle_result",
+				{
+					match_type: data.match_type,
+					winner: data.winner
+				},
+				() => {console.log("SNAPYR: battle_result", data.match_type, data.winner);}
+			);
 
 			if(match && match.id == data.id) {
 				if(match.on_result)

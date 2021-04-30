@@ -135,6 +135,17 @@ splinterlands.Store = class {
 		if(splinterlands.is_mobile_app)
 			params.app = splinterlands.mobile_OS;
 
+		snapyr.track(
+			"start_purchase",
+			{
+				type:  type,
+				quantity: qty,
+				currency: currency,
+				merchant: merchant
+			},
+			() => {console.log("SNAPYR: start_purchase", type, qty, currency, merchant);}
+		);
+
 		return new splinterlands.Purchase(await splinterlands.api('/purchases/start', params));
 	}
 
