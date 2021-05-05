@@ -18,7 +18,7 @@ splinterlands.GuildBuilding = class {
 			};
 		}
 
-		let levels = splinterlands.get_settings().guilds[this.type].levels;
+		let levels = (splinterlands.get_settings().guilds[this.type].levels) ? splinterlands.get_settings().guilds[this.type].levels : splinterlands.get_settings().guilds[this.type].cost[0].levels;
 		let total_to_level = 0;
 
 		for(let i = 0; i < this.level; i++)
@@ -26,8 +26,9 @@ splinterlands.GuildBuilding = class {
 
 		return {
 			total: levels[this.level],
-			progress: this.contributions - total_to_level,
-			remaining: total_to_level + levels[this.level] - this.contributions
+			progress: (this.contributions) ? this.contributions - total_to_level : this.contrib_dec - total_to_level,
+			remaining: (this.contributions) ? total_to_level + levels[this.level] - this.contributions : Math.max(total_to_level + levels[this.level] - this.contrib_dec, 0),
+			crowns: (this.contributions) ? 0 : splinterlands.get_settings().guilds[this.type].cost[1].levels[this.level]
 		};
 	}
 
