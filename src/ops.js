@@ -480,7 +480,19 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function guild_contribution(guild_id, amount) {
+		console.warn("splinterlands.ops.guild_contribution is deprecated. Please use splinterlands.ops.guild_building_contribution ")
 		return splinterlands.send_tx_wrapper('guild_contribution', 'Guild Contribution', { guild_id, amount }, tx => tx);
+	}
+
+	async function guild_building_contribution(guild_id, building, dec_amount, crowns_amount) {
+		let amount = [];
+		if(dec_amount > 0) {
+			amount.push(dec_amount + ' DEC');
+		}
+		if(crowns_amount > 0) {
+			amount.push(crowns_amount + ' CROWN');
+		}
+		return splinterlands.send_tx_wrapper('guild_contribution', 'Guild Contribution', { guild_id, building, amount }, tx => tx);
 	}
 
 	async function league_advance() {
@@ -535,6 +547,7 @@ window.splinterlands.ops = (function() {
 		guild_demote_member,
 		guild_kick_member,
 		guild_contribution,
+		guild_building_contribution,
 		league_advance,
 		set_active_authority
 	};
