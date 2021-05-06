@@ -43,21 +43,63 @@ splinterlands.GuildBuilding = class {
 	}
 
 	get levels() {
-		let bldg = splinterlands.get_settings().guilds[this.type];
-		let bonus1 = this.type == 'guild_hall' ? bldg.member_limit : splinterlands.get_settings().guilds.dec_bonus_pct;
-		let bonus2 = this.type == 'guild_hall' ? [1,2,3,4,5,6,7,8,9,10] : splinterlands.get_settings().guilds.shop_discount_pct;
+		let bldg = null;				
+		let bonus1 = [];
+		let bonus2 = [];
 
-		return bldg.levels.map((l, i) => {
-			return {
-				level: i + 1,
-				contributions: l,
-				bonus_1: bonus1[i],
-				bonus_2: bonus2[i]
-			}
-		})
+		switch (this.type) {
+			case 'guild_hall':
+				bldg = splinterlands.get_settings().guilds[this.type];
+				bonus1 = bldg.member_limit;
+				bonus2 = [1,2,3,4,5,6,7,8,9,10];
+				
+				return bldg.levels.map((l, i) => {
+					return {
+						level: i + 1,
+						contributions: l,
+						bonus_1: bonus1[i],
+						bonus_2: bonus2[i]
+					}
+				});
+			case 'quest_lodge':
+				bldg = splinterlands.get_settings().guilds[this.type];
+				bonus1 = splinterlands.get_settings().guilds.dec_bonus_pct;
+				bonus2 = splinterlands.get_settings().guilds.shop_discount_pct;
+				
+				return bldg.levels.map((l, i) => {
+					return {
+						level: i + 1,
+						contributions: l,
+						bonus_1: bonus1[i],
+						bonus_2: bonus2[i]
+					}
+				});	
+			case 'arena':
+				// tier can range from 0 to 4 (corresponding to building levels 1&2, 3&4, 5&6, 7&8, 9&10)
+				let dec_cost_levels = splinterlands.get_settings().guilds['arena'].cost[0].levels;
+				let crown_cost_levels = splinterlands.get_settings().guilds['arena'].cost[1].levels;
+				
+				bonus1 = [1,1,2,2,3,3,4,4,5,5];
+				bonus2 = splinterlands.get_settings().frays;
+				let bonus3 = splinterlands.get_settings().guilds.crown_multiplier;
+				
+				return  dec_cost_levels.map((l, i) => {
+					let arena_tier = Math.ceil((i+1) / 2) - 1;
+					return {
+						level: i + 1,
+						contributions: l,
+						contributions_crowns: crown_cost_levels[i],
+						bonus_1: bonus1[i],
+						bonus_2: bonus2[arena_tier].length,
+						bonus_3: bonus3[i]
+					}
+				});
+			default:
+				break;
+		}
 	}
 
 	get image_url() {
-		return `https://d36mxiodymuqjm.cloudfront.net/website/guilds/hall/${this.type}_level-${this.level}.png`
+		return `https://d36mxiodymuqjm.cloudfront.net/website/guilds/bldg/buildings/bldg_guild_${this.type}-${this.level}-v2.png`;		
 	}
 }
