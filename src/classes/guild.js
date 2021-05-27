@@ -124,4 +124,8 @@ splinterlands.Guild = class {
 	async delete_announcement(announcement_id) {		
 		return await splinterlands.api('/guilds/delete_announcement', {id : announcement_id });
 	}
+
+	async frays(tournament_id) {		
+		return await splinterlands.api('/guilds/frays', { guild_id : this.id, tournament_id });
+	}
 }
