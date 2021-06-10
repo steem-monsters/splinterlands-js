@@ -337,21 +337,19 @@ var splinterlands = (function() {
 			twttr.conversion.trackPid('o5rpo', { tw_sale_amount: 0, tw_order_quantity: 0 });
 		});
 
-		snapyr.identify(_player.name,
+		snapyr.identify(_player.alt_name || _player.name,
 			{ 
 				join_date: _player.join_date, 
 				starter_pack_purchase: _player.starter_pack_purchase,
 				email: _player.email				
-			},
-		  	() => { console.log("SNAPYR: identify"); }
+			}
 		);
 
 		snapyr.track(
 			"login",
 			{
 				is_mobile: true
-			},
-			() => {console.log("SNAPYR: login");}
+			}
 		);
 
 		// Check if the player is currently involved in a match
@@ -808,9 +806,9 @@ var splinterlands = (function() {
 			snapyr.track(
 				"sign_up",
 				{
+					playerName: splinterlands.get_player().alt_name || splinterlands.get_player().name,
 					type: "email"
-				},
-				() => {console.log("SNAPYR: sign_up");}
+				}
 			);
 
 			splinterlands.utils.loadScript("https://platform.twitter.com/oct.js", () => {
@@ -847,9 +845,9 @@ var splinterlands = (function() {
 			snapyr.track(
 				"sign_up",
 				{
+					playerName: splinterlands.get_player().alt_name || splinterlands.get_player().name,
 					type: "eos"
-				},
-				() => {console.log("SNAPYR: sign_up");}
+				}
 			);
 
 			splinterlands.utils.loadScript("https://platform.twitter.com/oct.js", () => {
@@ -887,9 +885,9 @@ var splinterlands = (function() {
 			snapyr.track(
 				"sign_up",
 				{
+					playerName: splinterlands.get_player().alt_name || splinterlands.get_player().name,
 					type: "eth"
-				},
-				() => {console.log("SNAPYR: sign_up");}
+				}
 			);
 
 			splinterlands.utils.loadScript("https://platform.twitter.com/oct.js", () => {

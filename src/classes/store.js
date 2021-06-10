@@ -142,8 +142,7 @@ splinterlands.Store = class {
 				quantity: qty,
 				currency: currency,
 				merchant: merchant
-			},
-			() => {console.log("SNAPYR: start_purchase", type, qty, currency, merchant);}
+			}
 		);
 
 		return new splinterlands.Purchase(await splinterlands.api('/purchases/start', params));

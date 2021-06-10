@@ -110,8 +110,7 @@ window.splinterlands.socket = (function() {
 					{
 						purchase_amount_usd: parseFloat(data.amount_usd),
 						type: data.type
-					},
-					() => {console.log("SNAPYR: purchase_complete", parseFloat(data.amount_usd), data.type);}
+					}
 				);
 
 				window.dispatchEvent(new CustomEvent('splinterlands:purchase_complete', { detail: data }));
@@ -160,8 +159,7 @@ window.splinterlands.socket = (function() {
 				{
 					match_type: data.match_type,
 					winner: data.winner
-				},
-				() => {console.log("SNAPYR: battle_result", data.match_type, data.winner);}
+				}
 			);
 
 			if(match && match.id == data.id) {

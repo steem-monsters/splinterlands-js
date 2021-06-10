@@ -92,8 +92,7 @@ window.splinterlands.ops = (function() {
 				 {
 					match_type: match_type,
 					settings: settings
-				 },
-				 () => {console.log("SNAPYR: find_match");}
+				 }
 			);
 
 			splinterlands.set_match({ id: tx.id, status: 0 });
