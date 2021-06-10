@@ -254,4 +254,8 @@ splinterlands.Player = class {
 	async dec_balances() {
 		return await splinterlands.ec_api('/players/dec_balances');
 	}
+
+	async get_inventory() {
+		return await splinterlands.api('/players/inventory');		
+	}
 }
