@@ -801,6 +801,8 @@ var splinterlands = (function() {
 		let response = await api('/players/create_email', params);
 
 		if(response && !response.error) {
+			let login_response = await email_login(email, password); // Must login first for splinterlands.get_player() to work for tracking
+			
 			log_event('sign_up');
 
 			snapyr.track(
@@ -814,7 +816,8 @@ var splinterlands = (function() {
 			splinterlands.utils.loadScript("https://platform.twitter.com/oct.js", () => {
 				twttr.conversion.trackPid('o4d37', { tw_sale_amount: 0, tw_order_quantity: 0 });
 			});
-			return await email_login(email, password);
+
+			return login_response; 
 		}
 
 		return response;
@@ -840,6 +843,8 @@ var splinterlands = (function() {
 		let response = await api('/players/create_email', params);
 
 		if(response && !response.error) {
+			let login_response = await eos_login();
+
 			log_event('sign_up');
 
 			snapyr.track(
@@ -854,7 +859,7 @@ var splinterlands = (function() {
 				twttr.conversion.trackPid('o4d37', { tw_sale_amount: 0, tw_order_quantity: 0 });
 			});
 
-			return await eos_login();
+			return login_response;
 		}
 
 		return response;
@@ -880,6 +885,8 @@ var splinterlands = (function() {
 		let response = await api('/players/create_eth', params);
 
 		if(response && !response.error) {
+			let login_response = eth_login();
+
 			log_event('sign_up');
 
 			snapyr.track(
@@ -894,7 +901,7 @@ var splinterlands = (function() {
 				twttr.conversion.trackPid('o4d37', { tw_sale_amount: 0, tw_order_quantity: 0 });
 			});
 
-			return await eth_login();
+			return login_response;
 		}
 
 		return response;
