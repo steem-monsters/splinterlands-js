@@ -285,9 +285,9 @@ window.splinterlands.utils = (function() {
 		if(error)
 			return { available: false, error };
 
-		let existing_account = await steem.api.getAccountsAsync([name]);
+		let is_existing_account = await this.account_exists(name);
 
-		if(existing_account && existing_account.length > 0)
+		if(is_existing_account)
 			return { available: false, error: 'That account name is already taken.' };
 
 		return { available: true };
