@@ -112,7 +112,7 @@ splinterlands.Store = class {
 		return currencies;
 	}
 
-	static async start_purchase(type, qty, currency, merchant, data) {
+	static async start_purchase(type, qty, currency, merchant, data, purchase_origin) {
 		let orig_currency = currency;
 		let player = splinterlands.get_player() ? splinterlands.get_player().name : '';
 
@@ -123,8 +123,17 @@ splinterlands.Store = class {
 			orig_currency = 'WAX';
 
 		console.log("orig_currency: ", orig_currency)
+		if(!purchase_origin) {
+			if(splinterlands.is_mobile_app && splinterlands.mobile_OS === "android") {
+				purchase_origin = "google";
+			} else if(splinterlands.is_mobile_app && splinterlands.mobile_OS === "iOS") {
+				purchase_origin = "apple";
+			} else {
+				purchase_origin = "crypto";
+			}
+		}
 
-		let params = { player, type, qty, currency, orig_currency };
+		let params = { player, type, qty, currency, orig_currency, purchase_origin };
 
 		if(merchant)
 			params.merchant = merchant;
@@ -183,7 +192,13 @@ splinterlands.Store = class {
 				display: 'paypal',
 			},
 			createOrder: async function(data, actions) {
-				const purchaseInfo = await splinterlands.Store.start_purchase(type, get_qty(), 'USD');
+				const purchaseInfo = await splinterlands.Store.start_purchase(type, get_qty(), 'USD', null, null, 'paypal');
+
+				if(purchaseInfo.code === "verification_needed") {
+					window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Verification Needed", message: "Verification is needed for this purchase. Please make your purchase again on our desktop website at https://splinterlands.com." } }));
+
+					return { error: "Verification needed."}
+				}
 
 				// Set up the transaction
 				return actions.order.create({
