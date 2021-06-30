@@ -352,6 +352,14 @@ var splinterlands = (function() {
 			}
 		);
 
+		//Womplay Sign Up check
+		let womplay_id = await _player.get_womplay_id();
+		let new_womplay_id = splinterlands.get_init_url_search_params().get("uid");
+		if(!womplay_id && new_womplay_id) {
+			await splinterlands.ec_api("/womplay/sign_up", { womplay_id: new_womplay_id  });
+			_player.get_player_properties(true);
+		}
+
 		// Check if the player is currently involved in a match
 		if(_player.outstanding_match && _player.outstanding_match.id) {
 			// Set it as the currently active match
@@ -818,7 +826,7 @@ var splinterlands = (function() {
 				twttr.conversion.trackPid('o4d37', { tw_sale_amount: 0, tw_order_quantity: 0 });
 			});
 
-			return login_response; 
+			return login_response;
 		}
 
 		return response;
