@@ -595,7 +595,8 @@ var splinterlands = (function() {
 			}
 		}
 
-		
+		//Filter out Gladiator cards for now.
+		_collection = _collection.filter((c => c.edition != 6))
 
 		return _collection;
 	}
