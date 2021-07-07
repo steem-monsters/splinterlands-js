@@ -137,7 +137,7 @@ splinterlands.Card = class {
 
 	get playable() {
 		// If it's listed for sale on the market it's not playable
-		if(this.market_id)
+		if(this.market_id && this.market_listing_status == 0)
 			return false;
 
 		// If it's delegated to another player it's not playable
