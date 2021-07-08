@@ -21,6 +21,7 @@ splinterlands.Player = class {
 			this.season_reward = new splinterlands.Season(this.season_reward);
 
 		this.has_collection_power_changed = true;
+		this._player_properties = null;
 	}
 
 	async load_balances() {
@@ -237,11 +238,26 @@ splinterlands.Player = class {
 		return (max_league > 0 ? splinterlands.get_settings().season.reward_packs[max_league] : '0');				
 	}
 
+	async get_player_properties(do_refresh) {
+		if(this._player_properties && !do_refresh) {
+			return this._player_properties
+		} else {
+			this._player_properties = (await splinterlands.api(`/player_properties`)).values;
+			return this._player_properties;
+		}		
+	}
+
 	async get_player_property(property) {
 		return await splinterlands.api(`/player_properties/${property}`);
 	}
 
 	async set_player_property(property, value) {
+		if(property == 'mobile_tutorial_progress' && value == 'complete') {
+			let womplay_id = await this.get_womplay_id();
+			if(womplay_id) {
+				await splinterlands.ec_api("/womplay/tracking", { womplay_id, event_name: "completed_tutorial"  });				
+			}
+		}
 		return await splinterlands.api_post(`/player_properties/${property}`, { value });
 	}
 
@@ -257,5 +273,10 @@ splinterlands.Player = class {
 
 	async get_inventory() {
 		return await splinterlands.api('/players/inventory');		
+	}
+
+	async get_womplay_id() {
+		let properties = await this.get_player_properties();
+		return (properties.womplay_id) ? properties.womplay_id.value : null;
 	}
 }

@@ -102,6 +102,18 @@ window.splinterlands.socket = (function() {
 					splinterlands.utils.loadScript("https://platform.twitter.com/oct.js", () => {
 						twttr.conversion.trackPid('o4d35', { tw_sale_amount: 10, tw_order_quantity: 1 });
 					});
+
+					let womplay_id = await splinterlands.get_player().get_womplay_id();
+					if(womplay_id) {
+						await splinterlands.ec_api("/womplay/tracking", { womplay_id, event_name: "purchased_spellbook"  });				
+					}					
+				}
+
+				if(data.type == 'booster_pack') {
+					let womplay_id = await splinterlands.get_player().get_womplay_id();
+					if(womplay_id) {
+						await splinterlands.ec_api("/womplay/tracking", { womplay_id, event_name: "purchased_booster_pack"  });				
+					}			
 				}
 					
 				// TODO: Send starter_purchase event here?
@@ -161,6 +173,14 @@ window.splinterlands.socket = (function() {
 					winner: data.winner
 				}
 			);
+
+			let player = splinterlands.get_player(); 
+			if(player.battles == 0) {
+				let womplay_id = await player.get_womplay_id();
+				if(womplay_id) {
+					await splinterlands.ec_api("/womplay/tracking", { womplay_id, event_name: "completed_first_battle"  });				
+				}
+			}
 
 			if(match && match.id == data.id) {
 				if(match.on_result)

@@ -14,7 +14,14 @@ splinterlands.Quest = class {
 	get can_start() { return !this.id || (this.claimed && this.next <= 0); }
 	get can_refresh() { return this.id ? (!this.claimed && (!this.refresh_trx_id || this.next <= 0)) : false; }
 
-	async claim_rewards() { return await splinterlands.ops.claim_quest_rewards(this.id); }
+	async claim_rewards() { 
+		let womplay_id = await splinterlands.get_player().get_womplay_id();
+		if(womplay_id) {
+			await splinterlands.ec_api("/womplay/tracking", { womplay_id, event_name: "completed_daily_quest"  });				
+		}	
+		
+		return await splinterlands.ops.claim_quest_rewards(this.id);
+	}
 	async start_quest() { return await splinterlands.ops.start_quest(); }
 	async refresh_quest() { return await splinterlands.ops.refresh_quest(); }
 }
