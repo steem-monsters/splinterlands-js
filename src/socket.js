@@ -89,7 +89,7 @@ window.splinterlands.socket = (function() {
 			}
 		},
 
-		purchase_complete: function(data) {
+		purchase_complete: async function(data) {
 			let trx = splinterlands.get_transaction(data.uid);
 
 			if(trx) {
