@@ -91,6 +91,16 @@ var splinterlands = (function() {
 		localStorage.setItem('splinterlands:ref', splinterlands.utils.getURLParameter(url, 'ref'));
 	}
 
+	async function set_referral_account(referral_account) { 
+		let account_exists = await splinterlands.utils.account_exists(referral_account);
+		if(account_exists) { 
+			localStorage.setItem('splinterlands:ref', referral_account);
+			return { success: true };
+		} else {
+			return { success: false, error: "Invalid Referral Account" };
+		}
+	}
+
 	function get_card_details(card_detail_id) { 
 		return card_detail_id ? _cards.find(c => c.id == card_detail_id) : _cards;
 	}
@@ -1008,6 +1018,14 @@ var splinterlands = (function() {
 		return history;
 	}
 
+	async function get_news() {
+		const res = await fetch(`${splinterlands.get_settings().asset_url}website/mobile_news/sps_airdrop.html`);
+
+		let news = await res.text();
+		
+        return { has_news: true, news_html: news }
+	}
+
 	return { 
 		init, api, ec_api, api_post, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
 		log_event, load_market, browser_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
@@ -1026,7 +1044,9 @@ var splinterlands = (function() {
 		get_init_url_search_params: () => _init_url_search_params,
 		eth_login,
 		create_account_eth,
-		get_server_time_offset: () => _server_time_offset
+		get_server_time_offset: () => _server_time_offset,
+		get_news,
+		set_referral_account
 	};
 })();
 
