@@ -5,9 +5,9 @@
   "main": "splinterlands.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-		"minify": "uglifycss src/splinterlands.css > dist/splinterlands.min.css && uglifyjs libraries/eosjs-ecc.min.js libraries/web3.min.js libraries/hive_0.8.4.min.js libraries/md5.min.js src/splinterlands.js src/utils.js src/socket.js src/classes/card.js src/classes/league.js src/classes/guild.js src/classes/player_settings.js src/classes/player.js src/classes/quest.js src/classes/potion.js src/classes/card_details.js src/classes/guild_building.js src/classes/store.js src/classes/battle.js src/classes/transaction.js src/classes/match.js src/classes/battle_card.js src/classes/reward_item.js src/classes/season.js src/classes/market.js src/ops.js src/blockchain/tron.js src/blockchain/ethereum.js src/blockchain/eos.js  -c -o dist/splinterlands.min.js",
-		"publish-dev": "npm run minify && node ./publish.js -bucket=steemmonsters -folder=dist-dev",
-		"publish-prod": "npm run minify && node ./publish.js -bucket=steemmonsters -folder=dist -invalidate=true"
+    "minify": "uglifycss src/splinterlands.css > dist/splinterlands.min.css && uglifyjs libraries/eosjs-ecc.min.js libraries/web3.min.js libraries/hive.min.js libraries/md5.min.js src/splinterlands.js src/utils.js src/socket.js src/classes/card.js src/classes/league.js src/classes/guild.js src/classes/player_settings.js src/classes/player.js src/classes/quest.js src/classes/potion.js src/classes/card_details.js src/classes/guild_building.js src/classes/store.js src/classes/battle.js src/classes/transaction.js src/classes/match.js src/classes/battle_card.js src/classes/reward_item.js src/classes/season.js src/classes/market.js src/ops.js src/blockchain/tron.js src/blockchain/ethereum.js src/blockchain/eos.js  -c -o dist/splinterlands.min.js",
+    "publish-dev": "npm run minify && node ./publish.js -bucket=steemmonsters -folder=dist-dev",
+    "publish-prod": "npm run minify && node ./publish.js -bucket=steemmonsters -folder=dist -invalidate=true"
   },
   "repository": {
     "type": "git",
