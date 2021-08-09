@@ -120,13 +120,16 @@ var splinterlands = (function() {
 			var xhr = new XMLHttpRequest();
 			xhr.open('GET', _config.api_url + url + '?' + splinterlands.utils.param(data));
 			xhr.onload = function() {
-				if (xhr.status === 200)
+				if (xhr.status === 200) {
 					resolve(splinterlands.utils.try_parse(xhr.responseText));
-				else
-					reject('Request failed.  Returned status of ' + xhr.status);
+				}
+				else {
+					console.log(`Request failed (${url}).  Returned status of ${xhr.status}`)
+					reject(`Request failed (${url}).  Returned status of ${xhr.status}`);
+				}
 			};
 			xhr.send();
-		});
+		})
 	}
 
 	function ec_api(url, data) {
@@ -283,60 +286,87 @@ var splinterlands = (function() {
 		username = username.toLowerCase().trim();
 		if(username.startsWith('@')) 
 			username = username.substr(1);
+		
+		try {			
+			// They are logging in with an email address
+			if(username.includes('@'))
+				return await email_login(username, key);
 
-		// They are logging in with an email address
-		if(username.includes('@'))
-			return await email_login(username, key);
+			// Use the keychain extension if no private key is specified for login
+			_use_keychain = !key;
 
-		// Use the keychain extension if no private key is specified for login
-		_use_keychain = !key;
+			if(_use_keychain && !window.hive_keychain)
+				return { success: false, error: 'Missing private posting key.' };
 
-		if(_use_keychain && !window.hive_keychain)
-			return { success: false, error: 'Missing private posting key.' };
+			let params = { name: username, ref: localStorage.getItem('splinterlands:ref'), ts: Date.now() };
+		
+		
+			if(!_use_keychain) {
+				if(key.startsWith('STM'))
+					return { success: false, error: 'This appears to be a public key. You must use your private posting key to log in.' };
 
-		let params = { name: username, ref: localStorage.getItem('splinterlands:ref'), ts: Date.now() };
+				// Check if this is a master password, if so try to generate the private key
+				if (key && !steem.auth.isWif(key))
+					key = steem.auth.getPrivateKeys(username, key, ['posting']).posting;
 
-		if(!_use_keychain) {
-			if(key.startsWith('STM'))
-				return { success: false, error: 'This appears to be a public key. You must use your private posting key to log in.' };
+				// Check that the key is a valid private key.
+				try { steem.auth.wifToPublic(key); }
+				catch (err) { return { success: false, error: `Invalid password or private posting key for account @${username}` }; }
 
-			// Check if this is a master password, if so try to generate the private key
-			if (key && !steem.auth.isWif(key))
-				key = steem.auth.getPrivateKeys(username, key, ['posting']).posting;
+				// Sign the login request using the provided private key
+				params.ts = Date.now();
+				params.sig = eosjs_ecc.sign(username + params.ts, key);
+			} else {
+				params.sig = await new Promise(resolve => hive_keychain.requestSignBuffer(username, username + params.ts, 'Posting', r => resolve(r.result)));
 
-			// Check that the key is a valid private key.
-			try { steem.auth.wifToPublic(key); }
-			catch (err) { return { success: false, error: `Invalid password or private posting key for account @${username}` }; }
+				if(!params.sig)
+					return { success: false, error: 'Unable to log in with account @' + username };
+			}
 
-			// Sign the login request using the provided private key
-			params.ts = Date.now();
-			params.sig = eosjs_ecc.sign(username + params.ts, key);
-		} else {
-			params.sig = await new Promise(resolve => hive_keychain.requestSignBuffer(username, username + params.ts, 'Posting', r => resolve(r.result)));
+			// Get the encrypted access token from the server
+			let response = await api('/players/login', params);
+			
+			if(!response || response.error)
+				throw new Error(response)
+				
+			_player = new splinterlands.Player(response);
 
-			if(!params.sig)
-				return { success: false, error: 'Unable to log in with account @' + username };
+			localStorage.setItem('splinterlands:username', username);
+
+			if(!_use_keychain)
+				localStorage.setItem('splinterlands:key', key);
+
+			// Start the websocket connection if one is specified
+			if(_config.ws_url)
+				splinterlands.socket.connect(_config.ws_url, _player.name, _player.token);
+
+			// Load the player's card collection
+			await load_collection();
+
+			// Check if the player is currently involved in a match
+			if(_player.outstanding_match && _player.outstanding_match.id) {
+				// Set it as the currently active match
+				let match = set_match(_player.outstanding_match);
+				_player.outstanding_match = match;
+
+				// Check if the current player has already submitted, but not revealed, their team
+				if(match.team_hash && !match.team) {
+					// If the opponent already submitted their team, then we can reveal ours
+					if(match.opponent_team_hash)
+						await splinterlands.ops.team_reveal(match.id);
+					else {
+						// If the opponent has not submitted their team, then queue up the team reveal operation for when they do
+						match.on_opponent_submit = async () => await splinterlands.ops.team_reveal(match.id);
+					}
+				}
+
+				// Emit an outstanding_match event
+				window.dispatchEvent(new CustomEvent('splinterlands:outstanding_match', { detail: match }));
+			}
+		} catch (e) {
+			console.log("There was an issue with logging in: " + ((e.error) ? e.error : e))			
+			throw { error: "There was an issue with logging in: " + ((e.error) ? e.error : e) } 
 		}
-
-		// Get the encrypted access token from the server
-		let response = await api('/players/login', params);
-
-		if(!response || response.error)
-			return { success: false, error: 'Login Error: ' + response.error };
-
-		_player = new splinterlands.Player(response);
-
-		localStorage.setItem('splinterlands:username', username);
-
-		if(!_use_keychain)
-			localStorage.setItem('splinterlands:key', key);
-
-		// Start the websocket connection if one is specified
-		if(_config.ws_url)
-			splinterlands.socket.connect(_config.ws_url, _player.name, _player.token);
-
-		// Load the player's card collection
-		await load_collection();
 
 		log_event('log_in');
 		if(splinterlands.is_mobile_app) {
@@ -368,27 +398,6 @@ var splinterlands = (function() {
 		if(!womplay_id && new_womplay_id) {
 			await splinterlands.ec_api("/womplay/sign_up", { womplay_id: new_womplay_id  });
 			_player.get_player_properties(true);
-		}
-
-		// Check if the player is currently involved in a match
-		if(_player.outstanding_match && _player.outstanding_match.id) {
-			// Set it as the currently active match
-			let match = set_match(_player.outstanding_match);
-			_player.outstanding_match = match;
-
-			// Check if the current player has already submitted, but not revealed, their team
-			if(match.team_hash && !match.team) {
-				// If the opponent already submitted their team, then we can reveal ours
-				if(match.opponent_team_hash)
-					await splinterlands.ops.team_reveal(match.id);
-				else {
-					// If the opponent has not submitted their team, then queue up the team reveal operation for when they do
-					match.on_opponent_submit = async () => await splinterlands.ops.team_reveal(match.id);
-				}
-			}
-
-			// Emit an outstanding_match event
-			window.dispatchEvent(new CustomEvent('splinterlands:outstanding_match', { detail: match }));
 		}
 
 		return _player;
