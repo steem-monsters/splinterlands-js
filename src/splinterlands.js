@@ -429,7 +429,70 @@ var splinterlands = (function() {
 		});
 	}
 
-	async function send_tx(id, display_name, data, retries) {
+	async function send_tx(id, display_name, data) {
+		// Only use this method for battle API transactions for now
+		if(!splinterlands.get_settings().api_ops.includes(id)) {
+			return await send_tx_old(id, display_name, data); 
+		}
+
+		let active_auth = _player.require_active_auth && _settings.active_auth_ops.includes(id);
+		id = splinterlands.utils.format_tx_id(id);
+
+		try { data = splinterlands.utils.format_tx_data(data); }
+		catch(err) {
+			log_event('tx_length_exceeded', { type: id });
+			return { success: false, error: err.toString() };
+		}
+
+		let data_str = JSON.stringify(data);
+
+		let tx = { 
+			operations: [['custom_json', { 
+				required_auths: active_auth ? [_player.name] : [],
+				required_posting_auths: active_auth ? [] : [_player.name],
+				id,
+				json: data_str
+			}]] 
+		};
+
+		try {
+			// Start waiting for the transaction to be picked up by the server immediately
+			let check_tx_promise = check_tx(data.sm_id);
+			let broadcast_promise = null;
+
+			if(_player.use_proxy) {
+			} else {
+				broadcast_promise = server_broadcast_tx(tx, active_auth).then(response => {
+					return {
+						type: 'broadcast',
+						method: 'battle_api',
+						success: (response && response.id),
+						trx_id: (response && response.id) ? response.id : null,
+						error: response.error ? response.error : null
+					}
+				});
+			}
+
+			let result = await Promise.race([check_tx_promise, broadcast_promise]);
+
+			// Check if the transaction was broadcast and picked up by the server before we got the result from the broadcast back
+			if(result.type != 'broadcast')
+				return result;
+
+			if(result.success) {
+				// Wait for the transaction to be picked up by the server
+				return await check_tx_promise;
+			} else {
+				clear_pending_tx(data.sm_id);
+				return await send_tx_old(id, display_name, data);
+			}
+		} catch (err) {
+			console.log(err);
+			return await send_tx_old(id, display_name, data);
+		}
+	}
+
+	async function send_tx_old(id, display_name, data, retries) {
 		if(!retries) retries = 0;
 
 		let active_auth = _player.require_active_auth && _settings.active_auth_ops.includes(id);
@@ -519,6 +582,70 @@ var splinterlands = (function() {
 				return result;
 			}
 		}
+	}
+
+	function prepare_tx(tx) {
+		return Object.assign({
+			ref_block_num: splinterlands.get_settings().chain_props.ref_block_num & 0xFFFF,
+			ref_block_prefix: splinterlands.get_settings().chain_props.ref_block_prefix,
+			expiration: new Date(
+				new Date(splinterlands.get_settings().chain_props.time + 'Z').getTime() +
+				600 * 1000
+			),
+		}, tx);
+	}
+
+	async function sign_tx(tx, use_active) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				if(!tx.expiration)
+					tx = prepare_tx(tx);
+
+				let signed_tx = null;
+
+				if(_use_keychain) {
+					let response = await new Promise(resolve => hive_keychain.requestSignTx(_player.name, tx, use_active ? 'Active' : 'Posting', resolve));
+					
+					if(response && response.success)
+						signed_tx = response.result;
+					else
+						return reject(response);
+				} else {
+					let key = localStorage.getItem('splinterlands:key');
+
+					if(!key)
+						return reject({ error: 'Key not found.' });
+
+					signed_tx = steem.auth.signTransaction(tx, [key]);
+				}
+
+				signed_tx.expiration = signed_tx.expiration.split('.')[0];
+				resolve(signed_tx);
+			} catch(err) { reject(err); }
+		});
+	}
+
+	async function server_broadcast_tx(tx, use_active) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				let signed_tx = await sign_tx(tx, use_active);
+				
+				if(!signed_tx)
+					return;
+
+				let op_name = tx.operations[0][1].id.replace(splinterlands.get_settings().test_mode ? `${splinterlands.get_settings().prefix}sm_` : 'sm_', '');
+
+				if(splinterlands.get_settings().api_ops.includes(op_name)) {
+					api_post(`/battle/battle_tx`, { signed_tx: JSON.stringify(signed_tx) }).then(resolve).catch(reject);
+					return;
+				}
+
+				// TODO: Get broadcast API stuff working
+				//let bcast_url = Config.tx_broadcast_urls[Math.floor(Math.random() * Config.tx_broadcast_urls.length)];
+				//api_post(`${bcast_url}/send`, { signed_tx: JSON.stringify(signed_tx) }, resolve).fail(reject);
+				resolve({ error: `Unsupported server broadcast operation.` });
+			} catch (err) { reject(err); }
+		});
 	}
 
 	async function browser_payment(to, amount, currency, memo) {
