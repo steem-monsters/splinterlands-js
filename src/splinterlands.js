@@ -937,7 +937,7 @@ var splinterlands = (function() {
 
 	async function create_account_email(email, password, subscribe, captcha_token) {
 		// Make sure the email address is all lowercase
-		email = email.toLowerCase();
+		email = email.trim().toLowerCase();
 
 		// Generate a key pair based on the email and password
 		let password_pub_key = steem.auth.getPrivateKeys(email, password).ownerPubkey;
@@ -980,6 +980,7 @@ var splinterlands = (function() {
 
 	async function create_account_eos(email, subscribe, captcha_token) {
 		let account = await splinterlands.eos.getIdentity();
+		email = email.trim().toLowerCase();
 
 		let params = { 
 			login_type: 'eos',
@@ -1022,6 +1023,7 @@ var splinterlands = (function() {
 
 	async function create_account_eth(email, subscribe, captcha_token) {
 		let account = await splinterlands.ethereum.getIdentity();
+		email = email.trim().toLowerCase();
 
 		let params = { 
 			login_type: 'ethereum',
