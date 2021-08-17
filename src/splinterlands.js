@@ -1200,5 +1200,10 @@ window.startWrappedApp = function(is_android, version) {
 		splinterlands.mobile_OS = "iOS";
 	}
 	
+	window.showLoadingAnimation = function(showLoader, text) {
+		text = text.replaceAll("<br>", "\n");
+		window.dispatchEvent(new CustomEvent('splinterlands:show_loading_animation', { detail: { showLoader, text } }));
+	}
+
 	return true;
 }
