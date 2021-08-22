@@ -56,6 +56,13 @@ window.splinterlands.ops = (function() {
 		});
 	}
 
+	async function undelegate_cards(card_ids) {
+		return splinterlands.send_tx_wrapper('undelegate_cards', 'Delegate Cards', { cards: card_ids }, async tx => {
+			await splinterlands.load_collection();
+			return tx.result;
+		});
+	}
+
 	async function market_purchase(market_ids, price, currency) {
 		return splinterlands.send_tx_wrapper('market_purchase', 'Market Purchase', {  items: market_ids, price: price + 0.01, currency: currency.toUpperCase() }, async tx => {
 			splinterlands.get_player().has_collection_power_changed = true;
@@ -515,6 +522,7 @@ window.splinterlands.ops = (function() {
 		gift_cards,
 		send_packs,
 		delegate_cards,
+		undelegate_cards,
 		market_purchase,
 		token_transfer,
 		sell_cards,
