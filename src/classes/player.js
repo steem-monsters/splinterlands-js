@@ -167,7 +167,7 @@ splinterlands.Player = class {
 			return { error: `You must purchase the Summoner's Spellbook before you may request your account keys.` };
 
 		if(this.has_keys)
-			return { error: `Account keys have already been requested from this account and may only be requested once. Please contact us at support@splinterlands.com or on Discord for help.` };
+			return { error: `Account keys have already been requested from this account and may only be requested once. Please go to https://support.splinterlands.com/ or on Discord for help.` };
 
 		return await splinterlands.api('/players/request_keys');
 	}
