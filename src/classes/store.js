@@ -332,6 +332,61 @@ splinterlands.Store = class {
 			return result;
 		}
 	}
+
+	static async restore_iap(product_id, purchase_token) {
+		if(splinterlands.is_mobile_app) {
+			return new Promise(function(resolve, reject) {
+				//Have to wait for home screen/news to finish loading
+				setTimeout(resolve, 2000);			
+			}).then(async function() {			
+				window.showLoadingAnimation(true, "Checking In App Purchases\n\nDo not close the app");
+				let qty = 0;
+				let product_type = 'credits';
+
+				switch (product_id) {
+					case 'spellbook':
+						product_type = 'starter_pack'
+						qty = 1;
+						break;
+					case 'small':
+						qty = 2000;
+						break;
+					case 'middle':
+						qty = 10000;
+						break;
+					case 'large':
+						qty = 20000;
+						break;
+					case 'purse':
+						qty = 50000;
+						break;
+					case 'bounty':
+						qty = 100000;
+						break;
+					case 'ransom':
+						qty = 200000;
+						break;
+					default:
+						console.log("Unknown product_id:", product_id);
+						return;
+				}
+
+				let purchase = await splinterlands.Store.start_purchase(product_type, qty, 'USD')
+				let validate = await splinterlands.Store.mobile_validate(product_id, purchase.uid, purchase_token)
+				
+				if(!validate.error){
+					if(splinterlands.mobile_OS === "android") {
+						window.BlockHandler.purchaseVerified(purchase_token, true);
+					}
+				} else {
+					window.showLoadingAnimation(false, "Checking In App Purchases\n\nDo not close the app");
+				}
+			});
+		} else {
+			console.log("ERROR: Trying to restore non mobile IAP")
+			return;
+		}
+	}
 }
 
 splinterlands.Purchase = class {
