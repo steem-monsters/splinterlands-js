@@ -376,7 +376,7 @@ splinterlands.Card = class {
 			(this.skin ? this.skin + '/' : '') +
 			encodeURIComponent(this.details.name.replace(/'/g, '')) +
 			(this.gold ? '_gold' : '') +
-			'.png';
+			((this.details.edition == 7 || this.details.tier == 7) ? '.jpg' : '.png');
 	}
 
 	get image_url_battle() {
@@ -384,14 +384,15 @@ splinterlands.Card = class {
 			(this.skin ? this.skin + '/' : '') +
 			encodeURIComponent(this.details.name.replace(/'/g, '')) +
 			(this.gold ? '_gold' : '') +
-			'.png';
+			((this.details.edition == 7 || this.details.tier == 7) ? '.jpg' : '.png');;
 	}
 
 	get image_url_battle_mobile() {
 		if(this.details.type == 'Summoner') {
 			return SUMMONER_CARD_URL_MOBILE + 
 				(this.team_num == 2 ? 'Right/' : 'Left/') + 
-				encodeURIComponent(this.details.name.replace(/'/g, '')) + '.png';
+				encodeURIComponent(this.details.name.replace(/'/g, '')) + 
+				((this.details.edition == 7 || this.details.tier == 7) ? '.jpg' : '.png');
 		}
 
 		let edition = (this.edition == 1 || this.edition == 3) ? 1 : 0;
@@ -399,7 +400,7 @@ splinterlands.Card = class {
 		return BATTLE_CARD_URLS_MOBILE[edition] +
 			encodeURIComponent(this.details.name.replace(/'/g, '')) +
 			(this.gold ? '_gold' : '') +
-			'.png';
+			((this.details.edition == 7 || this.details.tier == 7) ? '.jpg' : '.png');
 	}
 	
 	async lore() { return await splinterlands.load_card_lore(this.card_detail_id); }
