@@ -75,7 +75,7 @@ splinterlands.Card = class {
 	}
 	
 	cards_to_level(level) {
-		if(this.edition >= 4 || this.details.tier >= 4) {
+		if(this.edition == 4 || this.details.tier >= 4) {
 			let rates = splinterlands.get_settings()[this.gold ? 'combine_rates_gold' : 'combine_rates'][this.details.rarity - 1];
 			let cards = rates[level - 1];
 			return cards <= 0 ? 'N/A' : cards;
@@ -130,6 +130,9 @@ splinterlands.Card = class {
 		// Give a bonus if burning a max level card
 		if(this.xp >= this.max_xp)
 			total_dec *= splinterlands.get_settings().dec.max_burn_bonus;
+
+		// Tier 7 cards give half the DEC and CP
+		if(this.details.tier >= 7) total_dec = total_dec / 2;
 	
 		this._dec = total_dec;
 		return this._dec;
