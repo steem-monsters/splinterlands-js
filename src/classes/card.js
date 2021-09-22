@@ -116,9 +116,11 @@ splinterlands.Card = class {
 	
 		let dec = burn_rate * bcx;
 	
-		if(this.gold)
-			dec *= splinterlands.get_settings().dec.gold_burn_bonus;
-	
+		if(this.gold) {
+			const gold_burn_bonus_prop = (this.details.tier >= 7) ? 'gold_burn_bonus_2' : 'gold_burn_bonus';
+			dec *= splinterlands.get_settings().dec[gold_burn_bonus_prop];
+		}
+			
 		if(this.edition == 0)
 			dec *= splinterlands.get_settings().dec.alpha_burn_bonus;
 	
