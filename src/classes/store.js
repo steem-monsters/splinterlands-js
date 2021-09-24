@@ -143,6 +143,10 @@ splinterlands.Store = class {
 
 		if(splinterlands.is_mobile_app)
 			params.app = splinterlands.mobile_OS;
+		
+		if((purchase_origin == 'apple' || purchase_origin == 'google') && type == 'credits') {
+			return { error: "We are very sorry but purchases of Credits are currently unavailable on the Splinterlands mobile app."}
+		}
 
 		snapyr.track(
 			"start_purchase",
