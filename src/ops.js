@@ -112,30 +112,19 @@ window.splinterlands.ops = (function() {
 
 		let data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`) };
 
-		// If it's not a tournament battle, submit and reveal the team together unless the player specifies otherwise
-		let submit_and_reveal = ['Practice', 'Ranked'].includes(match.match_type) && !splinterlands.get_player().settings.submit_hashed_team;
-
-		if(submit_and_reveal) {
-			data.summoner = summoner;
-			data.monsters = monsters;
-			data.secret = secret;
-		}
-
 		return splinterlands.send_tx_wrapper('submit_team', 'Submit Team', data, async tx => {
-			if(!submit_and_reveal) {
-				let cur_match = splinterlands.get_match();
+			let cur_match = splinterlands.get_match();
 
-				if(cur_match && cur_match.id == match.id) {
-					// If the opponent already submitted their team, then we can reveal ours
-					if(cur_match.opponent_team_hash)
-						return await splinterlands.ops.team_reveal(cur_match.id, summoner, monsters, secret);
+			if(cur_match && cur_match.id == match.id) {
+				// If the opponent already submitted their team, then we can reveal ours
+				if(cur_match.opponent_team_hash)
+					return await splinterlands.ops.team_reveal(cur_match.id, summoner, monsters, secret);
 
-					// If the opponent has not submitted their team, then queue up the team reveal operation for when they do
-					cur_match.on_opponent_submit = async () => await splinterlands.ops.team_reveal(cur_match.id, summoner, monsters, secret);
+				// If the opponent has not submitted their team, then queue up the team reveal operation for when they do
+				cur_match.on_opponent_submit = async () => await splinterlands.ops.team_reveal(cur_match.id, summoner, monsters, secret);
 
-					// Save the team info locally in case the browser is refreshed or something and it needs to be resubmitted later
-					localStorage.setItem(`splinterlands:${cur_match.id}`, JSON.stringify({ summoner, monsters, secret }));
-				}
+				// Save the team info locally in case the browser is refreshed or something and it needs to be resubmitted later
+				localStorage.setItem(`splinterlands:${cur_match.id}`, JSON.stringify({ summoner, monsters, secret }));
 			}
 			
 			return tx;
