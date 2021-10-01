@@ -12,6 +12,8 @@ splinterlands.RewardItem = class {
 				return "Reward Card";
 			case "dec": 
 				return `${this.quantity} Dark Energy Crystals`;
+			case "credits": 
+				return `${this.quantity} Credits`;
 			case "potion": 
 				let potion = splinterlands.Potion.get_potion(this.potion_type);
 				return `${this.quantity} ${potion.name} Potion Charge${this.quantity > 1 ? 's' : ''}`;
@@ -34,6 +36,8 @@ splinterlands.RewardItem = class {
 				return 'https://d36mxiodymuqjm.cloudfront.net/website/card-back_3.png';
 			case "dec": 
 				return "https://d36mxiodymuqjm.cloudfront.net/website/icons/img_dec_fx_256.png";
+			case "credits": 
+				return "https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/shop/img_credits.png";
 			case "potion": 
 				return splinterlands.Potion.get_potion(this.potion_type).image_url;
 			case "pack":
