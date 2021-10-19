@@ -1164,6 +1164,16 @@ var splinterlands = (function() {
         return { has_news: true, news_html: news }
 	}
 
+	async function get_claimable_dec_balance() {
+		//let history = await api('/players/claimable_dec_balance');
+		return { claimable_dec: 10 };
+	}
+
+	async function claim_dec() {
+		//let claim = await api('/players/claim_dec');
+		return { success: true };
+	}
+
 	return { 
 		init, api, ec_api, api_post, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
 		log_event, load_market, browser_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
@@ -1184,7 +1194,9 @@ var splinterlands = (function() {
 		create_account_eth,
 		get_server_time_offset: () => _server_time_offset,
 		get_news,
-		set_referral_account
+		set_referral_account,
+		get_claimable_dec_balance,
+		claim_dec
 	};
 })();
 
