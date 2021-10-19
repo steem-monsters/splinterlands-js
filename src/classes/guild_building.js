@@ -94,6 +94,34 @@ splinterlands.GuildBuilding = class {
 						bonus_3: bonus3[i]
 					}
 				});
+			case 'barracks':
+				// tier can range from 0 to 4 (corresponding to building levels 1&2, 3&4, 5&6, 7&8, 9&10)
+				let dec_barracks_cost_levels = splinterlands.get_settings().guilds['barracks'].cost[0].levels;
+				let crown_barracks_cost_levels = splinterlands.get_settings().guilds['barracks'].cost[1].levels;
+				
+				let perks_names = ["Advantage", "Unleash I", "Banish I", "Surge I", "Unleash II", "Banish II", "Unleash III", "Surge II", "Ambush", "Unleash IV"];
+				let perks_desc = ["Home Team wins when there’s a Draw. Home Team units go first in Tie.",
+							  "Can use Gladiator cards up to the Bronze level cap.",
+							  "Select one card that the Enemy Team cannot use in Home battles.",
+							  "+1 added to the Mana Cap for all your guild’s Brawl battles.",
+							  "Can use Gladiator cards up to the Silver level cap.",
+							  "Select a second card that the Enemy Team cannot use in Home battles.",
+							  "Can use Gladiator cards up to the Gold level cap.",
+							  "+2 added to the Mana Cap for all your guild’s Brawl battles.",
+							  "All Enemy units suffer a +/- 1 Speed disadvantage for Home Arena battles.",
+							  "Can use Gladiator cards up to the MAX level cap."
+							];
+				
+				return  dec_barracks_cost_levels.map((l, i) => {
+					return {
+						level: i + 1,
+						contributions: l,
+						contributions_crowns: crown_barracks_cost_levels[i],
+						perk: perks_names[i],
+						perk_desc: perks_desc[i],
+						perk_img_url: `https://d36mxiodymuqjm.cloudfront.net/website/guilds/brawls/tactics/img_tactic-${i+1}_128.png`
+					}
+				});
 			default:
 				break;
 		}
