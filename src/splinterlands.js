@@ -24,6 +24,10 @@ var splinterlands = (function() {
 			_config.ec_api_url = "https://ec-api.splinterlands.com"
 		}
 
+		if(!_config.battle_api_url) {
+			_config.battle_api_url = config.api_url
+		}
+
 		steem.api.setOptions({ transport: 'http', uri: 'https://api.hive.blog', url: 'https://api.hive.blog' });
 
 		// Load the browser id and create a new session id
@@ -167,6 +171,31 @@ var splinterlands = (function() {
 		}
 
 		let response = await fetch(_config.api_url + url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			body: splinterlands.utils.param(data),
+		});
+		
+		if(response.ok) {
+			return response.json();
+		} else {
+			return Promise.reject(`Request failed.  Returned status of ${response.status}: ${response.statusText}`);
+		}
+	}
+
+	async function battle_api_post(url, data) {
+		if (data == null || data == undefined) data = {};
+
+		data.v = new Date().getTime();
+
+		if (_player) {
+			data.token = _player.token;
+			data.username = _player.name;
+		}
+
+		let response = await fetch(_config.battle_api_url + url, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
@@ -636,7 +665,7 @@ var splinterlands = (function() {
 				let op_name = tx.operations[0][1].id.replace(splinterlands.get_settings().test_mode ? `${splinterlands.get_settings().prefix}sm_` : 'sm_', '');
 
 				if(splinterlands.get_settings().api_ops.includes(op_name)) {
-					api_post(`/battle/battle_tx`, { signed_tx: JSON.stringify(signed_tx) }).then(resolve).catch(reject);
+					battle_api_post(`/battle/battle_tx`, { signed_tx: JSON.stringify(signed_tx) }).then(resolve).catch(reject);
 					return;
 				}
 
