@@ -122,6 +122,28 @@ splinterlands.GuildBuilding = class {
 						perk_img_url: `https://d36mxiodymuqjm.cloudfront.net/website/guilds/brawls/tactics/img_tactic-${i+1}_128.png`
 					}
 				});
+			case 'guild_shop':
+				bonus1 = splinterlands.get_settings().guilds.merit_multiplier;
+				let guild_store_items = splinterlands.get_settings().guild_store_items;
+
+				let dec_shop_cost_levels = splinterlands.get_settings().guilds['guild_shop'].cost[0].levels;
+				let crown_shop_cost_levels = splinterlands.get_settings().guilds['guild_shop'].cost[1].levels;
+				
+				return dec_shop_cost_levels.map((l, i) => {
+					let items = guild_store_items.filter(item => item.unlock_level === (i + 1));
+					items.map( x => {
+						x.item_img_url = `https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/shop/guild/${x.icon}`;
+						x.item_img_sm_url = `https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/shop/guild/${x.icon_sm}`;
+						return x;
+					})
+					return {
+						level: i + 1,
+						contributions: l,
+						contributions_crowns: crown_shop_cost_levels[i],
+						bonus_1: ((bonus1[i] - 1.0) * 100).toFixed(0),
+						bonus_2: items
+					}
+				});
 			default:
 				break;
 		}
