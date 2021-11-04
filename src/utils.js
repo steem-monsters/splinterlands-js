@@ -756,7 +756,31 @@ window.splinterlands.utils = (function() {
 		{
 			"name": "Close Range",
 			"desc": "Monsters with the Close Range ability can perform ranged attacks from the first position."
-		}
+		},
+		{
+			"name": "Amplify",
+			"desc": "Increases Magic Reflect, Return Fire, and Thorns damage to all enemy monsters by 1."
+		},
+		{
+			"name": "Backfire",
+			"desc": "If an enemy misses this Monster with an attack, the attacker takes 2 damage."
+		},
+		{
+			"name": "Bloodlust",
+			"desc": "Every time this Monster defeats an opponent, it gets +1 to all stats (in the Reverse Speed ruleset, -1 to Speed)."
+		},
+		{
+			"name": "Camouflage",
+			"desc": "This Monster cannot be targeted for attacks unless it's in the first position."
+		},
+		{
+			"name": "Deathblow",
+			"desc": "This Monster does 2x damage if their target is the only Monster left on the enemy team."
+		},
+		{
+			"name": "Forcefield",
+			"desc": "This Monster takes only 1 damage from attacks with power 5+"
+		},
 	];
 
 	return { 
