@@ -6,8 +6,10 @@ window.splinterlands.utils = (function() {
   	BETA_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_beta/';
 	ALPHA_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_v2.2/';
 	SUMMONER_CARD_URL_MOBILE = 'https://d36mxiodymuqjm.cloudfront.net/cards_battle_mobile/Summoners/';
+	GLADIATOR_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_gladiator/';
+	CHAOS_LEGION_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_chaos/';
 
-	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL, UNTAMED_CARD_URL];
+	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL, UNTAMED_CARD_URL, GLADIATOR_URL, CHAOS_LEGION_URL];
 	
 	BATTLE_CARD_URLS = [
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_alpha/',
@@ -15,7 +17,9 @@ window.splinterlands.utils = (function() {
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_alpha/',
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_beta/',
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_untamed/',
-		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_untamed/'
+		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_untamed/',
+		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_gladiator/',
+		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_chaos/',
 	];
 
 	BATTLE_CARD_URLS_MOBILE = [
