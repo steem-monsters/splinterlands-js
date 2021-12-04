@@ -785,6 +785,18 @@ window.splinterlands.utils = (function() {
 			"name": "Forcefield",
 			"desc": "This Monster takes only 1 damage from attacks with power 5+"
 		},
+		{
+			"name": "Giant Killer",
+			"desc": "Does double damage against targets that cost 10 or more mana."
+		},
+		{
+			"name": "Recharge",
+			"desc": "This Monster attacks every other round but does 3x damage."
+		},
+		{
+			"name": "Scattershot",
+			"desc": "This Monster's attacks hit a random enemy target."
+		},
 	];
 
 	return { 
