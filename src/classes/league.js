@@ -93,8 +93,8 @@ splinterlands.League = class {
 		return splinterlands.get_settings().leagues[this.id + 1].min_power
 	}
 
-	get rating_reset() {
-		return this.id >= 10 ? 1900 + (this.id - 10) * 300 : Math.max((this.id - 1) * 200, 0);
+	get rating_reset() {				
+		return (splinterlands.get_settings().leagues[this.id].season_rating_reset);
 	}
 
 	get level_limits() {
