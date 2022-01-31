@@ -21,10 +21,14 @@ splinterlands.RewardItem = class {
 				let packtext = 'Untamed Edition Booster Pack';
 				if (this.edition == 2) {
 					packtext = 'Essence Orb';
+				} else if (this.edition == 4) {
+					packtext = 'Untamed Edition Booster Pack';
 				} else if (this.edition == 5) {
 					packtext = 'ΛZMΛRÉ Dice';
+				} else if (this.edition == 7) {
+					packtext = 'Chaos Legion Booster Pack';
 				} else {					
-					packtext = 'Untamed Edition Booster Pack';					
+					packtext = 'Booster Pack';					
 				}	
 				return this.quantity + ' ' + packtext;
 		}
@@ -43,10 +47,14 @@ splinterlands.RewardItem = class {
 			case "pack":
 				if (this.edition == 2) {
 					return 'https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/open_packs/img_essence-orb%402x.png';
+				} else if (this.edition == 4) {
+					return 'https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/shop/img_pack_untamed.png';
 				} else if (this.edition == 5) {
 					return 'https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/open_packs/img_azmare-dice%402x.png';
+				} else if (this.edition == 7) {
+					return 'https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/shop/img_pack_chaos-legion.png';
 				} else {					
-					return 'https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/shop/img_pack_untamed.png';					
+					return 'https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/shop/img_pack_chaos-legion.png';					
 				}								
 		}		
 	}
