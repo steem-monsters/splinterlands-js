@@ -123,6 +123,9 @@ var splinterlands = (function() {
 
 			var xhr = new XMLHttpRequest();
 			xhr.open('GET', _config.api_url + url + '?' + splinterlands.utils.param(data));
+			if(_player) {
+				xhr.setRequestHeader('Authorization', `Bearer ${_player ? _player.jwt_token : null}`) // need to call after xhr.open
+			}
 			xhr.onload = function() {
 				if (xhr.status === 200) {
 					resolve(splinterlands.utils.try_parse(xhr.responseText));
