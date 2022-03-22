@@ -67,27 +67,37 @@ var splinterlands = (function() {
 			console.log(`Set Hive RPC node to: ${rpc_list[0]}`);
 		}
 
-		//Snapyr Init
-		snapyr = window.snapyr = [];
-		for (
-		  var methods = ['load','page','track','identify', 'alias','group','ready','reset','getAnonymousId','setAnonymousId'],
-		  i = 0;
-		  i < methods.length;
-		  i++
-		) {
-		  var method = methods[i];
-		  snapyr[method] = (function (n) {
-			return function () {
-			  snapyr.push([n].concat(Array.prototype.slice.call(arguments)));
+		if(splinterlands.get_settings().test_mode) {
+			snapyr = window.snapyr = [];
+			snapyr.track = function() {
+				console.log("Testmode: Skipping Snapyr tracking");
 			};
-		  })(method);
-		}
-		snapyr.load("JJAzzlsU0tdrNJEJ1voRepSDgcQL5GSy", 'https://engine.snapyr.com');
-		snapyr.page();
+			snapyr.identify = function() {
+				console.log("Testmode: Skipping Snapyr identify");
+			};
+		} else {
+			//Snapyr Init
+			snapyr = window.snapyr = [];
+			for (
+			var methods = ['load','page','track','identify', 'alias','group','ready','reset','getAnonymousId','setAnonymousId'],
+			i = 0;
+			i < methods.length;
+			i++
+			) {
+			var method = methods[i];
+			snapyr[method] = (function (n) {
+				return function () {
+				snapyr.push([n].concat(Array.prototype.slice.call(arguments)));
+				};
+			})(method);
+			}
+			snapyr.load("JJAzzlsU0tdrNJEJ1voRepSDgcQL5GSy", 'https://engine.snapyr.com');
+			snapyr.page();
 
-		splinterlands.utils.loadScript("https://sdk.snapyr.com/js/1.0.0/snapyr-sdk.min.js", () => {
-			console.log("Snapyr Loaded");
-		});
+			splinterlands.utils.loadScript("https://sdk.snapyr.com/js/1.0.0/snapyr-sdk.min.js", () => {
+				console.log("Snapyr Loaded");
+			});
+		}
 	}
 
 	function set_url(url) { 
