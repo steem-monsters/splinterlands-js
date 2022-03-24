@@ -349,7 +349,7 @@ window.splinterlands.ops = (function() {
 		});
 	}
 
-	async function purchase(type, qty, currency, data) {
+	async function purchase(type, qty, currency, data, bonus_packs) {
 		if(type.toLowerCase() == 'orb') {
 			if(!currency || currency.toUpperCase() != 'DEC')
 				return new Promise((resolve, reject) => reject({ error: 'Invalid currency specified. Essence Orbs may only be purchased with DEC.' }));
@@ -363,7 +363,7 @@ window.splinterlands.ops = (function() {
 			return splinterlands.send_tx_wrapper('purchase_dice', 'Purchase ΛZMΛRÉ Dice', { qty }, tx => tx);
 		}
 
-		return splinterlands.send_tx_wrapper('purchase', 'Purchase', { type, qty, currency, data }, tx => tx);
+		return splinterlands.send_tx_wrapper('purchase', 'Purchase', { type, qty, currency, bonus: bonus_packs, data }, tx => tx);
 	}
 
 	async function withdraw_dec(qty, wallet) {
