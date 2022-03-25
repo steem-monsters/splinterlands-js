@@ -37,9 +37,10 @@ splinterlands.Store = class {
 	static get starter_price() { return splinterlands.get_settings().starter_pack_price; }
 	static get orb_price() { return splinterlands.get_settings().dec.orb_cost; }
 	static get dice_price() { return splinterlands.get_settings().dec.dice_cost; }
+	static get chaos_legion_price() { return splinterlands.get_settings().chaos_legion.pack_price; }
 
 	static pack_purchase_info(edition, qty) {
-		if(![2,4,5].includes(edition))
+		if(![2,4,5,7].includes(edition))
 			return { error: 'Invalid pack edition specified.' };
 
 		if(edition == 4) {
@@ -65,6 +66,13 @@ splinterlands.Store = class {
 				bonus: Math.floor(qty >= 100 ? qty * 0.1 : (qty >= 20 ? qty * 0.05 : 0)),
 				total_usd: +(qty * splinterlands.Store.dice_price / 1000).toFixed(2),
 				total_dec: Math.floor(splinterlands.utils.guild_discounted_cost(qty * splinterlands.Store.dice_price))
+			}
+		} else if (edition == 7) {
+			return {
+				edition,
+				qty,
+				bonus: qty >= 2000 ? Math.floor(qty * 0.20) : (qty >= 500 ? Math.floor(qty * 0.15) : Math.floor(qty * 0.1)),
+				total_usd: +(qty * splinterlands.Store.chaos_legion_price).toFixed(2)
 			}
 		}
 	}
