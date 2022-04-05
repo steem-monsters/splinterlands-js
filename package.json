@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/steem-monsters/splinterlands-js#readme",
   "dependencies": {
-    "aws-sdk": "^2.610.0",
+    "aws-sdk": "^2.1106.0",
     "uglify-es": "^3.3.9",
     "uglifycss": "0.0.29"
   }

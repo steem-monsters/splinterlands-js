@@ -51,4 +51,3 @@ if(login_response.error) {
 	// Proceed to show the home screen. The "login_response" variable will contain the player information returned by the server
 }
 ```
-	
