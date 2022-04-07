@@ -1,6 +1,7 @@
 splinterlands.Store = class {
-	static get payment_tokens() { 
+	static get payment_tokens() {
 		let currencies = [
+			{ name: "Dark Energy Crystals", symbol: "DEC" },
 			{ name: 'HIVE', symbol: 'HIVE' },
 			{ name: 'STEEM', symbol: 'STEEM' },
 			{ name: 'Tron', symbol: 'TRX' },
@@ -11,7 +12,13 @@ splinterlands.Store = class {
 			{ name: 'Litecoin', symbol: 'LTC' },
 			{ name: 'EOS', symbol: 'EOS' },
 			{ name: 'WAX', symbol: 'WAXP' },
-			{ name: 'Electroneum', symbol: 'ETN' }
+			{ name: 'Electroneum', symbol: 'ETN' },
+			{ name: "Binance USD", symbol: "BUSD" },
+			{ name: "Bitcoin Cash", symbol: "BCH"},
+			{ name: "Telos", symbol: "TLOS" },
+			{ name: "Splintershards", symbol: "SPS" },
+			{ name: "Polyient Games Unity", symbol: "PGU" },
+			{ name: "LeoFinance", symbol: "LEO" },
 		];
 
 		if(splinterlands.ethereum.hasWeb3Obj()) {
@@ -21,6 +28,7 @@ splinterlands.Store = class {
 			currencies.push({ name: 'SAND', symbol: 'SAND' })
 			currencies.push({ name: 'GALA', symbol: 'GALA' })
 			currencies.push({ name: 'GAME', symbol: 'GAME' })
+			currencies.push({ name: "Dai Stablecoin", symbol: "DAI" })
 		}
 
 		return currencies;
@@ -107,7 +115,7 @@ splinterlands.Store = class {
 			{ name: 'KuCoin Shares', symbol: 'KCS' },
 			{ name: 'EOS', symbol: 'EOS' }
 		];
-		
+
 		if(splinterlands.ethereum.hasWeb3Obj()) {
 			currencies.push({ name: 'Basic Attention Token', symbol: 'BAT' })
 			currencies.push({ name: 'Enjin Coin', symbol: 'ENJ' })
@@ -151,7 +159,7 @@ splinterlands.Store = class {
 
 		if(splinterlands.is_mobile_app)
 			params.app = splinterlands.mobile_OS;
-		
+
 		if((purchase_origin == 'apple') && (type == 'credits' || type == 'starter_pack')) {
 			return { error: "We are very sorry but purchases of Credits/Spellbooks are currently unavailable on the Splinterlands mobile app. You may also log into your account and play at https://splinterlands.com"}
 		}
@@ -191,7 +199,7 @@ splinterlands.Store = class {
 				total_remaining: available % 100000,
 				player_purchased: purchases ? parseInt(purchases.packs) + parseInt(purchases.bonus_packs) : 0
 			};
-		
+
 	}
 
 	static async paypal_button(type, get_qty) {
@@ -245,7 +253,7 @@ splinterlands.Store = class {
 					const orderID = data.orderID;
 
 					let result = await splinterlands.api('/purchases/paypal', { uid: refID, tx: orderID });
-					
+
 					if(result && !result.error)
 						window.dispatchEvent(new CustomEvent('splinterlands:purchase_approved', { detail: result }));
 
@@ -278,7 +286,7 @@ splinterlands.Store = class {
 	static async redeem_code(code) {
 		if(typeof code == 'string')
 			code = await splinterlands.api('/purchases/check_code', { code: code.toUpperCase() });
-		
+
 		switch(code.type) {
 			case 'starter_pack':
 				let purchase = await splinterlands.Store.start_purchase('starter_pack', 1, 'PROMO');
@@ -318,7 +326,7 @@ splinterlands.Store = class {
 		splinterlands.log_event('mobile_purchase', { product_id: product_id, uid: uid, purchase_token: purchase_token});
 
 		let result = await splinterlands.api('/purchases/mobilepurchase', { product_id: product_id, uid: uid, purchase_token: purchase_token});
-			
+
 		if(result && !result.error) {
 			window.dispatchEvent(new CustomEvent('splinterlands:purchase_approved', { detail: result }));
 
@@ -337,7 +345,7 @@ splinterlands.Store = class {
 		let query = { "product_id": product_id, "uid": uid };
 
 		let result = await splinterlands.api_post('/purchases/iospurchase?' + splinterlands.utils.param(query), { "receipt-data": receipt_data });
-			
+
 		if(result && !result.error) {
 			window.dispatchEvent(new CustomEvent('splinterlands:purchase_approved', { detail: result }));
 
@@ -353,8 +361,8 @@ splinterlands.Store = class {
 		if(splinterlands.is_mobile_app) {
 			return new Promise(function(resolve, reject) {
 				//Have to wait for home screen/news to finish loading
-				setTimeout(resolve, 2000);			
-			}).then(async function() {			
+				setTimeout(resolve, 2000);
+			}).then(async function() {
 				window.showLoadingAnimation(true, "Checking In App Purchases\n\nDo not close the app");
 				let qty = 0;
 				let product_type = 'credits';
@@ -389,7 +397,7 @@ splinterlands.Store = class {
 
 				let purchase = await splinterlands.Store.start_purchase(product_type, qty, 'USD')
 				let validate = await splinterlands.Store.mobile_validate(product_id, purchase.uid, purchase_token)
-				
+
 				if(!validate.error){
 					if(splinterlands.mobile_OS === "android") {
 						window.BlockHandler.purchaseVerified(purchase_token, true);

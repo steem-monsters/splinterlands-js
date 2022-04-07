@@ -17,7 +17,7 @@ var splinterlands = (function() {
 	let _init_url_search_params = null; //Query string app started with
 	let _server_time_offset = 0;
 
-	async function init(config) { 
+	async function init(config) {
 		_config = config;
 
 		if(!_config.ec_api_url) {
@@ -52,7 +52,7 @@ var splinterlands = (function() {
 
 		//hack to handle Angular query string issues
 		let urlHash = (window.location.hash) ? window.location.hash : window.location.search ;
-		_init_url_search_params = new URLSearchParams(urlHash.substring(urlHash.indexOf('?')));	
+		_init_url_search_params = new URLSearchParams(urlHash.substring(urlHash.indexOf('?')));
 
 		// Init MetaMask library
 		if (window.ethereum) {
@@ -100,14 +100,14 @@ var splinterlands = (function() {
 		}
 	}
 
-	function set_url(url) { 
-		_url = url; 
+	function set_url(url) {
+		_url = url;
 		localStorage.setItem('splinterlands:ref', splinterlands.utils.getURLParameter(url, 'ref'));
 	}
 
-	async function set_referral_account(referral_account) { 
+	async function set_referral_account(referral_account) {
 		let account_exists = await splinterlands.utils.account_exists(referral_account);
-		if(account_exists) { 
+		if(account_exists) {
 			localStorage.setItem('splinterlands:ref', referral_account);
 			return { success: true };
 		} else {
@@ -115,7 +115,7 @@ var splinterlands = (function() {
 		}
 	}
 
-	function get_card_details(card_detail_id) { 
+	function get_card_details(card_detail_id) {
 		return card_detail_id ? _cards.find(c => c.id == card_detail_id) : _cards;
 	}
 
@@ -190,7 +190,7 @@ var splinterlands = (function() {
 			},
 			body: splinterlands.utils.param(data),
 		});
-		
+
 		if(response.ok) {
 			return response.json();
 		} else {
@@ -215,7 +215,7 @@ var splinterlands = (function() {
 			},
 			body: splinterlands.utils.param(data),
 		});
-		
+
 		if(response.ok) {
 			return response.json();
 		} else {
@@ -288,31 +288,31 @@ var splinterlands = (function() {
 	}
 
 	async function eos_login() {
-		let params = await splinterlands.eos.scatterAuth();		
+		let params = await splinterlands.eos.scatterAuth();
 		if(params.error)
 			return({ "error" : params.message });
-		
-		let response = await api('/players/login_eos', params);	
+
+		let response = await api('/players/login_eos', params);
 		if(response.error) {
 			response.address = params.address; //Needed to show account name for new account popup
 			return(response);
-		}			
-		
-		return (await login(response.username, response.posting_key));			
+		}
+
+		return (await login(response.username, response.posting_key));
 	}
 
 	async function eth_login() {
-		let params = await splinterlands.ethereum.web3Auth();		
+		let params = await splinterlands.ethereum.web3Auth();
 		if(params.error)
 			return({ "error" : params.message });
-		
-		let response = await ec_api('/players/login_eth', params);	
+
+		let response = await ec_api('/players/login_eth', params);
 		if(response.error) {
 			response.address = params.address; //Needed to show account name for new account popup
 			return(response);
-		}			
-		
-		return (await login(response.username, response.posting_key));			
+		}
+
+		return (await login(response.username, response.posting_key));
 	}
 
 	async function login(username, key) {
@@ -326,10 +326,10 @@ var splinterlands = (function() {
 
 		// Format the username properly
 		username = username.toLowerCase().trim();
-		if(username.startsWith('@')) 
+		if(username.startsWith('@'))
 			username = username.substr(1);
-		
-		try {			
+
+		try {
 			// They are logging in with an email address
 			if(username.includes('@'))
 				return await email_login(username, key);
@@ -341,8 +341,8 @@ var splinterlands = (function() {
 				return { success: false, error: 'Missing private posting key.' };
 
 			let params = { name: username, ref: localStorage.getItem('splinterlands:ref'), ts: Date.now() };
-		
-		
+
+
 			if(!_use_keychain) {
 				if(key.startsWith('STM'))
 					return { success: false, error: 'This appears to be a public key. You must use your private posting key to log in.' };
@@ -367,10 +367,10 @@ var splinterlands = (function() {
 
 			// Get the encrypted access token from the server
 			let response = await api('/players/login', params);
-			
+
 			if(!response || response.error)
 				throw new Error(response)
-				
+
 			_player = new splinterlands.Player(response);
 
 			localStorage.setItem('splinterlands:username', username);
@@ -406,8 +406,8 @@ var splinterlands = (function() {
 				window.dispatchEvent(new CustomEvent('splinterlands:outstanding_match', { detail: match }));
 			}
 		} catch (e) {
-			console.log("There was an issue with logging in: " + ((e.error) ? e.error : e))			
-			throw { error: "There was an issue with logging in: " + ((e.error) ? e.error : e) } 
+			console.log("There was an issue with logging in: " + ((e.error) ? e.error : e))
+			throw { error: "There was an issue with logging in: " + ((e.error) ? e.error : e) }
 		}
 
 		log_event('log_in');
@@ -420,10 +420,10 @@ var splinterlands = (function() {
 		});
 
 		snapyr.identify(_player.alt_name || _player.name,
-			{ 
-				join_date: _player.join_date, 
+			{
+				join_date: _player.join_date,
 				starter_pack_purchase: _player.starter_pack_purchase,
-				email: _player.email				
+				email: _player.email
 			}
 		);
 
@@ -444,11 +444,11 @@ var splinterlands = (function() {
 
 		return _player;
 	}
-	
+
 	async function reset_password(email) {
 		return await api('/players/forgot_password', { email });
 	}
-  
+
   function logout() {
     localStorage.removeItem('splinterlands:username');
     localStorage.removeItem('splinterlands:key');
@@ -456,7 +456,7 @@ var splinterlands = (function() {
     _collection = null;
 		splinterlands.socket.close();
 	}
-	
+
 	async function send_tx_wrapper(id, display_name, data, on_success) {
 		return new Promise((resolve, reject) => {
 			send_tx(id, display_name, data).then(async result => {
@@ -474,7 +474,7 @@ var splinterlands = (function() {
 	async function send_tx(id, display_name, data) {
 		// Only use this method for battle API transactions for now
 		if(!splinterlands.get_settings().api_ops.includes(id)) {
-			return await send_tx_old(id, display_name, data); 
+			return await send_tx_old(id, display_name, data);
 		}
 
 		let active_auth = _player.require_active_auth && _settings.active_auth_ops.includes(id);
@@ -488,13 +488,13 @@ var splinterlands = (function() {
 
 		let data_str = JSON.stringify(data);
 
-		let tx = { 
-			operations: [['custom_json', { 
+		let tx = {
+			operations: [['custom_json', {
 				required_auths: active_auth ? [_player.name] : [],
 				required_posting_auths: active_auth ? [] : [_player.name],
 				id,
 				json: data_str
-			}]] 
+			}]]
 		};
 
 		try {
@@ -561,10 +561,10 @@ var splinterlands = (function() {
 			});
 		} else if(_use_keychain) {
 			broadcast_promise = new Promise(resolve => hive_keychain.requestCustomJson(_player.name, id, active_auth ? 'Active' : 'Posting', data_str, display_name, response => {
-				resolve({ 
+				resolve({
 					type: 'broadcast',
 					method: 'keychain',
-					success: response.success, 
+					success: response.success,
 					trx_id: response.success ? response.result.id : null,
 					error: response.success ? null : ((typeof response.error == 'string') ? response.error : JSON.stringify(response.error))
 				})
@@ -647,7 +647,7 @@ var splinterlands = (function() {
 
 				if(_use_keychain) {
 					let response = await new Promise(resolve => hive_keychain.requestSignTx(_player.name, tx, use_active ? 'Active' : 'Posting', resolve));
-					
+
 					if(response && response.success)
 						signed_tx = response.result;
 					else
@@ -671,7 +671,7 @@ var splinterlands = (function() {
 		return new Promise(async (resolve, reject) => {
 			try {
 				let signed_tx = await sign_tx(tx, use_active);
-				
+
 				if(!signed_tx)
 					return;
 
@@ -722,8 +722,8 @@ var splinterlands = (function() {
 			case 'eos':
 				return await splinterlands.eos.scatterPay(to, amount, memo);
 			case 'eth':
-				return await splinterlands.ethereum.web3Pay(to, amount);				
-			case 'erc20':			
+				return await splinterlands.ethereum.web3Pay(to, amount);
+			case 'erc20':
 				return await splinterlands.ethereum.erc20Payment(currency.toUpperCase(), amount * 1000, memo);
 		}
 	}
@@ -750,7 +750,7 @@ var splinterlands = (function() {
 	function check_tx(sm_id, timeout) {
 		return new Promise(resolve => {
 			_transactions[sm_id] = { resolve: resolve };
-			
+
 			_transactions[sm_id].timeout = setTimeout(() => {
 				if(_transactions[sm_id] && _transactions[sm_id].status != 'complete')
 					resolve({ success: false, error: 'Your transaction could not be found. This may be an issue with the game server. Please try refreshing the site to see if the transaction went through.' });
@@ -773,20 +773,20 @@ var splinterlands = (function() {
 		if(player && _player && player !== _player.name) { //If getting collection of another player
 			console.log("Updating Collection: ", player);
 			_collection = (await api(`/cards/collection/${player}`)).cards.map(c => new splinterlands.Card(c));
-			_collection_grouped = null;		
+			_collection_grouped = null;
 		} else {
 			if(_player.has_collection_power_changed) {
 				console.log("Updating Collection current player");
 				if(!player && _player)
 					player = _player.name;
-	
+
 				_collection = (await api(`/cards/collection/${player}`)).cards.map(c => new splinterlands.Card(c));
 				_collection_grouped = null;
-	
-				// If this is the current player's collection, add any "starter" cards				
+
+				// If this is the current player's collection, add any "starter" cards
 				get_card_details().filter(d => d.is_starter_card && !_collection.find(c => c.card_detail_id == d.id))
 					.forEach(c => _collection.push(splinterlands.utils.get_starter_card(c.id, c.starter_edition)));
-					
+
 				_player.has_collection_power_changed = false;
 			}
 		}
@@ -814,7 +814,7 @@ var splinterlands = (function() {
 		if(!_lore[card_detail_id]) {
 			_lore[card_detail_id] = await api('/cards/lore', { card_detail_id });
 		}
-			
+
 
 		return _lore[card_detail_id];
 	}
@@ -825,7 +825,7 @@ var splinterlands = (function() {
 			return _collection_grouped;
 
 		let save = !collection && !id_only;
-			
+
 		if(!collection)
 			collection = _collection;
 
@@ -834,7 +834,7 @@ var splinterlands = (function() {
 		// Group the cards in the collection by card_detail_id, edition, and gold foil
 		_cards.forEach(details => {
 			if(id_only) {
-				grouped.push(new splinterlands.CardDetails(Object.assign({ card_detail_id: details.id, owned: collection.filter(o => o.card_detail_id == details.id) }, details)));	 
+				grouped.push(new splinterlands.CardDetails(Object.assign({ card_detail_id: details.id, owned: collection.filter(o => o.card_detail_id == details.id) }, details)));
 			} else {
 				details.available_editions.forEach(edition => {
           let reg_cards = collection.filter(o => o.card_detail_id == details.id && o.gold == false && o.edition == parseInt(edition));
@@ -890,8 +890,8 @@ var splinterlands = (function() {
 			if(match.ruleset.includes('Little League') && d.stats.mana > 4)
 				return null;
 
-			let card = d.owned.find(o => 
-				(match.allowed_cards != 'gold_only' || o.gold) && 
+			let card = d.owned.find(o =>
+				(match.allowed_cards != 'gold_only' || o.gold) &&
 				(match.allowed_cards != 'alpha_only' || o.edition == 0) &&
 				(match.match_type == 'Ranked' ? o.playable_ranked : o.playable) &&
 				(!o.delegated_to || o.delegated_to == _player.name));
@@ -934,8 +934,8 @@ var splinterlands = (function() {
 				if(match.ruleset.includes('Odd Ones Out') && d.stats.mana[0] % 2 == 0)
 					return;
 
-				let card = d.owned.find(o => 
-					(match.allowed_cards != 'gold_only' || o.gold) && 
+				let card = d.owned.find(o =>
+					(match.allowed_cards != 'gold_only' || o.gold) &&
 					(match.allowed_cards != 'alpha_only' || o.edition == 0) &&
 					(match.match_type == 'Ranked' ? o.playable_ranked : o.playable) &&
 					(!o.delegated_to || o.delegated_to == _player.name));
@@ -986,13 +986,13 @@ var splinterlands = (function() {
 		// Generate a key pair based on the email and password
 		let password_pub_key = steem.auth.getPrivateKeys(email, password).ownerPubkey;
 
-		let params = { 
+		let params = {
 			purchase_id: 'new-' + splinterlands.utils.randomStr(6),	// We need to set a purchase ID even though not making a purchase for backwards compatibility
-			email: encodeURIComponent(email), 
+			email: encodeURIComponent(email),
 			password_pub_key: password_pub_key,
 			subscribe: subscribe,
 			is_test: splinterlands.get_settings().test_acct_creation,
-			ref: localStorage.getItem('splinterlands:ref'),			
+			ref: localStorage.getItem('splinterlands:ref'),
 			ref_url: localStorage.getItem('splinterlands:url'),
 			captcha_token: captcha_token
 		};
@@ -1001,7 +1001,7 @@ var splinterlands = (function() {
 
 		if(response && !response.error) {
 			let login_response = await email_login(email, password); // Must login first for splinterlands.get_player() to work for tracking
-			
+
 			log_event('sign_up');
 
 			snapyr.track(
@@ -1026,11 +1026,11 @@ var splinterlands = (function() {
 		let account = await splinterlands.eos.getIdentity();
 		email = email.trim().toLowerCase();
 
-		let params = { 
+		let params = {
 			login_type: 'eos',
 			purchase_id: 'new-' + splinterlands.utils.randomStr(6),	// We need to set a purchase ID even though not making a purchase for backwards compatibility
 			email: email,
-			address: account.name, 
+			address: account.name,
 			password_pub_key: account.publicKey,
 			subscribe: subscribe,
 			is_test: splinterlands.get_settings().test_acct_creation,
@@ -1063,17 +1063,17 @@ var splinterlands = (function() {
 		}
 
 		return response;
-	}	
+	}
 
 	async function create_account_eth(email, subscribe, captcha_token) {
 		let account = await splinterlands.ethereum.getIdentity();
 		email = email.trim().toLowerCase();
 
-		let params = { 
+		let params = {
 			login_type: 'ethereum',
 			purchase_id: 'new-' + splinterlands.utils.randomStr(6),	// We need to set a purchase ID even though not making a purchase for backwards compatibility
 			email: email,
-			address: account.publicKey, 
+			address: account.publicKey,
 			password_pub_key: account.publicKey,
 			subscribe: subscribe,
 			is_test: splinterlands.get_settings().test_acct_creation,
@@ -1106,7 +1106,7 @@ var splinterlands = (function() {
 		}
 
 		return response;
-	}	
+	}
 
 	async function redeem_promo_code(code, purchase_id) {
 		let response = await api('/purchases/start_code', { code, purchase_id });
@@ -1138,7 +1138,7 @@ var splinterlands = (function() {
 		_match = _match ? _match.update(match_data) : new splinterlands.Match(match_data);
 		return _match;
 	}
-	
+
 	function wait_for_match() {
 		return new Promise((resolve, reject) => {
 			if(!_match) {
@@ -1177,7 +1177,7 @@ var splinterlands = (function() {
 
 	async function battle_history(player, limit) {
 		let response = await api('/battle/history2', { player, limit });
-		
+
 		if(response && response.battles)
 			return response.battles.map(r => new splinterlands.Battle(r));
 
@@ -1204,7 +1204,7 @@ var splinterlands = (function() {
 		const res = await fetch(`${splinterlands.get_settings().asset_url}website/mobile_news/sps_airdrop.html`);
 
 		let news = await res.text();
-		
+
         return { has_news: true, news_html: news }
 	}
 
@@ -1218,8 +1218,8 @@ var splinterlands = (function() {
 		return { success: true };
 	}
 
-	return { 
-		init, api, ec_api, api_post, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details, 
+	return {
+		init, api, ec_api, api_post, login, logout, send_tx, send_tx_wrapper, load_collection, group_collection, get_battle_summoners, get_battle_monsters, get_card_details,
 		log_event, load_market, browser_payment, has_saved_login, create_account_email, email_login, check_promo_code, redeem_promo_code, reset_password, load_card_lore, group_collection_by_card, get_available_packs, get_potions, wait_for_match, wait_for_result, battle_history,
 		get_leaderboard, get_global_chat, set_url, external_deposit, create_blockchain_account,
 		get_config: () => _config,
@@ -1246,7 +1246,7 @@ var splinterlands = (function() {
 
 window.startWrappedApp = function(is_android, version) {
 	splinterlands.is_android = (is_android == null || !!is_android);
-	splinterlands.is_mobile_app = true; 
+	splinterlands.is_mobile_app = true;
 	splinterlands.mobile_OS_ver = version;
 
 	if(is_android == null || is_android) {
@@ -1255,7 +1255,7 @@ window.startWrappedApp = function(is_android, version) {
 	else {
 		splinterlands.mobile_OS = "iOS";
 	}
-	
+
 	window.showLoadingAnimation = function(showLoader, text) {
 		text = (text) ? text.replaceAll("<br>", "\n") : "";
 		window.dispatchEvent(new CustomEvent('splinterlands:show_loading_animation', { detail: { showLoader, text } }));
