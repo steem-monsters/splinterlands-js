@@ -36,6 +36,10 @@ splinterlands.Market = class {
 	static async rent(market_ids, currency, days) {
 		return splinterlands.send_tx_wrapper('market_rent', 'Rent Cards', {
 			items: market_ids, currency, days
+		}, async tx => {
+			await splinterlands.get_player().load_balances();
+			await splinterlands.load_collection();
+			return tx.result;
 		})
 	}
 }
