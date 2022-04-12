@@ -38,6 +38,7 @@ splinterlands.Market = class {
 			items: market_ids, currency, days
 		}, async tx => {
 			await splinterlands.get_player().load_balances();
+			splinterlands.get_player().has_collection_power_changed = true;
 			await splinterlands.load_collection();
 			return tx.result;
 		})
