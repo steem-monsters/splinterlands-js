@@ -1201,11 +1201,12 @@ var splinterlands = (function() {
 	}
 
 	async function get_news() {
-		const res = await fetch(`${splinterlands.get_settings().asset_url}website/mobile_news/sps_airdrop.html`);
+		//const res = await fetch(`${splinterlands.get_settings().asset_url}website/mobile_news/sps_airdrop.html`);
 
-		let news = await res.text();
+		//let news = await res.text();
 		
-        return { has_news: true, news_html: news }
+        //return { has_news: true, news_html: news }
+		return { has_news: false }
 	}
 
 	async function get_claimable_dec_balance() {
