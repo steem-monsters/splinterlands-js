@@ -63,6 +63,21 @@ window.splinterlands.ops = (function() {
 		});
 	}
 
+	async function cancel_cards_rental(market_item_id) {
+		return splinterlands.send_tx_wrapper('market_cancel_rental', 'Cancel Rental', { items: [market_item_id] }, async tx => {
+			if(tx && tx.trx_info && tx.trx_info.result) {
+				let result = JSON.parse(tx.trx_info.result);
+
+				if(result && result.market_items && Array.isArray(result.market_items) && result.market_items.length > 0 && result.market_items[0].next_rental_payment) {
+					console.log(result);
+					console.log(result.market_items[0].next_rental_payment);
+				}
+			}
+			await splinterlands.load_collection();
+			return tx.result;
+		});
+	}
+
 	async function market_purchase(market_ids, price, currency) {
 		return splinterlands.send_tx_wrapper('market_purchase', 'Market Purchase', {  items: market_ids, price: price + 0.01, currency: currency.toUpperCase() }, async tx => {
 			splinterlands.get_player().has_collection_power_changed = true;
@@ -126,7 +141,7 @@ window.splinterlands.ops = (function() {
 				// Save the team info locally in case the browser is refreshed or something and it needs to be resubmitted later
 				localStorage.setItem(`splinterlands:${cur_match.id}`, JSON.stringify({ summoner, monsters, secret }));
 			}
-			
+
 			return tx;
 		});
 	}
@@ -178,7 +193,7 @@ window.splinterlands.ops = (function() {
 		if(test) {
 			let ret_val = { cards: [], quest: splinterlands.get_player().quest };
 
-			ret_val.rewards = _test_reward_data.rewards.map(r => new splinterlands.RewardItem(r));				
+			ret_val.rewards = _test_reward_data.rewards.map(r => new splinterlands.RewardItem(r));
 			let card_rewards = _test_reward_data.rewards.filter(i => i.type == 'reward_card');
 
 			if(card_rewards)
@@ -200,7 +215,7 @@ window.splinterlands.ops = (function() {
 
 			if(tx.result.rewards) {
 				// New reward system
-				ret_val.rewards = tx.result.rewards.map(r => new splinterlands.RewardItem(r));				
+				ret_val.rewards = tx.result.rewards.map(r => new splinterlands.RewardItem(r));
 				let card_rewards = tx.result.rewards.filter(i => i.type == 'reward_card');
 
 				if(card_rewards)
@@ -327,7 +342,7 @@ window.splinterlands.ops = (function() {
 	async function accept_challenge(id) {
 		splinterlands.set_match({ id, status: 0 });
 		return splinterlands.send_tx_wrapper('accept_challenge', 'Accept Challenge', { id }, tx => {
-			console.log("accept_challenge tx: ", tx);			
+			console.log("accept_challenge tx: ", tx);
 		});
 	}
 
@@ -398,14 +413,14 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function guild_request_join(guild_id) {
-		return splinterlands.send_tx_wrapper('join_guild', 'Request Join Guild', { guild_id }, async tx => {			
+		return splinterlands.send_tx_wrapper('join_guild', 'Request Join Guild', { guild_id }, async tx => {
 			await splinterlands.get_player().refresh();
 			return tx;
 		});
 	}
 
 	async function guild_leave(guild_id) {
-		return splinterlands.send_tx_wrapper('leave_guild', 'Leave Guild', { guild_id }, async tx => {			
+		return splinterlands.send_tx_wrapper('leave_guild', 'Leave Guild', { guild_id }, async tx => {
 			delete splinterlands.get_player().guild;
 			return tx;
 		});
@@ -422,7 +437,7 @@ window.splinterlands.ops = (function() {
 			decal: decal
 		};
 
-		return splinterlands.send_tx_wrapper('create_guild', 'Create Guild', guild_data, async tx => {			
+		return splinterlands.send_tx_wrapper('create_guild', 'Create Guild', guild_data, async tx => {
 			await splinterlands.get_player().refresh();
 			return tx;
 		});
@@ -440,7 +455,7 @@ window.splinterlands.ops = (function() {
 			decal: decal
 		};
 
-		return splinterlands.send_tx_wrapper('edit_guild', 'Update Guild', guild_data, async tx => {			
+		return splinterlands.send_tx_wrapper('edit_guild', 'Update Guild', guild_data, async tx => {
 			await splinterlands.get_player().guild.refresh();
 			return tx;
 		});
@@ -491,7 +506,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function league_advance() {
-		return splinterlands.send_tx_wrapper('advance_league', 'Advance League', { notify: true }, async tx => {			
+		return splinterlands.send_tx_wrapper('advance_league', 'Advance League', { notify: true }, async tx => {
 			await splinterlands.get_player().refresh();
 			return tx;
 		});
@@ -512,6 +527,7 @@ window.splinterlands.ops = (function() {
 		send_packs,
 		delegate_cards,
 		undelegate_cards,
+		cancel_cards_rental,
 		market_purchase,
 		token_transfer,
 		sell_cards,
