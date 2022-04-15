@@ -65,14 +65,6 @@ window.splinterlands.ops = (function() {
 
 	async function cancel_cards_rental(market_item_id) {
 		return splinterlands.send_tx_wrapper('market_cancel_rental', 'Cancel Rental', { items: [market_item_id] }, async tx => {
-			if(tx && tx.trx_info && tx.trx_info.result) {
-				let result = JSON.parse(tx.trx_info.result);
-
-				if(result && result.market_items && Array.isArray(result.market_items) && result.market_items.length > 0 && result.market_items[0].next_rental_payment) {
-					console.log(result);
-					console.log(result.market_items[0].next_rental_payment);
-				}
-			}
 			await splinterlands.load_collection();
 			return tx.result;
 		});
