@@ -118,6 +118,10 @@ splinterlands.Player = class {
 
 	async recent_teams() { return await splinterlands.api('/players/recent_teams', { player: this.name }); }
 
+	static async get_recent_teams_encrypted(lookup_name, decrypt_key) {
+		return await splinterlands.api('/players/recent_teams', { player: lookup_name, decrypt_key });
+	}
+
 	async last_team() {
 		let teams = await this.recent_teams();
 
