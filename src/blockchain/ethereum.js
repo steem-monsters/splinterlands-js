@@ -2,12 +2,12 @@ if(!window.splinterlands)
 	window.splinterlands = {};
 
 window.splinterlands.ethereum = (function() {
-	let tokenContracts = { 
-		GAME: { 
+	let tokenContracts = {
+		GAME: {
 			address: '0x63f88A2298a5c4AEE3c216Aa6D926B184a4b2437',
 			precision: 18
 		},
-		BAT: { 
+		BAT: {
 			address: '0x0D8775F648430679A709E98d2b0Cb6250d2887EF',
 			precision: 18
 		},
@@ -52,20 +52,20 @@ window.splinterlands.ethereum = (function() {
 				value: window.web3.utils.toWei(amount, 'ether')
 			})
 			.on('transactionHash', (hash) => { return hash })
-			.on('error', (error, receipt) => { 
+			.on('error', (error, receipt) => {
 				if(typeof error === 'string')
 					return ({ "error" : true, "message": error });
-				else 
-					return error;			
+				else
+					return error;
 			});
 		} catch(e) {
-			console.log(e); 
+			console.log(e);
 			if(typeof e === 'string')
 				return ({ "error" : true, "message": e });
-			else 
-				return e; 
+			else
+				return e;
 		}
-	}	
+	}
 
 	async function checkAllowance(token) {
 		console.log("Calling checkAllowance...");
@@ -97,7 +97,7 @@ window.splinterlands.ethereum = (function() {
 			try {
 				if(!window.web3 || !window.web3.eth.accounts.givenProvider.selectedAddress)
 					return reject('Ethereum wallet not found. Please make sure Metamask or another browser-based Ethereum wallet is installed and unlocked.');
-				
+
 				if(!tokenContracts[token])
 					return reject('Invalid or unsupported token symbol specified.');
 
@@ -120,7 +120,7 @@ window.splinterlands.ethereum = (function() {
 						status_update_callback({ type: 'approval', status: 'error', data: { error } });
 						reject(error);
 					});
-			} catch(error) { 
+			} catch(error) {
 				status_update_callback({ type: 'approval', status: 'error', data: { error } });
 				reject(error);
 			}
@@ -162,7 +162,7 @@ window.splinterlands.ethereum = (function() {
 				status_update_callback({ type: 'payment', status: 'error', data: { error } });
 				reject(error);
 			}
-		}); 
+		});
 	}
 
 	async function web3connect() {
@@ -179,6 +179,15 @@ window.splinterlands.ethereum = (function() {
 			const addresses = await window.ethereum.enable();
 			return addresses ? addresses[0] : null;
 		} catch (err) { return null; }
+	}
+
+	async function walletConnect() {
+		try {
+			const {connect, connector, sendTx} = window.splinterlands.walletConnect;
+			console.info(connect, connector, sendTx);
+		} catch (e) {
+			console.info(e)
+		}
 	}
 
 
@@ -201,13 +210,13 @@ window.splinterlands.ethereum = (function() {
 				publicKey,
 			}
 		} catch(e) {
-			console.log(e); 
+			console.log(e);
 			if(typeof e === 'string')
 				return ({ "error" : true, "message": e });
-			else 
-				return e; 
+			else
+				return e;
 		}
-	}	 
+	}
 
 	async function web3Auth(type) {
 		if (!window.web3)
@@ -219,34 +228,33 @@ window.splinterlands.ethereum = (function() {
 			const ts = Math.floor(Date.now() / 1000);
 			const msg = `${type || 'Login'}: ${address} ${ts}`;
 			const sig = await web3.eth.personal.sign(web3.utils.utf8ToHex(msg), address);
-			
+
 			return { address, ts, msg, sig };
 		} catch(e) {
-			console.log(e); 
+			console.log(e);
 			if(typeof e === 'string')
 				return ({ "error" : true, "message": e });
-			else 
+			else
 				return e;
 		}
 	}
 
 	async function web3Pay(to, amount) {
 		try {
-			await sendFromWeb3(to, amount);			
+			await sendFromWeb3(to, amount);
 		} catch (e)  {
-			console.log(e); 
+			console.log(e);
 			if(typeof e === 'string')
 				return ({ "error" : true, "message": e });
-			else 
+			else
 				return e;
 		}
 	}
 
 	async function erc20Payment(token, amount, purchase_id, status_update_callback) {
-		console.log("Start erc20Payment")
 		if(!status_update_callback)
 			status_update_callback = console.log;
-		
+
 		let address = await web3connect();
 
 		if(!address)
@@ -258,5 +266,5 @@ window.splinterlands.ethereum = (function() {
 		await payToken(token, amount, purchase_id, status_update_callback);
 	}
 
-	return { hasWeb3Obj, getIdentity, web3Auth, web3Pay, erc20Payment };
+	return { hasWeb3Obj, getIdentity, web3Auth, web3Pay, erc20Payment, walletConnect };
 })();

@@ -17,11 +17,10 @@ splinterlands.Store = class {
 			{ name: "Bitcoin Cash", symbol: "BCH"},
 			{ name: "Telos", symbol: "TLOS" },
 			{ name: "Splintershards", symbol: "SPS" },
-			{ name: "Polyient Games Unity", symbol: "PGU" },
 			{ name: "LeoFinance", symbol: "LEO" },
 		];
 
-		if(splinterlands.ethereum.hasWeb3Obj()) {
+		if(!splinterlands.ethereum.hasWeb3Obj()) {
 			currencies.push({ name: 'Basic Attention Token', symbol: 'BAT' })
 			currencies.push({ name: 'Enjin Coin', symbol: 'ENJ' })
 			currencies.push({ name: 'Uniswap', symbol: 'UNI' })
@@ -410,6 +409,35 @@ splinterlands.Store = class {
 			console.log("ERROR: Trying to restore non mobile IAP")
 			return;
 		}
+	}
+
+	static async connectMobilePayToken(connector) {
+		if (!connector.connected) {
+			// create new session
+			connector.createSession();
+		}
+
+		// Subscribe to connection events
+		connector.on('connect', (error, _payload) => {
+			if (error) {
+				throw error;
+			}
+			console.log('Connected');
+		});
+
+		connector.on('session_update', (error, _payload) => {
+			if (error) {
+				throw error;
+			}
+			console.log('Session updated');
+		});
+
+		connector.on('disconnect', (error, _payload) => {
+			if (error) {
+				throw error;
+			}
+			console.log('Disconnected');
+		});
 	}
 }
 
