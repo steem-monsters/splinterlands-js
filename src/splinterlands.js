@@ -988,7 +988,7 @@ var splinterlands = (function() {
 
 		let params = {
 			purchase_id: 'new-' + splinterlands.utils.randomStr(6),	// We need to set a purchase ID even though not making a purchase for backwards compatibility
-			email: encodeURIComponent(email),
+			email: email,
 			password_pub_key: password_pub_key,
 			subscribe: subscribe,
 			is_test: splinterlands.get_settings().test_acct_creation,
