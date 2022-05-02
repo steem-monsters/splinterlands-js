@@ -5,7 +5,7 @@ if(!window.splinterlands)
 
 window.splinterlands.walletConnect = (function() {
 	let config = {
-		infuraId: "19233183444441bc985de5f05cfc65a9"
+		infuraId: "bfb49469e8284560b1cf9ca30f359989"
 	}
 
 	let connector = null;
