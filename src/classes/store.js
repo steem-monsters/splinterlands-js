@@ -407,7 +407,7 @@ splinterlands.Store = class {
 	static async claim_airdrop(name) {
 		return splinterlands.send_tx_wrapper('claim_airdrop', 'Claim Airdrop', { name }, async tx => {
 			await splinterlands.load_collection();
-			return tx.result.cards.map(c => new splinterlands.Card(c));
+			return tx.result.map(c => new splinterlands.Card(c));
 		});
 	}
 }
