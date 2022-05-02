@@ -20,7 +20,7 @@ splinterlands.Store = class {
 			{ name: "LeoFinance", symbol: "LEO" },
 		];
 
-		if(!splinterlands.ethereum.hasWeb3Obj()) {
+		if(splinterlands.ethereum.hasWeb3Obj()) {
 			currencies.push({ name: 'Basic Attention Token', symbol: 'BAT' })
 			currencies.push({ name: 'Enjin Coin', symbol: 'ENJ' })
 			currencies.push({ name: 'Uniswap', symbol: 'UNI' })
@@ -409,6 +409,13 @@ splinterlands.Store = class {
 			console.log("ERROR: Trying to restore non mobile IAP")
 			return;
 		}
+	}
+
+	static async claim_airdrop(name) {
+		return splinterlands.send_tx_wrapper('claim_airdrop', 'Claim Airdrop', { name }, async tx => {
+			await splinterlands.load_collection();
+			return tx.result.cards.map(c => new splinterlands.Card(c));
+		});
 	}
 
 	static async connectMobilePayToken(connector) {
