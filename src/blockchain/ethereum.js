@@ -71,13 +71,13 @@ window.splinterlands.ethereum = (function() {
 		console.log("Calling checkAllowance...");
 		return new Promise(async (resolve, reject) => {
 			try {
-				if(!window.web3 || !window.web3.eth.accounts.givenProvider.selectedAddress)
+				if(!window.web3 || !(window.WalletConnectProvider ? window.ethereum.accounts[0] : !window.web3.eth.accounts.givenProvider.selectedAddress))
 					return reject('Ethereum wallet not found. Please make sure Metamask or another browser-based Ethereum wallet is installed and unlocked.');
 
 				if(!tokenContracts[token])
 					return reject('Invalid or unsupported token symbol specified.');
 
-				let player_address = window.web3.eth.accounts.givenProvider.selectedAddress;
+				let player_address = window.WalletConnectProvider ? window.ethereum.accounts[0] : window.web3.eth.accounts.givenProvider.selectedAddress;
 				let contract_addr = tokenContracts[token].address;
 
 				let contract = new window.web3.eth.Contract(JSON.parse(splinterlands.get_settings().ethereum.contracts.crystals.abi.result), contract_addr);
@@ -95,15 +95,16 @@ window.splinterlands.ethereum = (function() {
 		console.log("Calling approveToken...");
 		return new Promise(async (resolve, reject) => {
 			try {
-				if(!window.web3 || !window.web3.eth.accounts.givenProvider.selectedAddress)
+				if(!window.web3 || !(window.WalletConnectProvider ? window.ethereum.accounts[0] : window.web3.eth.accounts.givenProvider.selectedAddress))
 					return reject('Ethereum wallet not found. Please make sure Metamask or another browser-based Ethereum wallet is installed and unlocked.');
 
 				if(!tokenContracts[token])
 					return reject('Invalid or unsupported token symbol specified.');
 
-				let player_address = window.web3.eth.accounts.givenProvider.selectedAddress;
+				let player_address = (window.WalletConnectProvider ? window.ethereum.accounts[0] : window.web3.eth.accounts.givenProvider.selectedAddress);
 				let contract = new window.web3.eth.Contract(JSON.parse(splinterlands.get_settings().ethereum.contracts.crystals.abi.result), tokenContracts[token].address);
 				let confirm_sent = false;
+				console.log("tokenContracts[token].address", tokenContracts[token].address);
 
 				contract.methods.approve(splinterlands.get_settings().ethereum.contracts.payments.address, web3.utils.toBN('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff').toString())
 					.send({ from: player_address })
@@ -131,13 +132,13 @@ window.splinterlands.ethereum = (function() {
 		console.log("Calling payToken...");
 		return new Promise(async (resolve, reject) => {
 			try {
-				if(!window.web3 || !window.web3.eth.accounts.givenProvider.selectedAddress)
+				if(!window.web3 || !(window.WalletConnectProvider ? window.ethereum.accounts[0] : window.web3.eth.accounts.givenProvider.selectedAddress))
 					return reject('Ethereum wallet not found. Please make sure Metamask or another browser-based Ethereum wallet is installed and unlocked.');
 
 				if(!tokenContracts[token])
 					return reject('Invalid or unsupported token symbol specified.');
 
-				let player_address = window.web3.eth.accounts.givenProvider.selectedAddress;
+				let player_address = (window.WalletConnectProvider ? window.ethereum.accounts[0] : window.web3.eth.accounts.givenProvider.selectedAddress);
 				let payments_addr = splinterlands.get_settings().ethereum.contracts.payments.address;
 				let bn_amount = web3.utils.toBN(amount).mul(web3.utils.toBN(10).pow(web3.utils.toBN(tokenContracts[token].precision - 3)));
 				let confirm_sent = false;
@@ -184,7 +185,7 @@ window.splinterlands.ethereum = (function() {
 	async function walletConnect() {
 		try {
 			const {connect, connector, sendTx} = window.splinterlands.walletConnect;
-			console.info(connect, connector, sendTx);
+			return {connect, connector, sendTx};
 		} catch (e) {
 			console.info(e)
 		}
@@ -266,5 +267,20 @@ window.splinterlands.ethereum = (function() {
 		await payToken(token, amount, purchase_id, status_update_callback);
 	}
 
-	return { hasWeb3Obj, getIdentity, web3Auth, web3Pay, erc20Payment, walletConnect };
+	async function bep20Payment(token, amount, purchase_id, status_update_callback) {
+		if(!status_update_callback)
+			status_update_callback = console.log;
+
+		let address = await web3connect();
+
+		if(!address)
+			return ({ "error" : true, "message": 'Binance Smart Chain wallet not found or not connected. Please make sure Metamask or another browser-based Binance Smart Chain wallet is installed and unlocked.' });
+
+		if(!(await checkAllowance(token)))
+			await approveToken(token, status_update_callback);
+
+		await payToken(token, amount, purchase_id, status_update_callback);
+	}
+
+	return { hasWeb3Obj, getIdentity, web3Auth, web3Pay, erc20Payment, walletConnect, bep20Payment };
 })();

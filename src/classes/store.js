@@ -11,7 +11,7 @@ splinterlands.Store = class {
 			{ name: 'Ether', symbol: 'ETH' },
 			{ name: 'Litecoin', symbol: 'LTC' },
 			{ name: 'EOS', symbol: 'EOS' },
-			{ name: 'WAX', symbol: 'WAXP' },
+			{ name: 'WAX', symbol: 'WAX' },
 			{ name: 'Electroneum', symbol: 'ETN' },
 			{ name: "Binance USD", symbol: "BUSD" },
 			{ name: "Bitcoin Cash", symbol: "BCH"},
@@ -134,7 +134,7 @@ splinterlands.Store = class {
 		if(!['HIVE', 'HBD', 'DEC'].includes(currency))
 			currency = 'HIVE';
 
-		if(orig_currency === 'WAXP')
+		if(orig_currency === 'WAX')
 			orig_currency = 'WAX';
 
 		console.log("orig_currency: ", orig_currency)

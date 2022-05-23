@@ -50,9 +50,9 @@ var splinterlands = (function () {
         // Load market data
         await load_market();
 
-		//hack to handle Angular query string issues
-		let urlHash = (window.location.hash) ? window.location.hash : window.location.search ;
-		_init_url_search_params = new URLSearchParams(urlHash.substring(urlHash.indexOf('?')));
+        //hack to handle Angular query string issues
+        let urlHash = (window.location.hash) ? window.location.hash : window.location.search;
+        _init_url_search_params = new URLSearchParams(urlHash.substring(urlHash.indexOf('?')));
 
         // Init MetaMask library
         if (window.ethereum) {
@@ -715,7 +715,11 @@ var splinterlands = (function () {
 
     async function browser_payment(to, amount, currency, memo) {
         let token = splinterlands.utils.get_token(currency);
-
+        console.log('to', to);
+        console.log('amount', amount);
+        console.log('currency', currency);
+        console.log('memo', memo);
+        console.log('token', token);
         switch (token.type) {
             case 'hive':
                 if (_use_keychain) {
@@ -748,6 +752,8 @@ var splinterlands = (function () {
                 return await splinterlands.ethereum.web3Pay(to, amount);
             case 'erc20':
                 return await splinterlands.ethereum.erc20Payment(currency.toUpperCase(), amount * 1000, memo);
+            case 'multi-network':
+                return await splinterlands.ethereum.bep20Payment(currency.toUpperCase(), amount * 1000, memo);
         }
     }
 

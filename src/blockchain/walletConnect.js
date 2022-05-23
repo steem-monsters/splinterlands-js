@@ -1,5 +1,3 @@
-const ConnectProvider = WalletConnectProvider.default;
-
 if(!window.splinterlands)
     window.splinterlands = {};
 
@@ -15,7 +13,6 @@ window.splinterlands.walletConnect = (function() {
 		await connector.enable();
 		const web3 = new Web3(connector);
 		alert(await web3.eth.getAccounts());
-
 	}
 
 	async function sendTx(tx) {
