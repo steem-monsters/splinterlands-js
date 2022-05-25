@@ -715,11 +715,6 @@ var splinterlands = (function () {
 
     async function browser_payment(to, amount, currency, memo) {
         let token = splinterlands.utils.get_token(currency);
-        console.log('to', to);
-        console.log('amount', amount);
-        console.log('currency', currency);
-        console.log('memo', memo);
-        console.log('token', token);
         switch (token.type) {
             case 'hive':
                 if (_use_keychain) {
@@ -754,6 +749,8 @@ var splinterlands = (function () {
                 return await splinterlands.ethereum.erc20Payment(currency.toUpperCase(), amount * 1000, memo);
             case 'multi-network':
                 return await splinterlands.ethereum.bep20Payment(currency.toUpperCase(), amount * 1000, memo);
+            case 'wax':
+                return await splinterlands.waxjs.waxPay(to, amount * 1000, memo);
         }
     }
 
