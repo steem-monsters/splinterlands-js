@@ -797,6 +797,10 @@ window.splinterlands.utils = (function() {
 			"name": "Scattershot",
 			"desc": "This Monster's attacks hit a random enemy target."
 		},
+		{
+			"name": "Reflection Shield",
+			"desc": "This Monster doesn't take damage from Blast, Magic Reflect, Thorns, or Return Fire."
+		},
 	];
 
 	return { 
