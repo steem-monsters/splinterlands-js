@@ -16,6 +16,7 @@ var splinterlands = (function () {
     let _url = null;
     let _init_url_search_params = null; //Query string app started with
     let _server_time_offset = 0;
+    let _additional_season_rshares_count = 0;
 
     async function init(config) {
         _config = config;
@@ -1262,6 +1263,24 @@ var splinterlands = (function () {
         return airdrops;
     }
 
+    function set_match(match_data) {
+        if (!match_data) {
+            _match = null;
+            return;
+        }
+
+        _match = _match ? _match.update(match_data) : new splinterlands.Match(match_data);
+        return _match;
+    }
+
+    function set_server_time_offset(server_time_offset) {
+        _server_time_offset = server_time_offset;
+    }
+    
+    function set_additional_season_rshares_count(additional_season_rshares_count) {
+        _additional_season_rshares_count = additional_season_rshares_count;
+    }
+
     return {
         init,
         api,
@@ -1312,11 +1331,14 @@ var splinterlands = (function () {
         eth_login,
         create_account_eth,
         get_server_time_offset: () => _server_time_offset,
+        set_server_time_offset,
         get_news,
         set_referral_account,
         get_claimable_dec_balance,
         claim_dec,
-        check_unclaimed_airdrops
+        check_unclaimed_airdrops,
+        additional_season_rshares_count: () => _additional_season_rshares_count,
+        set_additional_season_rshares_count,
     };
 })();
 
