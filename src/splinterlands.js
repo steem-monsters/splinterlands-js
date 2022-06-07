@@ -16,6 +16,7 @@ var splinterlands = (function () {
     let _url = null;
     let _init_url_search_params = null; //Query string app started with
     let _server_time_offset = 0;
+    let _additional_season_rshares_count = 0;
 
     async function init(config) {
         _config = config;
@@ -1316,7 +1317,8 @@ var splinterlands = (function () {
         set_referral_account,
         get_claimable_dec_balance,
         claim_dec,
-        check_unclaimed_airdrops
+        check_unclaimed_airdrops,
+        additional_season_rshares_count: () => _additional_season_rshares_count
     };
 })();
 
