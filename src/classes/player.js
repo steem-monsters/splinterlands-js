@@ -293,12 +293,11 @@ splinterlands.Player = class {
         return (properties.womplay_id) ? properties.womplay_id.value : null;
     }
 
-    static async last_season_rewards() {
+    async get_last_season_rewards() {
         let result = await splinterlands.api('/players/last_season_rewards', {});
         if (!result || result.error) {
             return result && result.error ? result.error : 'Could not load rewards for this account for the last season.';
         }
-
-        return result;
+        return { rewards: result.rewards.map(r => new splinterlands.RewardItem(r)) };
     }
 }
