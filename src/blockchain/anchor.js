@@ -44,7 +44,7 @@ window.splinterlands.anchorjs = (function () {
         }
     }
 
-    async function waxTransactionAnchor() {
+    async function waxTransactionAnchor(memo, to, amount) {
         const chain = {
             blockchain: 'eos',
             protocol: 'https',
@@ -55,15 +55,15 @@ window.splinterlands.anchorjs = (function () {
         const params = {
             chain,
             source_account_type: 'wax',
-            destination_account: '<%= data.ext_currency_address %>',
-            amount: '<%= data.ext_currency_amount %>',
+            destination_account: to,
+            amount,
             precision: 8,
             symbol: 'WAX',
-            memo: '<%= data.payment_info.memo %>'
+            memo
         };
 
-        await anchorPay(params, () => SM.ShowDialog('process_payment', {currency: 'WAX'}));
+        await anchorPay(params);
     }
 
-    return {anchorPay, waxTransactionAnchor};
+    return {waxTransactionAnchor};
 })();

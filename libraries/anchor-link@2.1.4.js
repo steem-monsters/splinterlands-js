@@ -16624,11 +16624,11 @@ module.exports = EVP_BytesToKey
     for (var k in exports) {
         sha256[k] = exports[k];
     }
-        
+
     if (typeof module === 'object' && typeof module.exports === 'object') {
         module.exports = sha256;
     } else if (typeof define === 'function' && define.amd) {
-        define(function() { return sha256; }); 
+        define(function() { return sha256; });
     } else {
         root.sha256 = sha256;
     }
@@ -34581,7 +34581,7 @@ class Link {
                 throw new Error('Invalid request flags');
             }
             // wait for callback or user cancel
-            const ctx = {};
+            let ctx = {};
             const socket = waitForCallback(linkUrl, ctx).then((data) => {
                 if (typeof data.rejected === 'string') {
                     throw new errors_1.CancelError(`Rejected by wallet: ${data.rejected}`);
