@@ -3,7 +3,7 @@ splinterlands.Quest = class {
 		Object.keys(data).forEach(k => this[k] = data[k]);
 
 		this.created_date = new Date(this.created_date || 0);
-		this.details = splinterlands.get_settings().quests.find(q => q.name == this.name);
+		this.details = splinterlands.get_settings().daily_quests.find(q => q.name == this.name);
   }
   
   rewards(league_num) { return this.details.reward_qty_by_league[league_num]; }

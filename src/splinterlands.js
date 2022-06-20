@@ -413,6 +413,7 @@ var splinterlands = (function () {
             }
         } catch (e) {
             console.log('There was an issue with logging in: ' + ((e.error) ? e.error : e))
+            console.log(e);
             throw {error: 'There was an issue with logging in: ' + ((e.error) ? e.error : e)}
         }
 
@@ -1281,6 +1282,14 @@ var splinterlands = (function () {
         _additional_season_rshares_count = additional_season_rshares_count;
     }
 
+    function get_leagues_settings(league_format) {
+        if(splinterlands.get_settings().leagues.wild && splinterlands.get_settings().leagues.modern) {
+            return (league_format) ? splinterlands.get_settings().leagues[league_format] : splinterlands.get_settings().leagues.wild;
+        } else {
+            return splinterlands.get_settings().leagues;
+        }
+    }
+
     return {
         init,
         api,
@@ -1339,6 +1348,7 @@ var splinterlands = (function () {
         check_unclaimed_airdrops,
         additional_season_rshares_count: () => _additional_season_rshares_count,
         set_additional_season_rshares_count,
+        get_leagues_settings,
     };
 })();
 
