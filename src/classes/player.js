@@ -246,10 +246,36 @@ splinterlands.Player = class {
     }
 
     get pending_season_rewards() {
-        let max_league = this.season_max_league || 0;
+		if(!this.has_season_focus()) {
+			let max_league = this.season_max_league || 0;
 
-        return (max_league > 0 ? splinterlands.get_settings().season.reward_packs[max_league] : '0');
+			return (max_league > 0 ? splinterlands.get_settings().season.reward_packs[max_league] : '0');
+		} else {
+			return this.get_current_season_chest_info().chests;
+		}
     }
+
+	get_current_season_chest_info() {
+		if(this.current_season_player) {
+			const chestTier = this.current_season_player.chest_tier;
+			const seasonRewardShares = this.current_season_player.rshares;
+			return splinterlands.utils.get_chest_qty('season', chestTier, seasonRewardShares);
+		}
+
+		const previousSeasonHighestAcheivedLeague = splinterlands.utils.get_previous_season_highest_acheived_league(player.previous_season_player);
+		const chestTier = Math.max(Math.floor((previousSeasonHighestAcheivedLeague - 1) / 3), 0);
+		const seasonRewardShares = splinterlands.additional_season_rshares_count; // Tally of reward shares earned before a new current_season_player is loaded
+		return splinterlands.utils.get_chest_qty('season', chestTier, seasonRewardShares);
+	}
+
+	has_season_focus() {
+		if (splinterlands.get_settings().new_rewards && this.current_season_player && (this.current_season_player.chest_tier === null || this.current_season_player.chest_tier === undefined)) {
+			// this is an edge case and should only happen if a player has logged in right before the season has been reset
+			// and still has a chest_tier of null even though this shouldn't be possible when ranked rewards is live
+			return false;
+		}
+		return splinterlands.get_settings().new_rewards;
+	}
 
     async get_player_properties(do_refresh) {
         if (this._player_properties && !do_refresh) {

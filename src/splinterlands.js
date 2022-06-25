@@ -255,7 +255,7 @@ var splinterlands = (function () {
             window.dispatchEvent(new CustomEvent('splinterlands:maintenance_mode', {detail: {maintenance_mode: response.maintenance_mode}}));
         }
 
-        _settings = response;
+        _settings = new splinterlands.Settings(response);
     }
 
     function has_saved_login() {
