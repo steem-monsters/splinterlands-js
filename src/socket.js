@@ -48,7 +48,7 @@ window.splinterlands.socket = (function() {
 		var message = JSON.parse(m.data);
 
 		if(message && message.server_time)
-			splinterlands._server_time_offset = Date.now() - message.server_time;
+			splinterlands.set_server_time_offset(Date.now() - message.server_time);
 
 		if(message.id && _message_handlers[message.id])
 			_message_handlers[message.id](message.data);
@@ -242,6 +242,13 @@ window.splinterlands.socket = (function() {
 			if(data.new_collection_power !== undefined && splinterlands.get_player().collection_power != data.new_collection_power) {
 				splinterlands.get_player().collection_power = data.new_collection_power;
 				splinterlands.get_player().has_collection_power_changed = true;
+			}
+
+			if (data.additional_season_rshares) {
+				if (splinterlands.get_player().current_season_player && splinterlands.get_player().current_season_player.rshares !== undefined) {
+					splinterlands.get_player().current_season_player.rshares += data.additional_season_rshares;
+				}
+				splinterlands.set_additional_season_rshares_count(splinterlands.additional_season_rshares_count() + data.additional_season_rshares);
 			}
 
 			// Emit a rating_update event

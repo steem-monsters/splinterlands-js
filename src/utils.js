@@ -803,6 +803,77 @@ window.splinterlands.utils = (function() {
 		},
 	];
 
+	function get_chest_type_from_chest_tier(chestTier) {
+		if (chestTier === 0) return 'bronze'; 
+		if (chestTier === 1) return 'silver'; 
+		if (chestTier === 2) return 'gold'; 
+		if (chestTier === 3) return 'diamond'; 
+		if (chestTier === 4) return 'champion';
+		return 'original';
+	}
+
+	function get_previous_season_highest_acheived_league(previousSeasonPlayer) {
+		if (!previousSeasonPlayer) {
+			return 0;
+		}
+		return previousSeasonPlayer.max_league;
+	}
+
+	function get_chest_qty(type, chest_tier, rshares) {
+		const reward_config = splinterlands.get_settings().loot_chests[type][chest_tier];
+		let chests = -1;
+		let total_rshares = 0;
+		let next_chest = 0;
+		const reward_tiers = [];
+	
+		while (rshares >= Math.round(total_rshares)) {
+			chests++;
+			next_chest = reward_config.base * reward_config.step_multiplier ** chests;
+			total_rshares += next_chest;
+			reward_tiers.push({
+				chests: chests + 1,
+				total_reward_shares_required: Math.round(total_rshares),
+			});
+		}
+		const users_current_chests = chests;
+		const users_total_rshares = total_rshares;
+		const users_next_chest = next_chest;
+	
+		while (chests < (reward_config.max - 1)) {
+			chests++;
+			next_chest = reward_config.base * reward_config.step_multiplier ** chests;
+			total_rshares += next_chest;
+			reward_tiers.push({
+				chests: chests + 1,
+				total_reward_shares_required: Math.round(total_rshares),
+			});
+		}
+	
+		if (chests >= reward_config.max) {
+			const cappedRewardsTiers = reward_tiers.slice(0, reward_config.max);
+			const maxRewardShares = cappedRewardsTiers[cappedRewardsTiers.length -1].total_reward_shares_required;
+			return { 
+				chests: reward_config.max,
+				progress: maxRewardShares,
+				total: maxRewardShares,
+				reward_tiers: cappedRewardsTiers,
+				reward_shares: rshares,
+				chest_tier,
+				chest_type: get_chest_type_from_chest_tier(chest_tier),
+			};
+		}
+	
+		return {
+			chests: users_current_chests, 
+			progress: Math.round(users_next_chest) - (Math.round(users_total_rshares) - rshares), 
+			total: Math.round(users_next_chest),
+			reward_tiers,
+			reward_shares: rshares,
+			chest_tier,
+			chest_type: get_chest_type_from_chest_tier(chest_tier),
+		};
+	}
+
 	return { 
 		randomStr, 
 		timeout, 
@@ -838,6 +909,9 @@ window.splinterlands.utils = (function() {
 		post,
 		get_rpc_nodes,
 		set_rpc_nodes,
-		server_date
+		server_date,
+		get_chest_type_from_chest_tier,
+		get_chest_qty,
+		get_previous_season_highest_acheived_league
 	 };
 })();

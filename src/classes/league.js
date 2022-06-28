@@ -83,18 +83,18 @@ splinterlands.League = class {
 	}
 
 	get min_power() {		
-		return splinterlands.get_settings().leagues[this.id].min_power
+		return splinterlands.get_leagues_settings()[this.id].min_power
 	}
 
 	get max_power() {		
 		if(this.id >= 15)
 			return -1;
 
-		return splinterlands.get_settings().leagues[this.id + 1].min_power
+		return splinterlands.get_leagues_settings()[this.id + 1].min_power
 	}
 
 	get rating_reset() {				
-		return (splinterlands.get_settings().leagues[this.id].season_rating_reset);
+		return (splinterlands.get_leagues_settings()[this.id].season_rating_reset);
 	}
 
 	get level_limits() {
@@ -111,8 +111,8 @@ splinterlands.League = class {
 
 	get is_max_league() {
 		if(this.id == null) 
-			return (this.old_id >= (splinterlands.get_settings().leagues.length - 1));
+			return (this.old_id >= (splinterlands.get_leagues_settings().length - 1));
 		else		
-			return (this.id >= (splinterlands.get_settings().leagues.length - 1));
+			return (this.id >= (splinterlands.get_leagues_settings().length - 1));
 	}
 }
