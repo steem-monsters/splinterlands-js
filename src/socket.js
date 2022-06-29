@@ -237,8 +237,12 @@ window.splinterlands.socket = (function() {
 		},
 
 		rating_update: function(data) {
-			splinterlands.get_player().update_rating(data.new_rating, data.new_league);
-			
+			if(!data.wild) {
+				splinterlands.get_player().update_rating(data.new_rating, data.new_league);
+			} else {
+				splinterlands.get_player().update_rating(data.wild.new_rating, data.wild.new_league);
+			} 
+
 			if(data.new_collection_power !== undefined && splinterlands.get_player().collection_power != data.new_collection_power) {
 				splinterlands.get_player().collection_power = data.new_collection_power;
 				splinterlands.get_player().has_collection_power_changed = true;

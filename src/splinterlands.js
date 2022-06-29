@@ -926,7 +926,7 @@ var splinterlands = (function () {
             let card = d.owned.find(o =>
                 (match.allowed_cards != 'gold_only' || o.gold) &&
                 (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
-                (match.match_type == 'Ranked' ? o.playable_ranked : o.playable) &&
+                (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
                 (!o.delegated_to || o.delegated_to == _player.name));
 
             // Add "starter" card
@@ -970,7 +970,7 @@ var splinterlands = (function () {
                 let card = d.owned.find(o =>
                     (match.allowed_cards != 'gold_only' || o.gold) &&
                     (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
-                    (match.match_type == 'Ranked' ? o.playable_ranked : o.playable) &&
+                    (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
                     (!o.delegated_to || o.delegated_to == _player.name));
 
                 // Add "starter" card
