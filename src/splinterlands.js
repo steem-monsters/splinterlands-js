@@ -754,22 +754,7 @@ var splinterlands = (function () {
     }
 
     async function external_deposit(wallet_type, to, amount, currency, memo) {
-        switch (wallet_type) {
-            case 'hive_engine':
-                var result = await splinterlands.utils.hive_engine_transfer(to, currency, amount, memo);
-                return !result.success ? {success: false, error: result.error} : result;
-            case 'tron':
-                if (currency != 'DEC')
-                    return {success: false, error: 'Invalid currency specified.'};
-
-                let token = splinterlands.utils.get_token('DEC-TRON');
-                return await splinterlands.tron.sendToken(to, amount, token.token_id);
-            case 'bsc':
-                if (currency != 'DEC')
-                    return {success: false, error: 'Invalid currency specified.'};
-
-                return await splinterlands.bsc.bscDeposit(amount, splinterlands.get_player().name);
-        }
+        return { error: "We are very sorry but deposits are currently unavailable on the Splinterlands mobile app. Please goto to https://splinterlands.com to despoit your currency."}		
     }
 
     function check_tx(sm_id, timeout) {
