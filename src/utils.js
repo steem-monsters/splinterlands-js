@@ -30,6 +30,7 @@ window.splinterlands.utils = (function() {
 	rpc_index = 0;
 	//rpc_nodes = ["https://api.steemit.com", "https://seed.steemmonsters.com", "https://steemd.minnowsupportproject.org"];
 	rpc_nodes = ["https://api.hive.blog", "https://anyx.io", "https://hived.splinterlands.com"];
+	version = "0.7.26";
 
 	function switch_rpc() {
 		// Try the next RPC node
@@ -40,6 +41,8 @@ window.splinterlands.utils = (function() {
 
 	function get_rpc_nodes(list) { return rpc_nodes; }
 	function set_rpc_nodes(list) { rpc_nodes = list; }
+
+	function get_version() {return version}
 
 	async function post(url, data) {
 		return new Promise((resolve, reject) => {
@@ -912,6 +915,7 @@ window.splinterlands.utils = (function() {
 		server_date,
 		get_chest_type_from_chest_tier,
 		get_chest_qty,
-		get_previous_season_highest_acheived_league
+		get_previous_season_highest_acheived_league,
+		get_version
 	 };
 })();
