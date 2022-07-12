@@ -753,7 +753,7 @@ var splinterlands = (function () {
         }
     }
 
-    async function external_deposit(wallet_type, to, amount, currency, memo) {        		
+    async function external_deposit(wallet_type, to, amount, currency, memo) {
 		switch (wallet_type) {
             case 'hive_engine':
                 var result = await splinterlands.utils.hive_engine_transfer(to, currency, amount, memo);
@@ -1210,7 +1210,6 @@ var splinterlands = (function () {
 
     async function battle_history(player, limit) {
         let response = await api('/battle/history2', {player, limit});
-
         if (response && response.battles)
             return response.battles.map(r => new splinterlands.Battle(r));
 
@@ -1219,7 +1218,6 @@ var splinterlands = (function () {
 
     async function get_leaderboard(season, leaderboard_id, page) {
         let leaderboard = await api('/players/leaderboard_with_player', {season, leaderboard: leaderboard_id, page});
-
         if (leaderboard.leaderboard)
             leaderboard.leaderboard = leaderboard.leaderboard.map(p => new splinterlands.Player(p));
 
@@ -1227,10 +1225,29 @@ var splinterlands = (function () {
         return leaderboard;
     }
 
+    async function battle_history_by_mode(player, format, board_num) {
+        let response = await api('/battle/history2', {player, leaderboard: board_num, format});
+
+        if (response && response.battles)
+            return response.battles.map(r => new splinterlands.Battle(r));
+
+        return response;
+    }
+
     async function get_global_chat() {
         let history = await api('/players/chat_history');
         history.forEach(h => h.player = new splinterlands.Player(h.player));
         return history;
+    }
+
+    async function get_leaderboard_by_mode(season, leaderboard_id, format, page) {
+        let leaderboard = await api('/players/leaderboard_with_player', {season, leaderboard: leaderboard_id, format, page});
+
+        if (leaderboard.leaderboard)
+            leaderboard.leaderboard = leaderboard.leaderboard.map(p => new splinterlands.Player(p));
+
+        leaderboard.player = leaderboard.player ? new splinterlands.Player(leaderboard.player) : _player;
+        return leaderboard;
     }
 
     async function get_news() {
@@ -1270,7 +1287,7 @@ var splinterlands = (function () {
     function set_server_time_offset(server_time_offset) {
         _server_time_offset = server_time_offset;
     }
-    
+
     function set_additional_season_rshares_count(additional_season_rshares_count) {
         _additional_season_rshares_count = additional_season_rshares_count;
     }
@@ -1342,6 +1359,8 @@ var splinterlands = (function () {
         additional_season_rshares_count: () => _additional_season_rshares_count,
         set_additional_season_rshares_count,
         get_leagues_settings,
+        battle_history_by_mode,
+        get_leaderboard_by_mode
     };
 })();
 
