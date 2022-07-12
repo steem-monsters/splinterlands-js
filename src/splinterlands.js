@@ -1208,7 +1208,15 @@ var splinterlands = (function () {
         });
     }
 
-    async function battle_history(player, format, board_num) {
+    async function battle_history(player, limit) {
+        let response = await api('/battle/history2', {player, limit});
+        if (response && response.battles)
+            return response.battles.map(r => new splinterlands.Battle(r));
+
+        return response;
+    }
+
+    async function battle_history_by_mode(player, format, board_num) {
         let response = await api('/battle/history2', {player, leaderboard: board_num, format});
 
         if (response && response.battles)
@@ -1217,7 +1225,16 @@ var splinterlands = (function () {
         return response;
     }
 
-    async function get_leaderboard(season, leaderboard_id, format, page) {
+    async function get_leaderboard(season, leaderboard_id, page) {
+        let leaderboard = await api('/players/leaderboard_with_player', {season, leaderboard: leaderboard_id, page});
+        if (leaderboard.leaderboard)
+            leaderboard.leaderboard = leaderboard.leaderboard.map(p => new splinterlands.Player(p));
+
+        leaderboard.player = leaderboard.player ? new splinterlands.Player(leaderboard.player) : _player;
+        return leaderboard;
+    }
+
+    async function get_leaderboard_by_mode(season, leaderboard_id, format, page) {
         let leaderboard = await api('/players/leaderboard_with_player', {season, leaderboard: leaderboard_id, format, page});
 
         if (leaderboard.leaderboard)
@@ -1342,6 +1359,8 @@ var splinterlands = (function () {
         additional_season_rshares_count: () => _additional_season_rshares_count,
         set_additional_season_rshares_count,
         get_leagues_settings,
+        battle_history_by_mode,
+        get_leaderboard_by_mode
     };
 })();
 
