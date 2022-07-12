@@ -1216,6 +1216,15 @@ var splinterlands = (function () {
         return response;
     }
 
+    async function get_leaderboard(season, leaderboard_id, page) {
+        let leaderboard = await api('/players/leaderboard_with_player', {season, leaderboard: leaderboard_id, page});
+        if (leaderboard.leaderboard)
+            leaderboard.leaderboard = leaderboard.leaderboard.map(p => new splinterlands.Player(p));
+
+        leaderboard.player = leaderboard.player ? new splinterlands.Player(leaderboard.player) : _player;
+        return leaderboard;
+    }
+
     async function battle_history_by_mode(player, format, board_num) {
         let response = await api('/battle/history2', {player, leaderboard: board_num, format});
 
@@ -1225,13 +1234,10 @@ var splinterlands = (function () {
         return response;
     }
 
-    async function get_leaderboard(season, leaderboard_id, page) {
-        let leaderboard = await api('/players/leaderboard_with_player', {season, leaderboard: leaderboard_id, page});
-        if (leaderboard.leaderboard)
-            leaderboard.leaderboard = leaderboard.leaderboard.map(p => new splinterlands.Player(p));
-
-        leaderboard.player = leaderboard.player ? new splinterlands.Player(leaderboard.player) : _player;
-        return leaderboard;
+    async function get_global_chat() {
+        let history = await api('/players/chat_history');
+        history.forEach(h => h.player = new splinterlands.Player(h.player));
+        return history;
     }
 
     async function get_leaderboard_by_mode(season, leaderboard_id, format, page) {
@@ -1242,12 +1248,6 @@ var splinterlands = (function () {
 
         leaderboard.player = leaderboard.player ? new splinterlands.Player(leaderboard.player) : _player;
         return leaderboard;
-    }
-
-    async function get_global_chat() {
-        let history = await api('/players/chat_history');
-        history.forEach(h => h.player = new splinterlands.Player(h.player));
-        return history;
     }
 
     async function get_news() {
