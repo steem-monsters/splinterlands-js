@@ -903,6 +903,7 @@ var splinterlands = (function () {
     }
 
     function get_battle_summoners(match) {
+		const IS_MODERN = match.format === 'modern';
         return group_collection(_collection, true).filter(d => d.type == 'Summoner' && d.owned.length > 0).map(d => {
             // Check if the splinter is inactive for this battle
             if (match.inactive.includes(d.color))
@@ -920,7 +921,8 @@ var splinterlands = (function () {
                 (match.allowed_cards != 'gold_only' || o.gold) &&
                 (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
                 (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
-                (!o.delegated_to || o.delegated_to == _player.name));
+                (!o.delegated_to || o.delegated_to == _player.name) && 
+                (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.tier, true): true));
 
             // Add "starter" card
             if (!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
@@ -936,6 +938,7 @@ var splinterlands = (function () {
     }
 
     function get_battle_monsters(match, summoner_card, ally_color) {
+        const IS_MODERN = match.format === 'modern';
         let summoner_details = get_card_details(summoner_card.card_detail_id);
 
         return group_collection(_collection, true)
@@ -964,7 +967,8 @@ var splinterlands = (function () {
                     (match.allowed_cards != 'gold_only' || o.gold) &&
                     (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
                     (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
-                    (!o.delegated_to || o.delegated_to == _player.name));
+                    (!o.delegated_to || o.delegated_to == _player.name) &&
+                    (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.tier, true): true));
 
                 // Add "starter" card
                 if (!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
@@ -1300,6 +1304,13 @@ var splinterlands = (function () {
         }
     }
 
+	function is_modern_card(edition, tier, exclude_gladiators) {
+		if(edition === 6 && exclude_gladiators) {
+			return false;
+		}
+		return splinterlands.get_settings().battles.modern.editions.includes(edition) || splinterlands.get_settings().battles.modern.tiers.includes(tier);
+	}
+
     return {
         init,
         api,
@@ -1360,7 +1371,8 @@ var splinterlands = (function () {
         set_additional_season_rshares_count,
         get_leagues_settings,
         battle_history_by_mode,
-        get_leaderboard_by_mode
+        get_leaderboard_by_mode,
+        is_modern_card
     };
 })();
 
