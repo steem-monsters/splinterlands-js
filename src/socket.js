@@ -238,7 +238,7 @@ window.splinterlands.socket = (function() {
 
 		rating_update: function(data) {
 			if(!data.wild) {
-				splinterlands.get_player().update_rating(data.new_rating, data.new_league);
+				splinterlands.get_player().update_modern_rating(data.modern.new_rating, data.modern.new_league);
 			} else {
 				splinterlands.get_player().update_rating(data.wild.new_rating, data.wild.new_league);
 			} 
