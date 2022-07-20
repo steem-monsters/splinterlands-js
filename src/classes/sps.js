@@ -16,7 +16,7 @@ splinterlands.SPS = class {
 
         if (splinterlands.use_keychain()) {
             console.log('splinterlands.use_keychain', splinterlands.use_keychain);
-            hive_keychain.requestSignBuffer(splinterlands.get_player().name, `hive${splinterlands.get_player().name}${ts}`, 'Posting', async (sign_response) => {
+            hive_keychain.requestSignBuffer(splinterlfands.get_player().name, `hive${splinterlands.get_player().name}${ts}`, 'Posting', async (sign_response) => {
                 if (!sign_response || sign_response.error) {
                     return (`There was an error claiming your airdrop: ${sign_response && sign_response.error ? sign_response.error : 'Unknown error'}`);
                 }
