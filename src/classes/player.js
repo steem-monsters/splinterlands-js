@@ -175,6 +175,11 @@ splinterlands.Player = class {
         this.league = new splinterlands.League(new_rating, new_league);
     }
 
+	update_modern_rating(new_rating, new_league) {
+        this.modern_rating = new_rating;
+        this.modern_league = new_league;
+    }
+
     async request_keys() {
         if (!this.starter_pack_purchase)
             return {error: `You must purchase the Summoner's Spellbook before you may request your account keys.`};
