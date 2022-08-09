@@ -117,7 +117,7 @@ window.splinterlands.ops = (function() {
 		if(!secret)
 			secret = splinterlands.utils.randomStr(10);
 
-		let data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`) };
+		let data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`), summoner, monsters, secret };
 
 		return splinterlands.send_tx_wrapper('submit_team', 'Submit Team', data, async tx => {
 			let cur_match = splinterlands.get_match();
