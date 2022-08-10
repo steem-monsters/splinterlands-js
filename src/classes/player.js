@@ -175,6 +175,11 @@ splinterlands.Player = class {
         this.league = new splinterlands.League(new_rating, new_league);
     }
 
+	update_modern_rating(new_rating, new_league) {
+        this.modern_rating = new_rating;
+        this.modern_league = new_league;
+    }
+
     async request_keys() {
         if (!this.starter_pack_purchase)
             return {error: `You must purchase the Summoner's Spellbook before you may request your account keys.`};
@@ -262,7 +267,7 @@ splinterlands.Player = class {
 			return splinterlands.utils.get_chest_qty('season', chestTier, seasonRewardShares);
 		}
 
-		const previousSeasonHighestAcheivedLeague = splinterlands.utils.get_previous_season_highest_acheived_league(player.previous_season_player);
+		const previousSeasonHighestAcheivedLeague = splinterlands.utils.get_previous_season_highest_acheived_league(this.previous_season_player);
 		const chestTier = Math.max(Math.floor((previousSeasonHighestAcheivedLeague - 1) / 3), 0);
 		const seasonRewardShares = splinterlands.additional_season_rshares_count; // Tally of reward shares earned before a new current_season_player is loaded
 		return splinterlands.utils.get_chest_qty('season', chestTier, seasonRewardShares);

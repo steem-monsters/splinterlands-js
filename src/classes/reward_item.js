@@ -14,6 +14,8 @@ splinterlands.RewardItem = class {
 				return `${this.quantity} Dark Energy Crystals`;
 			case "credits": 
 				return `${this.quantity} Credits`;
+			case "merits": 
+				return `${this.quantity} Merits`;
 			case "potion": 
 				let potion = splinterlands.Potion.get_potion(this.potion_type);
 				return `${this.quantity} ${potion.name} Potion Charge${this.quantity > 1 ? 's' : ''}`;
@@ -28,9 +30,11 @@ splinterlands.RewardItem = class {
 				} else if (this.edition == 7) {
 					packtext = 'Chaos Legion Booster Pack';
 				} else {					
-					packtext = 'Booster Pack';					
+					packtext = 'Booster Pack';
 				}	
 				return this.quantity + ' ' + packtext;
+			default:
+				return `${this.quantity} ${this.type.toUpperCase()}`
 		}
 	}
 
@@ -42,6 +46,8 @@ splinterlands.RewardItem = class {
 				return "https://d36mxiodymuqjm.cloudfront.net/website/icons/img_dec_fx_256.png";
 			case "credits": 
 				return "https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/shop/img_credits.png";
+			case "merits": 
+				return "https://d36mxiodymuqjm.cloudfront.net/website/icons/img_merit_256.png";
 			case "potion": 
 				return splinterlands.Potion.get_potion(this.potion_type).image_url;
 			case "pack":

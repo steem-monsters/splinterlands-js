@@ -117,7 +117,7 @@ window.splinterlands.ops = (function() {
 		if(!secret)
 			secret = splinterlands.utils.randomStr(10);
 
-		let data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`) };
+		let data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`), summoner, monsters, secret };
 
 		return splinterlands.send_tx_wrapper('submit_team', 'Submit Team', data, async tx => {
 			let cur_match = splinterlands.get_match();
@@ -373,29 +373,32 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx_wrapper('purchase', 'Purchase', { type, qty, currency, bonus: bonus_packs, data }, tx => tx);
 	}
 
-	async function withdraw_dec(qty, wallet) {
-		return { error: "We are very sorry but withdrawals are currently unavailable on the Splinterlands mobile app. Please goto to https://splinterlands.com to withdraw your currency."};
-		// let accounts = {
-		// 	tron: 'sm-dec-tron',
-		// 	ethereum: 'sl-eth',
-		// 	hive_engine: 'sl-hive',
-		// 	steem_engine: 'sl-steem',
-		// 	bsc: 'sl-bsc'
-		// }
+	async function withdraw_dec(qty, wallet) {		
+		let accounts = {
+			tron: 'sm-dec-tron',
+			ethereum: 'sl-eth',
+			hive_engine: 'sl-hive',
+			steem_engine: 'sl-steem',
+			bsc: 'sl-bsc'
+		}
 
-		// let player_wallet = null;
-		// if(['tron', 'ethereum', 'bsc'].some(type => type == wallet)) {
-		// 	player_wallet = await splinterlands.api('/players/wallets', { type: wallet });
+		let player_wallet = null;
+		if(['tron', 'ethereum', 'bsc'].some(type => type == wallet)) {
+			player_wallet = await splinterlands.api('/players/wallets', { type: wallet });
 
-		// 	if(!player_wallet) {
-		// 		return new Promise((resolve, reject) => reject({ error: `Please link a ${wallet} wallet before withdrawing.` }));
-		// 	}
+			if(!player_wallet) {
+				return new Promise((resolve, reject) => reject({ error: `Please link a ${wallet} wallet before withdrawing.` }));
+			}
 
-		// } else {
-		// 	player_wallet = { address: splinterlands.get_player().name };
-		// }
+		} else {
+			player_wallet = { address: splinterlands.get_player().name };
+		}
 
-		// return splinterlands.send_tx_wrapper('token_transfer', 'Withdraw DEC', { type: 'withdraw', to: accounts[wallet] || 'sl-hive', qty, token: 'DEC', memo: player_wallet.address }, tx => tx);
+		if(wallet != 'hive_engine') {
+			return { error: `We are very sorry but ${wallet.toUpperCase()} withdrawals are currently unavailable on the Splinterlands mobile app. Please goto to https://splinterlands.com to withdraw your currency.`};
+		}
+
+		return splinterlands.send_tx_wrapper('token_transfer', 'Withdraw DEC', { type: 'withdraw', to: accounts[wallet] || 'sl-hive', qty, token: 'DEC', memo: player_wallet.address }, tx => tx);
 	}
 
 	async function guild_join(guild_id) {
