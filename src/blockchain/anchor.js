@@ -64,6 +64,5 @@ window.splinterlands.anchorjs = (function () {
 
         await anchorPay(params);
     }
-
     return {waxTransactionAnchor};
 })();

@@ -22,7 +22,7 @@ window.splinterlands.waxjs = (function () {
                     data: {
                         from: wax.userAccount,
                         to,
-                        quantity,
+                        quantity: quantity + ' WAX',
                         memo,
                     },
                 }]
@@ -31,8 +31,9 @@ window.splinterlands.waxjs = (function () {
                 expireSeconds: 1200,
             });
 
+            // SM.SubmitPayment('wax', '<%= data.payment %>', 'WAX');
         } catch (err) {
-            console.error('WAX error: ', err);
+            console.log('WAX error: ', err);
         }
     }
 

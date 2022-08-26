@@ -28,6 +28,7 @@ splinterlands.Store = class {
 			currencies.push({ name: 'GALA', symbol: 'GALA' })
 			currencies.push({ name: 'GAME', symbol: 'GAME' })
 			currencies.push({ name: "Dai Stablecoin", symbol: "DAI" })
+			currencies.push({ name: "Emp Money", symbol: "EMP" })
 		}
 
 		return currencies;
@@ -121,7 +122,9 @@ splinterlands.Store = class {
 			currencies.push({ name: 'Uniswap', symbol: 'UNI' })
 			currencies.push({ name: 'SAND', symbol: 'SAND' })
 			currencies.push({ name: 'GALA', symbol: 'GALA' })
+			currencies.push({ name: "Dai Stablecoin", symbol: "DAI" })
 			currencies.push({ name: 'GAME', symbol: 'GAME' })
+			currencies.push({ name: "Emp Money", symbol: "EMP" })
 		}
 
 		return currencies;
