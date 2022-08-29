@@ -717,7 +717,6 @@ var splinterlands = (function () {
 
     async function browser_payment(to, amount, currency, memo) {
         let token = splinterlands.utils.get_token(currency);
-
         switch (token.type) {
             case 'hive':
                 if (_use_keychain) {
@@ -746,10 +745,16 @@ var splinterlands = (function () {
                 return await window.tronWeb.trx.sendTransaction(to, tronWeb.toSun(parseFloat(amount).toFixed(6)));
             case 'eos':
                 return await splinterlands.eos.scatterPay(to, amount, memo);
+            case 'simpleswap':
             case 'eth':
                 return await splinterlands.ethereum.web3Pay(to, amount);
             case 'erc20':
                 return await splinterlands.ethereum.erc20Payment(currency.toUpperCase(), amount * 1000, memo);
+            case 'multi-network':
+            case 'bep20':
+                return await splinterlands.ethereum.bep20Payment(currency.toUpperCase(), amount * 1000, memo);
+            case 'wax':
+                return await splinterlands.waxjs.waxPay(to, amount, memo);
         }
     }
 
@@ -921,7 +926,7 @@ var splinterlands = (function () {
                 (match.allowed_cards != 'gold_only' || o.gold) &&
                 (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
                 (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
-                (!o.delegated_to || o.delegated_to == _player.name) && 
+                (!o.delegated_to || o.delegated_to == _player.name) &&
                 (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true): true));
 
             // Add "starter" card
