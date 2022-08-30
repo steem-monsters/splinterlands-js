@@ -10,7 +10,7 @@ window.splinterlands.utils = (function() {
 	CHAOS_LEGION_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_chaos/';
 
 	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL, UNTAMED_CARD_URL, GLADIATOR_URL, CHAOS_LEGION_URL];
-	
+
 	BATTLE_CARD_URLS = [
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_alpha/',
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_beta/',
@@ -79,7 +79,7 @@ window.splinterlands.utils = (function() {
 
 		if(index < 0)
 			return null;
-		
+
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(url.substring(index)) || [, ""])[1].replace(/\+/g, '%20')) || null;
 	}
 
@@ -104,7 +104,7 @@ window.splinterlands.utils = (function() {
 				if(card.xp < splinterlands.get_settings().xp_levels[card.details.rarity - 1][i])
 					return i + 1;
 			}
-		
+
 			return splinterlands.get_settings().xp_levels[card.details.rarity - 1].length + 1;
 		}
 	}
@@ -161,7 +161,7 @@ window.splinterlands.utils = (function() {
 
 		if(JSON.stringify(data).length > 2000)
 			throw new Error('Max custom_json data length exceeded.');
-		
+
 		return data;
 	}
 
@@ -184,7 +184,7 @@ window.splinterlands.utils = (function() {
 
 		return newWindow;
 	}
-	
+
 	async function hive_engine_transfer(to, token, quantity, memo) {
 		var transaction_data = {
 			"contractName": "tokens",
@@ -199,7 +199,7 @@ window.splinterlands.utils = (function() {
 
 		if(window.steem_keychain) {
 			var result = await new Promise(resolve => steem_keychain.requestCustomJson(splinterlands.get_player().name, splinterlands.get_settings().ssc.hive_chain_id, 'Active', JSON.stringify(transaction_data), 'Transfer Token: ' + token, r => resolve(r)));
-			
+
 			if(!result.success)
 				return { success: false, error: result.error };
 
@@ -226,7 +226,7 @@ window.splinterlands.utils = (function() {
 
 		popup_center(url, title, 500, 560);
 	}
-	
+
 	// Checks whether or not a browser payment method is available for the specified token (i.e. Web3 for ETH or TronWeb for TRX)
 	async function browser_payment_available(token) {
 		return new Promise(async (resolve) =>  {
@@ -249,17 +249,19 @@ window.splinterlands.utils = (function() {
 				case 'GALA':
 				case 'ENJ':
 				case 'DAI':
+				case 'HT':
+				case 'PGU':
 					return resolve(!!window.web3);
 				default:
 					return resolve(false);
 			}
 		});
 	}
-  
+
   function get_edition_str(edition) {
     return ['Alpha', 'Beta', 'Promo', 'Reward', 'Untamed', 'Dice'][edition];
 	}
-	
+
 	function param(object) {
     var encodedString = '';
     for (var prop in object) {
@@ -319,9 +321,9 @@ window.splinterlands.utils = (function() {
 			return `https://d36mxiodymuqjm.cloudfront.net/website/stats/${stat}.png`;
 	}
 
-	function lookup_effect(effect) { 
+	function lookup_effect(effect) {
 		let obj = effects[effect];
-		
+
 		if(!obj) {
 			console.log('*** CANNOT FIND EFFECT: ' + effect);
 			return {};
@@ -381,7 +383,7 @@ window.splinterlands.utils = (function() {
 				callback();
 			};
 		}
-	
+
 		script.src = url;
 		document.getElementsByTagName("head")[0].appendChild( script );
 	}
@@ -390,10 +392,10 @@ window.splinterlands.utils = (function() {
 
 	function server_date(date_str, subtract_seconds) {
 		let date = new Date(new Date(date_str).getTime() + splinterlands.get_server_time_offset());
-	
+
 		if(subtract_seconds)
 			date = new Date(date.getTime() - subtract_seconds * 1000);
-	
+
 		return date;
 	}
 
@@ -804,10 +806,10 @@ window.splinterlands.utils = (function() {
 	];
 
 	function get_chest_type_from_chest_tier(chestTier) {
-		if (chestTier === 0) return 'bronze'; 
-		if (chestTier === 1) return 'silver'; 
-		if (chestTier === 2) return 'gold'; 
-		if (chestTier === 3) return 'diamond'; 
+		if (chestTier === 0) return 'bronze';
+		if (chestTier === 1) return 'silver';
+		if (chestTier === 2) return 'gold';
+		if (chestTier === 3) return 'diamond';
 		if (chestTier === 4) return 'champion';
 		return 'original';
 	}
@@ -825,7 +827,7 @@ window.splinterlands.utils = (function() {
 		let total_rshares = 0;
 		let next_chest = 0;
 		const reward_tiers = [];
-	
+
 		while (rshares >= Math.round(total_rshares)) {
 			chests++;
 			next_chest = reward_config.base * reward_config.step_multiplier ** chests;
@@ -838,7 +840,7 @@ window.splinterlands.utils = (function() {
 		const users_current_chests = chests;
 		const users_total_rshares = total_rshares;
 		const users_next_chest = next_chest;
-	
+
 		while (chests < (reward_config.max - 1)) {
 			chests++;
 			next_chest = reward_config.base * reward_config.step_multiplier ** chests;
@@ -848,11 +850,11 @@ window.splinterlands.utils = (function() {
 				total_reward_shares_required: Math.round(total_rshares),
 			});
 		}
-	
+
 		if (chests >= reward_config.max) {
 			const cappedRewardsTiers = reward_tiers.slice(0, reward_config.max);
 			const maxRewardShares = cappedRewardsTiers[cappedRewardsTiers.length -1].total_reward_shares_required;
-			return { 
+			return {
 				chests: reward_config.max,
 				progress: maxRewardShares,
 				total: maxRewardShares,
@@ -862,10 +864,10 @@ window.splinterlands.utils = (function() {
 				chest_type: get_chest_type_from_chest_tier(chest_tier),
 			};
 		}
-	
+
 		return {
-			chests: users_current_chests, 
-			progress: Math.round(users_next_chest) - (Math.round(users_total_rshares) - rshares), 
+			chests: users_current_chests,
+			progress: Math.round(users_next_chest) - (Math.round(users_total_rshares) - rshares),
 			total: Math.round(users_next_chest),
 			reward_tiers,
 			reward_shares: rshares,
@@ -874,13 +876,13 @@ window.splinterlands.utils = (function() {
 		};
 	}
 
-	return { 
-		randomStr, 
-		timeout, 
+	return {
+		randomStr,
+		timeout,
 		get_cur_block_num,
-		get_summoner_level, 
-		get_monster_level, 
-		get_ecr, 
+		get_summoner_level,
+		get_monster_level,
+		get_ecr,
 		get_token,
 		format_tx_id,
 		format_tx_data,

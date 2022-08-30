@@ -39,6 +39,14 @@ window.splinterlands.ethereum = (function () {
             precision: 18,
             address: '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56'
         },
+        HT: {
+            precision: 8,
+            address: '0x6f259637dcd74c767781e37bc6133cd6a68aa161'
+        },
+        PGU: {
+            precision: 18,
+            address: '0x98c36c0e953463BD5146C8783ce081CE1d187AcF'
+        },
     };
 
     // auto-populate a transfer in Ethereum web3 wallet

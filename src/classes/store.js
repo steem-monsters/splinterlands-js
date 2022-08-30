@@ -1,7 +1,7 @@
 splinterlands.Store = class {
 	static get payment_tokens() {
 		let currencies = [
-			{ name: "Dark Energy Crystals", symbol: "DEC" },
+			{ name: 'Dark Energy Crystals', symbol: 'DEC' },
 			{ name: 'HIVE', symbol: 'HIVE' },
 			{ name: 'STEEM', symbol: 'STEEM' },
 			{ name: 'Tron', symbol: 'TRX' },
@@ -13,11 +13,11 @@ splinterlands.Store = class {
 			{ name: 'EOS', symbol: 'EOS' },
 			{ name: 'WAX', symbol: 'WAX' },
 			{ name: 'Electroneum', symbol: 'ETN' },
-			{ name: "Binance USD", symbol: "BUSD" },
-			{ name: "Bitcoin Cash", symbol: "BCH"},
-			{ name: "Telos", symbol: "TLOS" },
-			{ name: "Splintershards", symbol: "SPS" },
-			{ name: "LeoFinance", symbol: "LEO" },
+			{ name: 'Binance USD', symbol: 'BUSD' },
+			{ name: 'Bitcoin Cash', symbol: 'BCH'},
+			{ name: 'Telos', symbol: 'TLOS' },
+			{ name: 'Splintershards', symbol: 'SPS' },
+			{ name: 'LeoFinance', symbol: 'LEO' },
 		];
 
 		if(splinterlands.ethereum.hasWeb3Obj()) {
@@ -27,8 +27,10 @@ splinterlands.Store = class {
 			currencies.push({ name: 'SAND', symbol: 'SAND' })
 			currencies.push({ name: 'GALA', symbol: 'GALA' })
 			currencies.push({ name: 'GAME', symbol: 'GAME' })
-			currencies.push({ name: "Dai Stablecoin", symbol: "DAI" })
-			currencies.push({ name: "Emp Money", symbol: "EMP" })
+			currencies.push({ name: 'Dai Stablecoin', symbol: 'DAI' })
+			currencies.push({ name: 'Emp Money', symbol: 'EMP' })
+			currencies.push({ name: 'Huobi Token', symbol: 'HT' })
+			currencies.push({ name: 'Polyient Games Unity', symbol: 'PGU' })
 		}
 
 		return currencies;
@@ -125,7 +127,9 @@ splinterlands.Store = class {
 			currencies.push({ name: "Dai Stablecoin", symbol: "DAI" })
 			currencies.push({ name: 'GAME', symbol: 'GAME' })
 			currencies.push({ name: "Emp Money", symbol: "EMP" })
-		}
+			currencies.push({ name: "Huobi Token", symbol: "HT" })
+            currencies.push({ name: 'Polyient Games Unity', symbol: 'PGU' })
+        }
 
 		return currencies;
 	}
