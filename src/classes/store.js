@@ -6,9 +6,11 @@ splinterlands.Store = class {
 			{ name: 'Tron', symbol: 'TRX' },
 			{ name: 'Hive Dollars', symbol: 'HBD' },
 			{ name: 'Steem Dollars', symbol: 'SBD' },
+			{ name: 'Steem', symbol: 'STEEM' },
 			{ name: 'Bitcoin', symbol: 'BTC' },
 			{ name: 'Ether', symbol: 'ETH' },
 			{ name: 'Litecoin', symbol: 'LTC' },
+			{ name: 'LeoFinance', symbol: 'LEO' },
 			{ name: 'EOS', symbol: 'EOS' },
 			{ name: 'WAX', symbol: 'WAXP' },
 			{ name: 'Electroneum', symbol: 'ETN' }
