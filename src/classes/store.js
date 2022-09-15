@@ -1,36 +1,36 @@
 splinterlands.Store = class {
 	static get payment_tokens() {
 		let currencies = [
-			{ name: 'Dark Energy Crystals', symbol: 'DEC' },
-			{ name: 'HIVE', symbol: 'HIVE' },
-			{ name: 'STEEM', symbol: 'STEEM' },
-			{ name: 'Tron', symbol: 'TRX' },
-			{ name: 'Hive Dollars', symbol: 'HBD' },
-			{ name: 'Steem Dollars', symbol: 'SBD' },
+			// { name: 'Dark Energy Crystals', symbol: 'DEC' },
+			{ name: 'Splintershards', symbol: 'SPS' },
+			{ name: 'Binance USD', symbol: 'BUSD' },
 			{ name: 'Bitcoin', symbol: 'BTC' },
 			{ name: 'Ether', symbol: 'ETH' },
+			{ name: 'HIVE', symbol: 'HIVE' },
+			{ name: 'Hive Dollars', symbol: 'HBD' },
+			{ name: 'LeoFinance', symbol: 'LEO' },
 			{ name: 'Litecoin', symbol: 'LTC' },
-			{ name: 'EOS', symbol: 'EOS' },
+			{ name: 'STEEM', symbol: 'STEEM' },
+			{ name: 'Steem Dollars', symbol: 'SBD' },
+			{ name: 'Tron', symbol: 'TRX' },
 			{ name: 'WAX', symbol: 'WAX' },
+			{ name: 'EOS', symbol: 'EOS' },
 			{ name: 'Electroneum', symbol: 'ETN' },
-			{ name: 'Binance USD', symbol: 'BUSD' },
 			{ name: 'Bitcoin Cash', symbol: 'BCH'},
 			{ name: 'Telos', symbol: 'TLOS' },
-			{ name: 'Splintershards', symbol: 'SPS' },
-			{ name: 'LeoFinance', symbol: 'LEO' },
 		];
 
 		if(splinterlands.ethereum.hasWeb3Obj()) {
 			currencies.push({ name: 'Basic Attention Token', symbol: 'BAT' })
-			currencies.push({ name: 'Enjin Coin', symbol: 'ENJ' })
-			currencies.push({ name: 'Uniswap', symbol: 'UNI' })
-			currencies.push({ name: 'SAND', symbol: 'SAND' })
-			currencies.push({ name: 'GALA', symbol: 'GALA' })
-			currencies.push({ name: 'GAME', symbol: 'GAME' })
 			currencies.push({ name: 'Dai Stablecoin', symbol: 'DAI' })
 			currencies.push({ name: 'Emp Money', symbol: 'EMP' })
+			currencies.push({ name: 'Enjin Coin', symbol: 'ENJ' })
+			currencies.push({ name: 'GALA', symbol: 'GALA' })
+			currencies.push({ name: 'GAME', symbol: 'GAME' })
 			currencies.push({ name: 'Huobi Token', symbol: 'HT' })
 			currencies.push({ name: 'Polyient Games Unity', symbol: 'PGU' })
+			currencies.push({ name: 'SAND', symbol: 'SAND' })
+			currencies.push({ name: 'Uniswap', symbol: 'UNI' })
 		}
 
 		return currencies;
