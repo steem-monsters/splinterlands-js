@@ -1,6 +1,7 @@
 splinterlands.Store = class {
 	static get payment_tokens() {
 		let currencies = [
+			{ name: "Dark Energy Crystals", symbol: "DEC" },
 			{ name: 'HIVE', symbol: 'HIVE' },
 			{ name: 'STEEM', symbol: 'STEEM' },
 			{ name: 'Tron', symbol: 'TRX' },
@@ -10,8 +11,13 @@ splinterlands.Store = class {
 			{ name: 'Ether', symbol: 'ETH' },
 			{ name: 'Litecoin', symbol: 'LTC' },
 			{ name: 'EOS', symbol: 'EOS' },
-			{ name: 'WAX', symbol: 'WAXP' },
-			{ name: 'Electroneum', symbol: 'ETN' }
+			{ name: 'WAX', symbol: 'WAX' },
+			{ name: 'Electroneum', symbol: 'ETN' },
+			{ name: "Binance USD", symbol: "BUSD" },
+			{ name: "Bitcoin Cash", symbol: "BCH"},
+			{ name: "Telos", symbol: "TLOS" },
+			{ name: "Splintershards", symbol: "SPS" },
+			{ name: "LeoFinance", symbol: "LEO" },
 		];
 
 		if(splinterlands.ethereum.hasWeb3Obj()) {
@@ -21,6 +27,8 @@ splinterlands.Store = class {
 			currencies.push({ name: 'SAND', symbol: 'SAND' })
 			currencies.push({ name: 'GALA', symbol: 'GALA' })
 			currencies.push({ name: 'GAME', symbol: 'GAME' })
+			currencies.push({ name: "Dai Stablecoin", symbol: "DAI" })
+			currencies.push({ name: "Emp Money", symbol: "EMP" })
 		}
 
 		return currencies;
@@ -114,7 +122,9 @@ splinterlands.Store = class {
 			currencies.push({ name: 'Uniswap', symbol: 'UNI' })
 			currencies.push({ name: 'SAND', symbol: 'SAND' })
 			currencies.push({ name: 'GALA', symbol: 'GALA' })
+			currencies.push({ name: "Dai Stablecoin", symbol: "DAI" })
 			currencies.push({ name: 'GAME', symbol: 'GAME' })
+			currencies.push({ name: "Emp Money", symbol: "EMP" })
 		}
 
 		return currencies;
@@ -127,7 +137,7 @@ splinterlands.Store = class {
 		if(!['HIVE', 'HBD', 'DEC'].includes(currency))
 			currency = 'HIVE';
 
-		if(orig_currency === 'WAXP')
+		if(orig_currency === 'WAX')
 			orig_currency = 'WAX';
 
 		console.log("orig_currency: ", orig_currency)
@@ -408,6 +418,35 @@ splinterlands.Store = class {
 		return splinterlands.send_tx_wrapper('claim_airdrop', 'Claim Airdrop', { name }, async tx => {
 			await splinterlands.load_collection();
 			return tx.result.map(c => new splinterlands.Card(c));
+		});
+	}
+
+	static async connectMobilePayToken(connector) {
+		if (!connector.connected) {
+			// create new session
+			connector.createSession();
+		}
+
+		// Subscribe to connection events
+		connector.on('connect', (error, _payload) => {
+			if (error) {
+				throw error;
+			}
+			console.log('Connected');
+		});
+
+		connector.on('session_update', (error, _payload) => {
+			if (error) {
+				throw error;
+			}
+			console.log('Session updated');
+		});
+
+		connector.on('disconnect', (error, _payload) => {
+			if (error) {
+				throw error;
+			}
+			console.log('Disconnected');
 		});
 	}
 }

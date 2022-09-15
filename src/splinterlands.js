@@ -720,7 +720,6 @@ var splinterlands = (function () {
 
     async function browser_payment(to, amount, currency, memo) {
         let token = splinterlands.utils.get_token(currency);
-
         switch (token.type) {
             case 'hive':
                 if (_use_keychain) {
@@ -749,10 +748,16 @@ var splinterlands = (function () {
                 return await window.tronWeb.trx.sendTransaction(to, tronWeb.toSun(parseFloat(amount).toFixed(6)));
             case 'eos':
                 return await splinterlands.eos.scatterPay(to, amount, memo);
+            case 'simpleswap':
             case 'eth':
                 return await splinterlands.ethereum.web3Pay(to, amount);
             case 'erc20':
                 return await splinterlands.ethereum.erc20Payment(currency.toUpperCase(), amount * 1000, memo);
+            case 'multi-network':
+            case 'bep20':
+                return await splinterlands.ethereum.bep20Payment(currency.toUpperCase(), amount * 1000, memo);
+            case 'wax':
+                return await splinterlands.waxjs.waxPay(to, amount, memo);
         }
     }
 

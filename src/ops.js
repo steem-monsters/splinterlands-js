@@ -117,18 +117,18 @@ window.splinterlands.ops = (function() {
 		if(!secret)
 			secret = splinterlands.utils.randomStr(10);
 
-		let data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`) };
+		let data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`), summoner, monsters, secret };
 
 		return splinterlands.send_tx_wrapper('submit_team', 'Submit Team', data, async tx => {
 			let cur_match = splinterlands.get_match();
 
 			if(cur_match && cur_match.id == match.id) {
-				// If the opponent already submitted their team, then we can reveal ours
-				if(cur_match.opponent_team_hash)
-					return await splinterlands.ops.team_reveal(cur_match.id, summoner, monsters, secret);
+				// // If the opponent already submitted their team, then we can reveal ours
+				// if(cur_match.opponent_team_hash)
+				// 	return await splinterlands.ops.team_reveal(cur_match.id, summoner, monsters, secret);
 
-				// If the opponent has not submitted their team, then queue up the team reveal operation for when they do
-				cur_match.on_opponent_submit = async () => await splinterlands.ops.team_reveal(cur_match.id, summoner, monsters, secret);
+				// // If the opponent has not submitted their team, then queue up the team reveal operation for when they do
+				// cur_match.on_opponent_submit = async () => await splinterlands.ops.team_reveal(cur_match.id, summoner, monsters, secret);
 
 				// Save the team info locally in case the browser is refreshed or something and it needs to be resubmitted later
 				localStorage.setItem(`splinterlands:${cur_match.id}`, JSON.stringify({ summoner, monsters, secret }));
