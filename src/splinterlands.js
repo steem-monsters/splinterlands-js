@@ -701,17 +701,21 @@ var splinterlands = (function () {
                 if (!signed_tx)
                     return;
 
-                let op_name = tx.operations[0][1].id.replace(splinterlands.get_settings().test_mode ? `${splinterlands.get_settings().prefix}sm_` : 'sm_', '');
+                let op_name = remove_tx_prefix(tx.operations[0][1].id);
 
                 if (splinterlands.get_settings().api_ops.includes(op_name)) {
-                    battle_api_post(`/battle/battle_tx`, {signed_tx: JSON.stringify(signed_tx)}).then(resolve).catch(reject);
+                    fetch(`${Config.battle_api_url || Config.api_url}/battle/battle_tx`, {
+                        method: 'POST',
+                        body: {signed_tx: JSON.stringify(signed_tx)}
+                    }).then(resolve).catch((error) => reject(error))
                     return;
                 }
 
-                // TODO: Get broadcast API stuff working
-                //let bcast_url = Config.tx_broadcast_urls[Math.floor(Math.random() * Config.tx_broadcast_urls.length)];
-                //api_post(`${bcast_url}/send`, { signed_tx: JSON.stringify(signed_tx) }, resolve).fail(reject);
-                resolve({error: `Unsupported server broadcast operation.`});
+                let bcast_url = _tx_broadcast_urls[Math.floor(Math.random() * _tx_broadcast_urls.length)];
+                fetch(`${bcast_url}/send`, {
+                    method: 'POST',
+                    body: {signed_tx: JSON.stringify(signed_tx)}
+                }).then(resolve).catch((err) => reject(err))
             } catch (err) {
                 reject(err);
             }
@@ -720,7 +724,6 @@ var splinterlands = (function () {
 
     async function browser_payment(to, amount, currency, memo) {
         let token = splinterlands.utils.get_token(currency);
-
         switch (token.type) {
             case 'hive':
                 if (_use_keychain) {
@@ -749,10 +752,16 @@ var splinterlands = (function () {
                 return await window.tronWeb.trx.sendTransaction(to, tronWeb.toSun(parseFloat(amount).toFixed(6)));
             case 'eos':
                 return await splinterlands.eos.scatterPay(to, amount, memo);
+            case 'simpleswap':
             case 'eth':
                 return await splinterlands.ethereum.web3Pay(to, amount);
             case 'erc20':
                 return await splinterlands.ethereum.erc20Payment(currency.toUpperCase(), amount * 1000, memo);
+            case 'multi-network':
+            case 'bep20':
+                return await splinterlands.ethereum.bep20Payment(currency.toUpperCase(), amount * 1000, memo);
+            case 'wax':
+                return await splinterlands.waxjs.waxPay(to, amount, memo);
         }
     }
 
@@ -1304,7 +1313,7 @@ var splinterlands = (function () {
             id = _settings.prefix + id;
 
         // Check if we need to use active authority for this operation
-        let active_auth = splinterlands.Player.require_active_auth && _settings.active_auth_ops.includes(id.slice(id.indexOf('sm_') + 3));
+        let active_auth = !!(splinterlands.Player.require_active_auth && _settings.active_auth_ops.includes(id.slice(id.indexOf('sm_') + 3)));
 
 
         // Add app name and nonce to prevent duplicate transaction errors
@@ -1319,8 +1328,8 @@ var splinterlands = (function () {
 
         let tx = {
             operations: [['custom_json', {
-                required_auths: active_auth ? [splinterlands.Player.name] : [],
-                required_posting_auths: active_auth ? [] : [splinterlands.Player.name],
+                required_auths: active_auth ? [splinterlands.get_player().name] : [],
+                required_posting_auths: active_auth ? [] : [splinterlands.get_player().name],
                 id,
                 json: JSON.stringify(data)
             }]]
@@ -1329,36 +1338,23 @@ var splinterlands = (function () {
         let op_name = remove_tx_prefix(id);
         let is_api_tx = _settings.api_ops.includes(op_name);
         // Check if the player does not yet have a Hive account and should send transactions by proxy
-        if (splinterlands.Player.use_proxy) {
+        if (splinterlands.get_player().use_proxy && !is_api_tx) {
             // Check if this is an operation to be broadcast by API or to the blockchain
-            if (is_api_tx) {
-                fetch(`${Config.battle_api_url || Config.api_url}/battle/battle_tx`, {
+                fetch(`${bcast_url}/proxy`, {
                     method: 'POST',
-                    body: {signed_tx: JSON.stringify(tx)}
+                    body: {
+                        player: splinterlands.get_player().name,
+                        access_token: splinterlands.get_player().token,
+                        id,
+                        json: data
+                    }
                 }).then(response => {
                     if (response && response.id)
-                        trx_lookup(response.id, true, null, callback, 10, supressErrors);
+                        trx_lookup(response.id, false, null, callback, 10, supressErrors);
                     else
                         return `Error sending transaction: ${response ? response.error : 'Unknown error'}`;
                 }).catch((err) => `Error sending transaction: ${err && err.message ? err.message : err}`);
                 return;
-            }
-
-            fetch(`${bcast_url}/proxy`, {
-                method: 'POST',
-                body: {
-                    player: splinterlands.Player.name,
-                    access_token: splinterlands.Player.token,
-                    id,
-                    json: data
-                }
-            }).then(response => {
-                if (response && response.id)
-                    trx_lookup(response.id, false, null, callback, 10, supressErrors);
-                else
-                    return `Error sending transaction: ${response ? response.error : 'Unknown error'}`;
-            });
-            return;
         }
 
         if (!active_auth || (active_auth && window.hive_keychain)) {
@@ -1393,9 +1389,9 @@ var splinterlands = (function () {
             id = _settings.prefix + id;
 
         // Check if we need to use active authority for this operation
-        let active_auth = splinterlands.Player.require_active_auth && _settings.active_auth_ops.includes(id.slice(id.indexOf('sm_') + 3));
+        let active_auth = !!(splinterlands.get_player().require_active_auth && _settings.active_auth_ops.includes(id.slice(id.indexOf('sm_') + 3)));
 
-        data.app = 'splinterlands/' + splinterlands.utils.get_version();
+        data.app = 'splinterlands/' + _settings.version;
 
         if (_settings.test_mode)
             data.app = _settings.prefix + data.app;
@@ -1406,12 +1402,12 @@ var splinterlands = (function () {
         let bcast_url = _tx_broadcast_urls[Math.floor(Math.random() * _tx_broadcast_urls.length)];
 
         // Check if the player does not yet have a Hive account and should send transactions by proxy
-        if (splinterlands.Player.use_proxy) {
+        if (splinterlands.get_player().use_proxy) {
             fetch(`${bcast_url}/proxy`, {
                 method: 'POST',
                 body: {
-                    player: splinterlands.Player.name,
-                    access_token: splinterlands.Player.token,
+                    player: splinterlands.get_player().name,
+                    access_token: splinterlands.get_player().token,
                     id,
                     json: data
                 }
@@ -1427,7 +1423,7 @@ var splinterlands = (function () {
         if (_use_keychain || (active_auth && window.hive_keychain)) {
             let rpc_node = rpc_nodes[_rpc_index % rpc_nodes.length];
 
-            window.hive_keychain.requestCustomJson(splinterlands.Player.name, id, active_auth ? 'Active' : 'Posting', JSON.stringify(data), title, function (response) {
+            window.hive_keychain.requestCustomJson(splinterlands.get_player().name, id, active_auth ? 'Active' : 'Posting', JSON.stringify(data), title, function (response) {
                 if (response.success) {
                     trx_lookup(response.result.id, false, null, callback, 10, supressErrors);
                 } else {
@@ -1460,7 +1456,7 @@ var splinterlands = (function () {
             }
 
             // Otherwise, broadcast the transaction using the stored posting key
-            steem.broadcast.customJson(localStorage.getItem('splinterlands:key'), [], [splinterlands.Player.name], id, JSON.stringify(data), function (err, result) {
+            steem.broadcast.customJson(localStorage.getItem('splinterlands:key'), [], [splinterlands.get_player().name], id, JSON.stringify(data), function (err, result) {
                 if (result && !err) {
                     trx_lookup(result.id, false, null, callback, 10, supressErrors);
                 } else {
