@@ -373,7 +373,7 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx_wrapper('purchase', 'Purchase', { type, qty, currency, bonus: bonus_packs, data }, tx => tx);
 	}
 
-	async function withdraw_dec(qty, wallet) {		
+	async function withdraw_dec(qty, wallet) {
 		let accounts = {
 			tron: 'sm-dec-tron',
 			ethereum: 'sl-eth',
@@ -512,6 +512,18 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx_wrapper('update_authority', 'Update Authority', { require_active_auth: is_active }, async tx => tx);
 	}
 
+	async function claim_riftwatchers_airdrop(name) {
+		return splinterlands.send_tx_wrapper(
+			'claim_airdrop',
+			'Claim Airdrop',
+			{name},
+			async tx => {
+				await splinterlands.load_collection();
+				return tx;
+			}
+		)
+	}
+
 
 	return {
 		combine_cards,
@@ -557,6 +569,7 @@ window.splinterlands.ops = (function() {
 		guild_contribution,
 		guild_building_contribution,
 		league_advance,
-		set_active_authority
+		set_active_authority,
+		claim_riftwatchers_airdrop
 	};
 })();
