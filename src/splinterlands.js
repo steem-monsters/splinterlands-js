@@ -1316,6 +1316,26 @@ var splinterlands = (function () {
 		return splinterlands.get_settings().battles.modern.editions.includes(edition) || splinterlands.get_settings().battles.modern.tiers.includes(tier);
 	}
 
+    function get_onfido(token, id) {
+        const onfido = Onfido.init({
+            useModal: true,
+            isModalOpen: true,
+            useMemoryHistory: true,
+            onModalRequestClose: function () {
+                onfido.setOptions({isModalOpen: false});
+            },
+            token,
+            onComplete: async function (data) {
+                // callback for when everything is complete
+                const check_result = await splinterlands.ec_api('/onfido/start_check', {
+                    applicant_id: id,
+                });
+            },
+            steps: ['document', 'face', 'complete'],
+        });
+        return onfido;
+    }
+
     return {
         init,
         api,
@@ -1377,7 +1397,8 @@ var splinterlands = (function () {
         get_leagues_settings,
         battle_history_by_mode,
         get_leaderboard_by_mode,
-        is_modern_card
+        is_modern_card,
+        get_onfido,
     };
 })();
 
