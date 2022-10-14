@@ -452,8 +452,8 @@ var splinterlands = (function () {
         return _player;
     }
 
-    async function reset_password(email) {
-        return await api('/players/forgot_password', {email});
+    async function reset_password(email, captcha_token) {
+        return await api('/players/forgot_password', {email, captcha_token});
     }
 
     function logout() {
