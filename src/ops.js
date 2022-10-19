@@ -373,6 +373,16 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx_wrapper('purchase', 'Purchase', { type, qty, currency, bonus: bonus_packs, data }, tx => tx);
 	}
 
+	async function fetch_transfer_out_fees(wallet, qty) {
+		try	{
+		const response = await fetch(`https://ec-api.splinterlands.com/bridge/estimateGas?token=dec&network=${wallet}&amount=${qty}`);
+		const gas_data = await response.json();
+		return gas_data;
+		} catch (error) {
+			return error;
+		}
+	}
+
 	async function withdraw_dec(qty, wallet) {
 		let accounts = {
 			tron: 'sm-dec-tron',
@@ -394,11 +404,7 @@ window.splinterlands.ops = (function() {
 			player_wallet = { address: splinterlands.get_player().name };
 		}
 
-		if(wallet != 'hive_engine') {
-			return { error: `We are very sorry but ${wallet.toUpperCase()} withdrawals are currently unavailable on the Splinterlands mobile app. Please goto to https://splinterlands.com to withdraw your currency.`};
-		}
-
-		return splinterlands.send_tx_wrapper('token_transfer', 'Withdraw DEC', { type: 'withdraw', to: accounts[wallet] || 'sl-hive', qty, token: 'DEC', memo: player_wallet.address }, tx => tx);
+		return splinterlands.send_tx_wrapper('token_transfer', 'Withdraw DEC', { type: 'withdraw', to: accounts[wallet] || wallet, qty, token: 'DEC', memo: player_wallet.address }, tx => tx);
 	}
 
 	async function guild_join(guild_id) {
@@ -570,6 +576,7 @@ window.splinterlands.ops = (function() {
 		guild_building_contribution,
 		league_advance,
 		set_active_authority,
-		claim_riftwatchers_airdrop
+		claim_riftwatchers_airdrop,
+		fetch_transfer_out_fees
 	};
 })();
