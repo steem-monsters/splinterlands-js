@@ -761,12 +761,16 @@ var splinterlands = (function () {
     async function external_deposit(wallet_type, to, amount, currency, memo) {
 		switch (wallet_type) {
             case 'hive_engine':
-                var result = await splinterlands.utils.hive_engine_transfer(to, currency, amount, memo);
+                const result = await splinterlands.utils.hive_engine_transfer(to, currency, amount, memo);
                 return !result.success ? {success: false, error: result.error} : result;
             case 'tron':
-                return { error: "We are very sorry but TRON deposits are currently unavailable on the Splinterlands mobile app. Please goto to https://splinterlands.com to despoit your currency."}
+                const token = splinterlands.get_settings().supported_currencies.find(c => c.currency === 'DEC-TRON');
+                return await splinterlands.tron.sendToken(to, amount, token.token_id)
             case 'bsc':
-                return { error: "We are very sorry but BSC deposits are currently unavailable on the Splinterlands mobile app. Please goto to https://splinterlands.com to despoit your currency."}
+            case 'ethereum':
+                const response = await splinterlands.eth_bsc_deposit(amount, currency, to, wallet_type, memo)
+                return response;
+            // return { error: "We are very sorry but BSC deposits are currently unavailable on the Splinterlands mobile app. Please goto to https://splinterlands.com to despoit your currency."}
         }
     }
 
@@ -908,7 +912,7 @@ var splinterlands = (function () {
     }
 
     function get_battle_summoners(match) {
-		const IS_MODERN = match.format === 'modern';
+        const IS_MODERN = match.format === 'modern';
         return group_collection(_collection, true).filter(d => d.type == 'Summoner' && d.owned.length > 0).map(d => {
             // Check if the splinter is inactive for this battle
             if (match.inactive.includes(d.color))
@@ -927,7 +931,7 @@ var splinterlands = (function () {
                 (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
                 (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
                 (!o.delegated_to || o.delegated_to == _player.name) &&
-                (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true): true));
+                (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true) : true));
 
             // Add "starter" card
             if (!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
@@ -973,7 +977,7 @@ var splinterlands = (function () {
                     (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
                     (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
                     (!o.delegated_to || o.delegated_to == _player.name) &&
-                    (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true): true));
+                    (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true) : true));
 
                 // Add "starter" card
                 if (!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
@@ -1250,7 +1254,12 @@ var splinterlands = (function () {
     }
 
     async function get_leaderboard_by_mode(season, leaderboard_id, format, page) {
-        let leaderboard = await api('/players/leaderboard_with_player', {season, leaderboard: leaderboard_id, format, page});
+        let leaderboard = await api('/players/leaderboard_with_player', {
+            season,
+            leaderboard: leaderboard_id,
+            format,
+            page
+        });
 
         if (leaderboard.leaderboard)
             leaderboard.leaderboard = leaderboard.leaderboard.map(p => new splinterlands.Player(p));
@@ -1302,19 +1311,19 @@ var splinterlands = (function () {
     }
 
     function get_leagues_settings(league_format) {
-        if(splinterlands.get_settings().leagues.wild && splinterlands.get_settings().leagues.modern) {
+        if (splinterlands.get_settings().leagues.wild && splinterlands.get_settings().leagues.modern) {
             return (league_format) ? splinterlands.get_settings().leagues[league_format] : splinterlands.get_settings().leagues.wild;
         } else {
             return splinterlands.get_settings().leagues;
         }
     }
 
-	function is_modern_card(edition, tier, exclude_gladiators) {
-		if(edition === 6 && exclude_gladiators) {
-			return false;
-		}
-		return splinterlands.get_settings().battles.modern.editions.includes(edition) || splinterlands.get_settings().battles.modern.tiers.includes(tier);
-	}
+    function is_modern_card(edition, tier, exclude_gladiators) {
+        if (edition === 6 && exclude_gladiators) {
+            return false;
+        }
+        return splinterlands.get_settings().battles.modern.editions.includes(edition) || splinterlands.get_settings().battles.modern.tiers.includes(tier);
+    }
 
     function get_onfido(token, id) {
         const onfido = Onfido.init({
@@ -1334,6 +1343,98 @@ var splinterlands = (function () {
             steps: ['document', 'face', 'complete'],
         });
         return onfido;
+    }
+
+    async function eth_bsc_deposit(amount, token, to, chain, memo) {
+        let address = memo;
+
+        if (!address) {
+            address = await web3connect();
+        }
+
+        if (!address) {
+            return;
+        }
+
+        token = token.toUpperCase();
+        chain = chain.toUpperCase();
+
+        const bridge_contracts = {
+            BSC_SPS: '0xE434F06f44700a41FA4747bE53163148750a6478',
+            BSC_DEC: '0x14Ae856ab69F157F8aC05B8a1482D9C31478fb47',
+            ETHEREUM_SPS: '0xE434F06f44700a41FA4747bE53163148750a6478',
+            ETHEREUM_DEC: '0x14Ae856ab69F157F8aC05B8a1482D9C31478fb47'
+        };
+
+        const token_contracts = {
+            BSC_SPS: '0x1633b7157e7638c4d6593436111bf125ee74703f',
+            BSC_DEC: '0xE9D7023f2132D55cbd4Ee1f78273CB7a3e74F10A',
+            ETHEREUM_SPS: '0x00813e3421e1367353bfe7615c7f7f133c89df74',
+            ETHEREUM_DEC: '0x9393fdc77090f31c7db989390d43f454b1a6e7f3'
+        };
+
+        let bridge_contract = bridge_contracts[`${chain}_${token}`];
+
+        if (!bridge_contract) {
+            return alert('Unsupported token and/or chain specified.');
+        }
+
+        const data = await fetch('https://d36mxiodymuqjm.cloudfront.net/misc/abis/Terablock-Bridge.json');
+        let abi = await data.json();
+        if (!Array.isArray(abi)) abi = abi.abi;
+
+        let contract = new window.web3.eth.Contract(abi, bridge_contract);
+
+        const d = window.web3.utils.toBN(15);
+        const m = window.web3.utils.toBN(10);
+        const amt = window.web3.utils.toBN(amount * 1000);
+        const rawAmt = token === 'DEC' ? amt : amt.mul(m.pow(d));
+
+        let confirm_sent = false;
+
+        await contract.methods.lockTokens(rawAmt.toString(), to).send({from: address})
+            .on('transactionHash', hash => {
+                    return ({
+                        type: 'transaction',
+                        status: 'broadcast',
+                        data: {hash}
+                    })
+                }
+            )
+            .on('confirmation', (confirmationNumber, receipt) => {
+                if (!confirm_sent) {
+                    confirm_sent = true;
+                    console.log({
+                        type: 'transaction',
+                        status: 'confirmed',
+                        data: {confirmationNumber, receipt}
+                    });
+                }
+
+                return receipt;
+            })
+            .on('error', (error, receipt) => {
+                return ({type: 'transaction', status: 'error', data: {error}});
+            });
+    }
+
+    async function web3connect() {
+        if (!window.WalletConnectProvider || !window.ethereum)
+            return null;
+
+        try {
+            let accounts = await window.ethereum.request({method: 'eth_accounts'});
+            if (accounts && Array.isArray(accounts) && accounts.length > 0)
+                return accounts[0];
+        } catch (err) {
+        }
+
+        try {
+            const addresses = await window.ethereum.enable();
+            return addresses ? addresses[0] : null;
+        } catch (err) {
+            return null;
+        }
     }
 
     return {
@@ -1399,6 +1500,7 @@ var splinterlands = (function () {
         get_leaderboard_by_mode,
         is_modern_card,
         get_onfido,
+        eth_bsc_deposit
     };
 })();
 
