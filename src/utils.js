@@ -8,8 +8,9 @@ window.splinterlands.utils = (function() {
 	SUMMONER_CARD_URL_MOBILE = 'https://d36mxiodymuqjm.cloudfront.net/cards_battle_mobile/Summoners/';
 	GLADIATOR_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_gladiator/';
 	CHAOS_LEGION_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_chaos/';
+	RIFT_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_riftwatchers/';
 
-	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL, UNTAMED_CARD_URL, GLADIATOR_URL, CHAOS_LEGION_URL];
+	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL, UNTAMED_CARD_URL, GLADIATOR_URL, CHAOS_LEGION_URL, RIFT_URL];
 	
 	BATTLE_CARD_URLS = [
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_alpha/',

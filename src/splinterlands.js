@@ -455,8 +455,8 @@ var splinterlands = (function () {
         return _player;
     }
 
-    async function reset_password(email) {
-        return await api('/players/forgot_password', {email});
+    async function reset_password(email, captcha_token) {
+        return await api('/players/forgot_password', {email, captcha_token});
     }
 
     function logout() {
@@ -1306,260 +1306,32 @@ var splinterlands = (function () {
         }
     }
 
-    async function broadcast_custom_json(id, title, data, callback, retries, supressErrors) {
-        Config = splinterlands.get_config();
-
-        if (_settings.test_mode && !id.startsWith(_settings.prefix))
-            id = _settings.prefix + id;
-
-        // Check if we need to use active authority for this operation
-        let active_auth = !!(splinterlands.Player.require_active_auth && _settings.active_auth_ops.includes(id.slice(id.indexOf('sm_') + 3)));
-
-
-        // Add app name and nonce to prevent duplicate transaction errors
-        data.app = 'splinterlands/' + _settings.version;
-        data.n = generate_password(10);
-
-        if (_settings.test_mode)
-            data.app = _settings.prefix + data.app;
-
-        // Pick a random broadcast URL from the list
-        let bcast_url = Config.tx_broadcast_url[Math.floor(Math.random() * Config.tx_broadcast_url.length)];
-
-        let tx = {
-            operations: [['custom_json', {
-                required_auths: active_auth ? [splinterlands.get_player().name] : [],
-                required_posting_auths: active_auth ? [] : [splinterlands.get_player().name],
-                id,
-                json: JSON.stringify(data)
-            }]]
-        };
-
-        let op_name = remove_tx_prefix(id);
-        let is_api_tx = _settings.api_ops.includes(op_name);
-        // Check if the player does not yet have a Hive account and should send transactions by proxy
-        if (splinterlands.get_player().use_proxy && !is_api_tx) {
-            // Check if this is an operation to be broadcast by API or to the blockchain
-                fetch(`${bcast_url}/proxy`, {
-                    method: 'POST',
-                    body: {
-                        player: splinterlands.get_player().name,
-                        access_token: splinterlands.get_player().token,
-                        id,
-                        json: data
-                    }
-                }).then(response => {
-                    if (response && response.id)
-                        trx_lookup(response.id, false, null, callback, 10, supressErrors);
-                    else
-                        return `Error sending transaction: ${response ? response.error : 'Unknown error'}`;
-                }).catch((err) => `Error sending transaction: ${err && err.message ? err.message : err}`);
-                return;
-        }
-
-        if (!active_auth || (active_auth && window.hive_keychain)) {
-
-            try {
-                let response = await server_broadcast_tx(tx, active_auth);
-
-                if (response && response.id)
-                    return trx_lookup(response.id, is_api_tx, null, callback, 10, supressErrors);
-
-                if (response.error === 'user_cancel')
-                    return 'Transaction was cancelled.';
-                else if (response.error && JSON.stringify(response.error).indexOf('Please wait to transact') >= 0) {
-                    await request_delegation(id, title, data, callback);
-                } else {
-                    // Retry using local broadcasting options
-                    setTimeout(() => broadcast_custom_json_local(id, title, data, callback, 2, supressErrors), 3000);
-                }
-            } catch (err) {
-                console.log(err);
-                broadcast_custom_json_local(id, title, data, callback, 2, supressErrors)
-            }
-        } else {
-            // Use Steem Connect if active key is required and Steem Keychain is not available
-            let callback_id = `cb_${generate_password(10)}`;
-            _active_auth_tx_callbacks[callback_id] = callback;
-        }
-    }
-
-    function broadcast_custom_json_local(id, title, data, callback, retries, supressErrors) {
-        if (_settings.test_mode && !id.startsWith(_settings.prefix))
-            id = _settings.prefix + id;
-
-        // Check if we need to use active authority for this operation
-        let active_auth = !!(splinterlands.get_player().require_active_auth && _settings.active_auth_ops.includes(id.slice(id.indexOf('sm_') + 3)));
-
-        data.app = 'splinterlands/' + _settings.version;
-
-        if (_settings.test_mode)
-            data.app = _settings.prefix + data.app;
-
-        if (isNaN(retries))
-            retries = 2;
-
-        let bcast_url = _tx_broadcast_urls[Math.floor(Math.random() * _tx_broadcast_urls.length)];
-
-        // Check if the player does not yet have a Hive account and should send transactions by proxy
-        if (splinterlands.get_player().use_proxy) {
-            fetch(`${bcast_url}/proxy`, {
-                method: 'POST',
-                body: {
-                    player: splinterlands.get_player().name,
-                    access_token: splinterlands.get_player().token,
-                    id,
-                    json: data
-                }
-            }).then(response => {
-                if (response && response.id)
-                    trx_lookup(response.id, false, null, callback, 10, supressErrors);
-                else
-                    return `Error sending transaction: ${response ? response.error : 'Unknown error'}`;
-            });
-            return;
-        }
-
-        if (_use_keychain || (active_auth && window.hive_keychain)) {
-            let rpc_node = rpc_nodes[_rpc_index % rpc_nodes.length];
-
-            window.hive_keychain.requestCustomJson(splinterlands.get_player().name, id, active_auth ? 'Active' : 'Posting', JSON.stringify(data), title, function (response) {
-                if (response.success) {
-                    trx_lookup(response.result.id, false, null, callback, 10, supressErrors);
-                } else {
-                    if (response.error == 'user_cancel')
-                        return 'Transaction was cancelled.';
-                    else if (response.error && JSON.stringify(response.error).indexOf('Please wait to transact') >= 0) {
-                        request_delegation(id, title, data, callback, retries).then();
-                        return;
-                    } else if (response.error != 'ignored' && retries > 0) {
-                        rpc_node = rpc_nodes[++_rpc_index % rpc_nodes.length];
-                        steem.api.setOptions({transport: 'http', uri: rpc_node, url: rpc_node, useAppbaseApi: true});
-                        console.log(`SWITCHED TO NEW RPC NODE: ${rpc_node}`);
-                        console.log('Retrying failed keychain transaction...');
-
-                        // Retry after 3 seconds
-                        setTimeout(() => broadcast_custom_json_local(id, title, data, callback, retries - 1, supressErrors), 3000);
-                        return;
-                    } else if (!supressErrors) {
-                        return `There was an error publishing this transaction to the Hive blockchain. Please check to see if it went through or try again in a few minutes. Error: ${response && response.error ? response.error : 'Unknown'}`;
-                    }
-                    if (callback) callback(response);
-                }
-            }, rpc_node);
-        } else {
-            // Use Steem Connect if active key is required and Steem Keychain is not available
-            if (active_auth) {
-                let callback_id = `cb_${generate_password(10)}`;
-                _active_auth_tx_callbacks[callback_id] = callback;
-                return;
-            }
-
-            // Otherwise, broadcast the transaction using the stored posting key
-            steem.broadcast.customJson(localStorage.getItem('splinterlands:key'), [], [splinterlands.get_player().name], id, JSON.stringify(data), function (err, result) {
-                if (result && !err) {
-                    trx_lookup(result.id, false, null, callback, 10, supressErrors);
-                } else {
-                    // Show error message
-                    if (err && JSON.stringify(err).indexOf('Please wait to transact') >= 0) {
-                        request_delegation(id, title, data, callback, retries).then();
-                        return;
-                    } else if (retries > 0) {
-                        // Try the next RPC node
-                        let rpc_node = rpc_nodes[++_rpc_index % rpc_nodes.length];
-                        steem.api.setOptions({transport: 'http', uri: rpc_node, url: rpc_node, useAppbaseApi: true});
-                        console.log(`SWITCHED TO NEW RPC NODE: ${rpc_node}`);
-
-                        // Retry after 3 seconds
-                        setTimeout(() => broadcast_custom_json_local(id, title, data, callback, retries - 1, supressErrors), 3000);
-                        return;
-                    } else if (!supressErrors) {
-                        return 'There was an error publishing this transaction to the Hive blockchain. Please try again in a few minutes. Error: ' + err;
-                    }
-
-                    if (callback) callback(result);
-                }
-            });
-        }
-    }
-
-
-    async function request_delegation(id, title, data, callback) {
-        await splinterlands.api('/players/delegation', null, function (result) {
-            if (result.success) {
-                setTimeout(() => broadcast_custom_json(id, title, data, callback), 1000);
-            } else {
-                if (result.error === undefined || result.error === null)
-                    return "Oops, it looks like you don't have enough Resource Credits to transact on the Hive blockchain.  We should be delegating more resources to your account now.  Please try this transaction again, and contact Support if this persists.";
-                else
-                    return "Oops, it looks like you don't have enough Resource Credits to transact on the Hive blockchain. Please contact Support for more information, if you have questions about this error! Error: " + result.error;
-
-                if (callback)
-                    callback(result);
-            }
-        });
-    }
-
-
-    function generate_password(length, rng) {
-        if (!rng)
-            rng = Math.random;
-
-        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        let retVal = "";
-        for (let i = 0, n = charset.length; i < length; ++i) {
-            retVal += charset.charAt(Math.floor(rng() * n));
-        }
-        return retVal;
-    }
-
-    function remove_tx_prefix(tx_name) {
-        return tx_name.replace(_settings.test_mode ? `${_settings.prefix}sm_` : 'sm_', '');
-    }
-
-    function trx_lookup(trx_id, is_api_tx, details, callback, retries, suppressError, timeout) {
-        // If this transaction is already in the list for some reason, ignore it.
-        if (_transactions[trx_id]) {
-            if (_transactions[trx_id].status == 'complete') {
-                if (callback)
-                    callback(_transactions[trx_id].data);
-
-                delete _transactions[trx_id];
-            }
-
-            return;
-        }
-
-        if (timeout == null || timeout == undefined)
-            timeout = 60;
-
-        _transactions[trx_id] = {details: details, callback: callback, suppressError: suppressError};
-
-        // If the current transaction is still outstanding after 30 seconds, then the node is likely behind on blocks :-(
-        if (timeout > 0) {
-            _transactions[trx_id].timeout = setTimeout(() => {
-                if (_transactions[trx_id] && _transactions[trx_id].status != 'complete') {
-                    if (!is_api_tx) {
-                        return 'It appears that there has been a delay in processing this transaction from the blockchain. Please be patient and do not submit the transaction again or it will be processed twice. For pack openings, you will receive a notification in-game when your packs are ready.';
-                    }
-
-                    // Remove the transaction from the list
-                    delete _transactions[trx_id];
-
-                    if (callback && !is_api_tx)
-                        callback(null);
-                }
-
-            }, timeout * 1000);
-        }
-    }
-
 	function is_modern_card(edition, tier, exclude_gladiators) {
 		if(edition === 6 && exclude_gladiators) {
 			return false;
 		}
 		return splinterlands.get_settings().battles.modern.editions.includes(edition) || splinterlands.get_settings().battles.modern.tiers.includes(tier);
 	}
+
+    function get_onfido(token, id) {
+        const onfido = Onfido.init({
+            useModal: true,
+            isModalOpen: true,
+            useMemoryHistory: true,
+            onModalRequestClose: function () {
+                onfido.setOptions({isModalOpen: false});
+            },
+            token,
+            onComplete: async function (data) {
+                // callback for when everything is complete
+                const check_result = await splinterlands.ec_api('/onfido/start_check', {
+                    applicant_id: id,
+                });
+            },
+            steps: ['document', 'face', 'complete'],
+        });
+        return onfido;
+    }
 
     return {
         init,
@@ -1620,10 +1392,10 @@ var splinterlands = (function () {
         additional_season_rshares_count: () => _additional_season_rshares_count,
         set_additional_season_rshares_count,
         get_leagues_settings,
-        broadcast_custom_json,
         battle_history_by_mode,
         get_leaderboard_by_mode,
         is_modern_card,
+        get_onfido,
     };
 })();
 
