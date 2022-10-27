@@ -507,8 +507,8 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx_wrapper('guild_contribution', 'Guild Contribution', { guild_id, building, amount }, tx => tx);
 	}
 
-	async function league_advance() {
-		return splinterlands.send_tx_wrapper('advance_league', 'Advance League', { notify: true }, async tx => {
+	async function league_advance(mode) {
+		return splinterlands.send_tx_wrapper('advance_league', `Advance ${mode} League`, { notify: true }, async tx => {
 			await splinterlands.get_player().refresh();
 			return tx;
 		});
