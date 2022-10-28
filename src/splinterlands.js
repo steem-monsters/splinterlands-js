@@ -915,7 +915,7 @@ var splinterlands = (function () {
     }
 
     function get_battle_summoners(match) {
-		const IS_MODERN = match.format === 'modern';
+        const IS_MODERN = match.format === 'modern';
         return group_collection(_collection, true).filter(d => d.type == 'Summoner' && d.owned.length > 0).map(d => {
             // Check if the splinter is inactive for this battle
             if (match.inactive.includes(d.color))
@@ -934,7 +934,7 @@ var splinterlands = (function () {
                 (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
                 (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
                 (!o.delegated_to || o.delegated_to == _player.name) &&
-                (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true): true));
+                (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true) : true));
 
             // Add "starter" card
             if (!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
@@ -980,7 +980,7 @@ var splinterlands = (function () {
                     (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
                     (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
                     (!o.delegated_to || o.delegated_to == _player.name) &&
-                    (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true): true));
+                    (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true) : true));
 
                 // Add "starter" card
                 if (!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
@@ -1247,7 +1247,12 @@ var splinterlands = (function () {
     }
 
     async function get_leaderboard_by_mode(season, leaderboard_id, format, page) {
-        let leaderboard = await api('/players/leaderboard_with_player', {season, leaderboard: leaderboard_id, format, page});
+        let leaderboard = await api('/players/leaderboard_with_player', {
+            season,
+            leaderboard: leaderboard_id,
+            format,
+            page
+        });
 
         if (leaderboard.leaderboard)
             leaderboard.leaderboard = leaderboard.leaderboard.map(p => new splinterlands.Player(p));
@@ -1299,7 +1304,7 @@ var splinterlands = (function () {
     }
 
     function get_leagues_settings(league_format) {
-        if(splinterlands.get_settings().leagues.wild && splinterlands.get_settings().leagues.modern) {
+        if (splinterlands.get_settings().leagues.wild && splinterlands.get_settings().leagues.modern) {
             return (league_format) ? splinterlands.get_settings().leagues[league_format] : splinterlands.get_settings().leagues.wild;
         } else {
             return splinterlands.get_settings().leagues;
