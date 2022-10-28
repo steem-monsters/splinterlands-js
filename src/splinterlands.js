@@ -768,12 +768,16 @@ var splinterlands = (function () {
     async function external_deposit(wallet_type, to, amount, currency, memo) {
 		switch (wallet_type) {
             case 'hive_engine':
-                var result = await splinterlands.utils.hive_engine_transfer(to, currency, amount, memo);
+                const result = await splinterlands.utils.hive_engine_transfer(to, currency, amount, memo);
                 return !result.success ? {success: false, error: result.error} : result;
             case 'tron':
-                return { error: "We are very sorry but TRON deposits are currently unavailable on the Splinterlands mobile app. Please goto to https://splinterlands.com to despoit your currency."}
+                const token = splinterlands.get_settings().supported_currencies.find(c => c.currency === 'DEC-TRON');
+                return await splinterlands.tron.sendToken(to, amount, token.token_id)
             case 'bsc':
-                return { error: "We are very sorry but BSC deposits are currently unavailable on the Splinterlands mobile app. Please goto to https://splinterlands.com to despoit your currency."}
+            case 'ethereum':
+                const response = await splinterlands.eth_bsc_deposit(amount, currency, to, wallet_type, memo)
+                return response;
+            // return { error: "We are very sorry but BSC deposits are currently unavailable on the Splinterlands mobile app. Please goto to https://splinterlands.com to despoit your currency."}
         }
     }
 
@@ -1247,12 +1251,7 @@ var splinterlands = (function () {
     }
 
     async function get_leaderboard_by_mode(season, leaderboard_id, format, page) {
-        let leaderboard = await api('/players/leaderboard_with_player', {
-            season,
-            leaderboard: leaderboard_id,
-            format,
-            page
-        });
+        let leaderboard = await api('/players/leaderboard_with_player', {season, leaderboard: leaderboard_id, format, page});
 
         if (leaderboard.leaderboard)
             leaderboard.leaderboard = leaderboard.leaderboard.map(p => new splinterlands.Player(p));
@@ -1304,15 +1303,11 @@ var splinterlands = (function () {
     }
 
     function get_leagues_settings(league_format) {
-        if (splinterlands.get_settings().leagues.wild && splinterlands.get_settings().leagues.modern) {
+        if(splinterlands.get_settings().leagues.wild && splinterlands.get_settings().leagues.modern) {
             return (league_format) ? splinterlands.get_settings().leagues[league_format] : splinterlands.get_settings().leagues.wild;
         } else {
             return splinterlands.get_settings().leagues;
         }
-    }
-
-    function remove_tx_prefix(tx_name) {
-        return tx_name.replace(_settings.test_mode ? `${_settings.prefix}sm_` : 'sm_', '');
     }
 
 	function is_modern_card(edition, tier, exclude_gladiators) {
