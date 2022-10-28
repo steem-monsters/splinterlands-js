@@ -373,7 +373,7 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx_wrapper('purchase', 'Purchase', { type, qty, currency, bonus: bonus_packs, data }, tx => tx);
 	}
 
-	async function withdraw_dec(qty, wallet) {
+	async function withdraw_crypto(qty, wallet, token) {
 		let accounts = {
 			tron: 'sm-dec-tron',
 			ethereum: 'sl-eth',
@@ -394,11 +394,7 @@ window.splinterlands.ops = (function() {
 			player_wallet = { address: splinterlands.get_player().name };
 		}
 
-		if(wallet != 'hive_engine') {
-			return { error: `We are very sorry but ${wallet.toUpperCase()} withdrawals are currently unavailable on the Splinterlands mobile app. Please goto to https://splinterlands.com to withdraw your currency.`};
-		}
-
-		return splinterlands.send_tx_wrapper('token_transfer', 'Withdraw DEC', { type: 'withdraw', to: accounts[wallet] || 'sl-hive', qty, token: 'DEC', memo: player_wallet.address }, tx => tx);
+		return splinterlands.send_tx_wrapper('token_transfer', `Withdraw ${token}`, { type: 'withdraw', to: accounts[wallet] || wallet, qty, token, memo: player_wallet.address }, tx => tx);
 	}
 
 	async function guild_join(guild_id) {
@@ -554,7 +550,7 @@ window.splinterlands.ops = (function() {
 		open_pack,
 		open_multi,
 		purchase,
-		withdraw_dec,
+		withdraw_crypto,
 		guild_join,
 		guild_request_join,
 		guild_leave,

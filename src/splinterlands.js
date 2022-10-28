@@ -1306,6 +1306,10 @@ var splinterlands = (function () {
         }
     }
 
+    function remove_tx_prefix(tx_name) {
+        return tx_name.replace(_settings.test_mode ? `${_settings.prefix}sm_` : 'sm_', '');
+    }
+
 	function is_modern_card(edition, tier, exclude_gladiators) {
 		if(edition === 6 && exclude_gladiators) {
 			return false;
