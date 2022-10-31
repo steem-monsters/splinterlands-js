@@ -520,6 +520,34 @@ window.splinterlands.ops = (function() {
 		)
 	}
 
+	async function claim_airdrop_staked_sps(token, qty) {
+		return splinterlands.send_tx_wrapper('stake_tokens', 'Stake', {
+			token,
+			qty,
+		}, async tx => {
+			await splinterlands.get_player().refresh();
+			return tx;
+		});
+	}
+
+	async function unstake_sps(token, qty) {
+		return splinterlands.send_tx_wrapper('unstake_tokens', 'Stake', {
+			token,
+			qty,
+		}, async tx => {
+			await splinterlands.get_player().refresh();
+			return tx;
+		});
+	}
+
+	async function cancel_apr_unstake(token) {
+		return splinterlands.send_tx_wrapper('cancel_unstake_tokens',
+			'Cancel Unstake', {token}, async tx => {
+			await splinterlands.get_player().refresh();
+			return tx;
+		});
+	}
+
 
 	return {
 		combine_cards,
@@ -566,6 +594,9 @@ window.splinterlands.ops = (function() {
 		guild_building_contribution,
 		league_advance,
 		set_active_authority,
-		claim_riftwatchers_airdrop
+		claim_riftwatchers_airdrop,
+		claim_airdrop_staked_sps,
+		unstake_sps,
+		cancel_apr_unstake
 	};
 })();
