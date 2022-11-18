@@ -407,6 +407,56 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx_wrapper('token_transfer', `Withdraw ${token}`, { type: 'withdraw', to: accounts[wallet] || wallet, qty, token, memo: player_wallet.address }, tx => tx);
 	}
 
+	function init_hive_active_key(player, key) {
+		if (!window.steem.auth.isWif(key)) {
+			try {
+				key = steem.auth.getPrivateKeys(player, key, ['active']).active;
+			} catch (err) { return 'The key entered was not a valid private key or master password.' }
+		}
+		return key;
+	}
+
+	async function init_active_key_transaction(player, token, to, key, qty) {
+		let accounts = {
+			tron: 'sm-dec-tron',
+			ethereum: 'sl-eth',
+			hive_engine: 'sl-hive',
+			steem_engine: 'sl-steem',
+			bsc: 'sl-bsc'
+		}
+		const active_key = init_hive_active_key(player, key);
+		const id = splinterlands.utils.format_tx_id('token_transfer');
+		const result = await new Promise(async function (resolve, reject)  {
+			await window.steem.broadcast.customJson( active_key, [player], [], id, JSON.stringify({
+				type: 'withdraw',
+				to: accounts[to] || to,
+				qty,
+				token,
+				memo: player
+			}), (error, res) => {
+				resolve(res ? {res} : {error})
+			});
+		})
+		return result
+	}
+
+	async function init_cards_transactions(key, player, transaction, data) {
+		const active_key = init_hive_active_key(player, key);
+		const id = splinterlands.utils.format_tx_id(transaction);
+		const result = await new Promise(async function (resolve, reject)  {
+			await window.steem.broadcast.customJson( active_key, [player], [], id, JSON.stringify(data), (error, res) => {
+				resolve(res ? {res} : {error})
+			});
+		})
+		if (transaction === 'burn_cards') {
+			splinterlands.get_player().has_collection_power_changed = true;
+		}
+		await splinterlands.get_player().load_balances();
+		await splinterlands.load_collection(player);
+
+		return result;
+	}
+
 	async function guild_join(guild_id) {
 		return splinterlands.send_tx_wrapper('join_guild', 'Join Guild', { guild_id }, async tx => {
 			await splinterlands.get_player().refresh();
@@ -577,6 +627,8 @@ window.splinterlands.ops = (function() {
 		league_advance,
 		set_active_authority,
 		claim_riftwatchers_airdrop,
-		fetch_transfer_out_fees
+		fetch_transfer_out_fees,
+		init_active_key_transaction,
+		init_cards_transactions
 	};
 })();
