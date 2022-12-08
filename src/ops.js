@@ -657,7 +657,7 @@ window.splinterlands.ops = (function() {
 		claim_riftwatchers_airdrop,
 		fetch_transfer_out_fees,
 		init_active_key_transaction,
-		init_cards_transactions
+		init_cards_transactions,
 		claim_airdrop_staked_sps,
 		unstake_sps,
 		cancel_apr_unstake
