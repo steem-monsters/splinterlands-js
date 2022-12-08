@@ -958,7 +958,7 @@ var splinterlands = (function () {
         let summoner_details = get_card_details(summoner_card.card_detail_id);
 
         return group_collection(_collection, true)
-            .filter(d => d.type == 'Monster' && d.owned.length > 0 && (d.color == summoner_details.color || d.color == 'Gray' || (summoner_details.color == 'Gold' && d.color == ally_color)))
+            .filter(d => d.type == 'Monster' && d.owned.length > 0 && (d.color == summoner_details.color || d.color == 'Gray' || ((summoner_details.color == 'Gold' || summoner_details.color == 'Gray') && d.color == ally_color)))
             .map(d => {
                 // Check if it's an allowed card
                 if ((match.ruleset.includes('Lost Legendaries') || match.allowed_cards == 'no_legendaries') && d.rarity == 4)
