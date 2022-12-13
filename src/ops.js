@@ -375,9 +375,9 @@ window.splinterlands.ops = (function() {
 
 	async function fetch_transfer_out_fees(wallet, qty) {
 		try	{
-		const response = await fetch(`https://ec-api.splinterlands.com/bridge/estimateGas?token=dec&network=${wallet}&amount=${qty}`);
-		const gas_data = await response.json();
-		return gas_data;
+			const response = await fetch(`https://ec-api.splinterlands.com/bridge/estimateGas?token=dec&network=${wallet}&amount=${qty}`);
+			const gas_data = await response.json();
+			return gas_data;
 		} catch (error) {
 			return error;
 		}
@@ -660,6 +660,6 @@ window.splinterlands.ops = (function() {
 		init_cards_transactions,
 		claim_airdrop_staked_sps,
 		unstake_sps,
-		cancel_apr_unstake
+		cancel_apr_unstake,
 	};
 })();

@@ -377,11 +377,16 @@ splinterlands.Card = class {
   }
 
   get image_url() {
-		return CARD_URLS[this.edition] +
-			(this.skin ? this.skin + '/' : '') +
-			encodeURIComponent(this.details.name.replace(/'/g, '')) +
-			(this.gold ? '_gold' : '') +
-			((this.details.edition == 7 || this.details.tier == 7) ? '.jpg' : '.png');
+		// Get proper Runi image
+		if(this.card_detail_id === 505) {
+			return `${RUNI_CARD_URL}cards/${this.uid}.jpg`
+		} else {
+			return CARD_URLS[this.edition] +
+				(this.skin ? this.skin + '/' : '') +
+				encodeURIComponent(this.details.name.replace(/'/g, '')) +
+				(this.gold ? '_gold' : '') +
+				((this.details.edition == 7 || this.details.tier == 7) ? '.jpg' : '.png');
+		}
 	}
 
 	get image_url_battle() {
@@ -402,10 +407,15 @@ splinterlands.Card = class {
 
 		let edition = (this.edition == 1 || this.edition == 3) ? 1 : 0;
 
-		return BATTLE_CARD_URLS_MOBILE[edition] +
-			encodeURIComponent(this.details.name.replace(/'/g, '')) +
-			(this.gold ? '_gold' : '') +
-			((this.details.edition == 7 || this.details.tier == 7) ? '.jpg' : '.png');
+		// Get proper Runi image
+		if(this.card_detail_id === 505) {
+			return `${RUNI_CARD_URL}battle-cards-mobile/${this.uid}.jpg`
+		} else {
+			return BATTLE_CARD_URLS_MOBILE[edition] +
+				encodeURIComponent(this.details.name.replace(/'/g, '')) +
+				(this.gold ? '_gold' : '') +
+				((this.details.edition == 7 || this.details.tier == 7) ? '.jpg' : '.png');
+		}
 	}
 	
 	async lore() { return await splinterlands.load_card_lore(this.card_detail_id); }

@@ -28,6 +28,8 @@ window.splinterlands.utils = (function() {
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_mobile/'
 	];
 
+	RUNI_CARD_URL = 'https://runi.splinterlands.com/'
+
 	rpc_index = 0;
 	//rpc_nodes = ["https://api.steemit.com", "https://seed.steemmonsters.com", "https://steemd.minnowsupportproject.org"];
 	rpc_nodes = ["https://api.hive.blog", "https://anyx.io", "https://hived.splinterlands.com"];
