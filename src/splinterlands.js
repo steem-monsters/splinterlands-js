@@ -990,6 +990,12 @@ var splinterlands = (function () {
                     if (match.ruleset.includes('Up Close & Personal') && d.stats.attack[card.level - 1] == 0)
                         return;
 
+                    if (match.ruleset.includes('Going the Distance') && d.stats.ranged[card.level - 1] == 0)
+                        return;
+
+                    if (match.ruleset.includes('Wands Out') && d.stats.magic[card.level - 1] == 0)
+                        return;
+
                     if (match.ruleset.includes('Keep Your Distance') && d.stats.attack[card.level - 1] > 0)
                         return;
 
