@@ -513,9 +513,7 @@ var splinterlands = (function () {
             let check_tx_promise = check_tx(data.sm_id);
             let broadcast_promise = null;
 
-            if (_player.use_proxy && !splinterlands.get_settings().api_ops.includes(id)) {
-            } else {
-                broadcast_promise = server_broadcast_tx(tx, active_auth).then(response => {
+            broadcast_promise = server_broadcast_tx(tx, active_auth).then(response => {
                     return {
                         type: 'broadcast',
                         method: 'battle_api',
@@ -523,8 +521,7 @@ var splinterlands = (function () {
                         trx_id: (response && response.id) ? response.id : null,
                         error: response.error ? response.error : null
                     }
-                });
-            }
+                });            
 
             let result = await Promise.race([check_tx_promise, broadcast_promise]);
 
