@@ -513,7 +513,7 @@ var splinterlands = (function () {
             let check_tx_promise = check_tx(data.sm_id);
             let broadcast_promise = null;
 
-            if (_player.use_proxy) {
+            if (_player.use_proxy && !splinterlands.get_settings().api_ops.includes(id)) {
             } else {
                 broadcast_promise = server_broadcast_tx(tx, active_auth).then(response => {
                     return {
