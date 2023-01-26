@@ -821,9 +821,6 @@ var splinterlands = (function () {
             }
         }
 
-        //Filter out Gladiator cards for now.
-        _collection = _collection.filter((c => c.edition != 6))
-
         return _collection;
     }
 
@@ -977,7 +974,9 @@ var splinterlands = (function () {
                     (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
                     (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
                     (!o.delegated_to || o.delegated_to == _player.name) &&
-                    (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true) : true));
+                    (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true) : true) &&
+					(o.edition !== 6 || (splinterlands.utils.summoner_has_ability(summoner_card, ['Conscript'])))
+				);
 
                 // Add "starter" card
                 if (!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
