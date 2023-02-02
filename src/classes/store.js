@@ -170,16 +170,6 @@ splinterlands.Store = class {
 			return { error: "We are very sorry but purchases of Credits/Spellbooks are currently unavailable on the Splinterlands mobile app. You may also log into your account and play at https://splinterlands.com"}
 		}
 
-		snapyr.track(
-			"start_purchase",
-			{
-				type:  type,
-				quantity: qty,
-				currency: currency,
-				merchant: merchant
-			}
-		);
-
 		return new splinterlands.Purchase(await splinterlands.api('/purchases/start', params));
 	}
 

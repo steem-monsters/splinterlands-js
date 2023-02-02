@@ -100,15 +100,6 @@ window.splinterlands.ops = (function() {
 
 	async function find_match(match_type, opponent, settings) {
 		return splinterlands.send_tx_wrapper('find_match', 'Find Match', { match_type, opponent, settings }, tx => {
-
-			snapyr.track(
-				"find_match",
-				 {
-					match_type: match_type,
-					settings: settings
-				 }
-			);
-
 			splinterlands.set_match({ id: tx.id, status: 0 });
 		});
 	}

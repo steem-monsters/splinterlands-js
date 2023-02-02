@@ -115,15 +115,6 @@ window.splinterlands.socket = (function() {
 						await splinterlands.ec_api("/womplay/tracking", { womplay_id, event_name: "purchased_booster_pack"  });				
 					}			
 				}
-					
-				// TODO: Send starter_purchase event here?
-				snapyr.track(
-					"purchase_complete",
-					{
-						purchase_amount_usd: parseFloat(data.amount_usd),
-						type: data.type
-					}
-				);
 
 				window.dispatchEvent(new CustomEvent('splinterlands:purchase_complete', { detail: data }));
 			}
@@ -165,14 +156,6 @@ window.splinterlands.socket = (function() {
 
 		battle_result: async function(data) {
 			let match = splinterlands.get_match();
-
-			snapyr.track(
-				"battle_result",
-				{
-					match_type: data.match_type,
-					winner: data.winner
-				}
-			);
 
 			let player = splinterlands.get_player(); 
 			if(player.battles == 0) {

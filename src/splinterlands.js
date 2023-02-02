@@ -66,39 +66,7 @@ var splinterlands = (function () {
             splinterlands.utils.set_rpc_nodes(rpc_list);
             steem.api.setOptions({transport: 'http', uri: rpc_list[0], url: rpc_list[0]});
             console.log(`Set Hive RPC node to: ${rpc_list[0]}`);
-        }
-
-        if (splinterlands.get_settings().test_mode) {
-            snapyr = window.snapyr = [];
-            snapyr.track = function () {
-                console.log('Testmode: Skipping Snapyr tracking');
-            };
-            snapyr.identify = function () {
-                console.log('Testmode: Skipping Snapyr identify');
-            };
-        } else {
-            //Snapyr Init
-            snapyr = window.snapyr = [];
-            for (
-                var methods = ['load', 'page', 'track', 'identify', 'alias', 'group', 'ready', 'reset', 'getAnonymousId', 'setAnonymousId'],
-                    i = 0;
-                i < methods.length;
-                i++
-            ) {
-                var method = methods[i];
-                snapyr[method] = (function (n) {
-                    return function () {
-                        snapyr.push([n].concat(Array.prototype.slice.call(arguments)));
-                    };
-                })(method);
-            }
-            snapyr.load('JJAzzlsU0tdrNJEJ1voRepSDgcQL5GSy', 'https://engine.snapyr.com');
-            snapyr.page();
-
-            splinterlands.utils.loadScript('https://sdk.snapyr.com/js/1.0.0/snapyr-sdk.min.js', () => {
-                console.log('Snapyr Loaded');
-            });
-        }
+        }        
     }
 
     function set_url(url) {
@@ -425,21 +393,6 @@ var splinterlands = (function () {
         splinterlands.utils.loadScript('https://platform.twitter.com/oct.js', () => {
             twttr.conversion.trackPid('o5rpo', {tw_sale_amount: 0, tw_order_quantity: 0});
         });
-
-        snapyr.identify(_player.alt_name || _player.name,
-            {
-                join_date: _player.join_date,
-                starter_pack_purchase: _player.starter_pack_purchase,
-                email: _player.email
-            }
-        );
-
-        snapyr.track(
-            'login',
-            {
-                is_mobile: true
-            }
-        );
 
         //Womplay Sign Up check
         let womplay_id = await _player.get_womplay_id();
@@ -1050,14 +1003,6 @@ var splinterlands = (function () {
 
             log_event('sign_up');
 
-            snapyr.track(
-                'sign_up',
-                {
-                    playerName: splinterlands.get_player().alt_name || splinterlands.get_player().name,
-                    type: 'email'
-                }
-            );
-
             splinterlands.utils.loadScript('https://platform.twitter.com/oct.js', () => {
                 twttr.conversion.trackPid('o4d37', {tw_sale_amount: 0, tw_order_quantity: 0});
             });
@@ -1093,14 +1038,6 @@ var splinterlands = (function () {
 
             log_event('sign_up');
 
-            snapyr.track(
-                'sign_up',
-                {
-                    playerName: splinterlands.get_player().alt_name || splinterlands.get_player().name,
-                    type: 'eos'
-                }
-            );
-
             splinterlands.utils.loadScript('https://platform.twitter.com/oct.js', () => {
                 twttr.conversion.trackPid('o4d37', {tw_sale_amount: 0, tw_order_quantity: 0});
             });
@@ -1135,14 +1072,6 @@ var splinterlands = (function () {
             let login_response = eth_login();
 
             log_event('sign_up');
-
-            snapyr.track(
-                'sign_up',
-                {
-                    playerName: splinterlands.get_player().alt_name || splinterlands.get_player().name,
-                    type: 'eth'
-                }
-            );
 
             splinterlands.utils.loadScript('https://platform.twitter.com/oct.js', () => {
                 twttr.conversion.trackPid('o4d37', {tw_sale_amount: 0, tw_order_quantity: 0});
