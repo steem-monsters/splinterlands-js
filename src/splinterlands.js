@@ -878,7 +878,7 @@ var splinterlands = (function () {
                 (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
                 (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
                 (!o.delegated_to || o.delegated_to == _player.name) &&
-                (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true) : true));
+                (IS_MODERN ? splinterlands.is_card_in_modern_sets(o.edition, o.details.tier, o.card_detail_id) : true));
 
             // Add "starter" card
             if (!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
@@ -896,6 +896,7 @@ var splinterlands = (function () {
     function get_battle_monsters(match, summoner_card, ally_color) {
         const IS_MODERN = match.format === 'modern';
         let summoner_details = get_card_details(summoner_card.card_detail_id);
+		let max_gladiators_allowed = splinterlands.Battle.calculate_max_number_of_gladiators_allowed(summoner_card, match.ruleset)
 
         return group_collection(_collection, true)
             .filter(d => d.type == 'Monster' && d.owned.length > 0 && (d.color == summoner_details.color || d.color == 'Gray' || ((summoner_details.color == 'Gold' || summoner_details.color == 'Gray') && d.color == ally_color)))
@@ -924,8 +925,10 @@ var splinterlands = (function () {
                     (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
                     (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
                     (!o.delegated_to || o.delegated_to == _player.name) &&
-                    (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true) : true) &&
-					(o.edition !== 6 || (splinterlands.utils.summoner_has_ability(summoner_card, ['Conscript'])))
+                    (IS_MODERN ? 
+						(o.edition == 6) ? max_gladiators_allowed > 0 : splinterlands.is_card_in_modern_sets(o.edition, o.details.tier, o.card_detail_id) : 
+						(o.edition == 6) ? max_gladiators_allowed > 0 : true
+					)
 				);
 
                 // Add "starter" card
@@ -1247,14 +1250,53 @@ var splinterlands = (function () {
         } else {
             return splinterlands.get_settings().leagues;
         }
-    }
+    }  
 
-    function is_modern_card(edition, tier, exclude_gladiators) {
-        if (edition === 6 && exclude_gladiators) {
-            return false;
-        }
-        return splinterlands.get_settings().battles.modern.editions.includes(edition) || splinterlands.get_settings().battles.modern.tiers.includes(tier);
-    }
+	// Checks to see if a card with properties "edition", "tier", and "card_detail_id" is in the Card Set defined by "set".
+	// Returns true if so, and false otherwise.
+	// -------------------------------------------------------------------------------------------------------------------
+	// A set is defined as per tech specs here: https://splinterlands.atlassian.net/wiki/spaces/SP/pages/113967129/Card+Sets
+	// Example 1: the set of all Chaos Legion cards is {"core":7,"editions":[]}
+	// Example 2: the subset of Chaos Legion consisting of the core Chaos Legion edition + Riftwatchers is {"core":7,"editions":[7,8]}
+	// "core" MUST be one of the editions included in SM.settings.core_editions (or 6 for Gladiators), which identifies the set,
+	// and "editions" MUST only consist of editions that make sense within the context of that set, as per the above spec
+	function is_card_in_set(set, edition, tier, card_detail_id) {
+		if(set.editions.length > 0 && !set.editions.includes(edition)) {
+			return false;
+		}
+
+		// TODO: Add case for upcoming Rebellion Set
+		switch(set.core) {
+			case Constants.EDITIONS.ALPHA.ID:
+				// Dragon Whelp, Neb Seni, Royal Dragon Archer, and Shin-Lo are the only Promo cards in the Alpha Set,
+				// and Alpha has no Reward cards
+				return edition === Constants.EDITIONS.ALPHA.ID || (card_detail_id >= 75 && card_detail_id <= 78);
+			case Constants.EDITIONS.BETA.ID:
+				return !tier && (edition === Constants.EDITIONS.BETA.ID || (edition === Constants.EDITIONS.PROMO.ID && card_detail_id > 78) || edition === Constants.EDITIONS.REWARD.ID);
+			case Constants.EDITIONS.GLADIUS.ID:
+				return edition === Constants.EDITIONS.GLADIUS.ID;
+			case Constants.EDITIONS.UNTAMED.ID:
+				return (edition === Constants.EDITIONS.UNTAMED.ID || tier === 4 || tier === 3) && edition !== Constants.EDITIONS.GLADIUS.ID;
+			case Constants.EDITIONS.CHAOS.ID:
+				return tier === 7;
+			default:
+				console.log(`Invalid set ${set.core}`);
+		}
+
+		return false;
+	}
+
+	// like is_card_in_set above, but checks for inclusion in multiple Card Sets
+	function is_card_in_sets(sets, edition, tier, card_detail_id) {
+		return sets.findIndex((s) => splinterlands.is_card_in_set(s, edition, tier, card_detail_id)) >= 0;
+	}
+
+	function is_card_in_modern_sets(edition, tier, card_detail_id) {
+		return (
+			splinterlands.is_card_in_set({ core: splinterlands.get_settings().core_editions[splinterlands.get_settings().core_editions.length - 2], editions: [] }, edition, tier, card_detail_id) ||
+			splinterlands.is_card_in_set({ core: splinterlands.get_settings().core_editions[splinterlands.get_settings().core_editions.length - 1], editions: [] }, edition, tier, card_detail_id)
+		);
+	}
 
     function get_onfido(token, id) {
         const onfido = Onfido.init({
@@ -1429,7 +1471,9 @@ var splinterlands = (function () {
         get_leagues_settings,
         battle_history_by_mode,
         get_leaderboard_by_mode,
-        is_modern_card,
+        is_card_in_set,
+		is_card_in_sets,
+		is_card_in_modern_sets,
         get_onfido,
         eth_bsc_deposit
     };
