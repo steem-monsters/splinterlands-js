@@ -31,7 +31,10 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function add_wallet(type, address) {
-		if(player.use_proxy) return { success: false, error: "You must own a Spellbook to link an external wallet."};
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to link an external wallet." } }));
+			return { success: false, error: "You must own a Spellbook to link an external wallet."};
+		}
 		return splinterlands.send_tx_wrapper('add_wallet', 'Link External Wallet', { type, address }, tx => tx);
 	}
 
@@ -308,7 +311,10 @@ window.splinterlands.ops = (function() {
 	};
 
 	async function start_quest() {
-		if(player.use_proxy) return { success: false, error: "You must own a Spellbook to start a Daily Quest."};
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to start a Daily Quest." } }));
+			return { success: false, error: "You must own a Spellbook to start a Daily Quest."};
+		}
 		return splinterlands.send_tx_wrapper('start_quest', 'Start Quest', { type: 'daily' }, tx => {
 			const new_quest = new splinterlands.Quest(tx.result);
 			splinterlands.get_player().quest = new_quest;
@@ -317,7 +323,10 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function refresh_quest() {
-		if(player.use_proxy) return { success: false, error: "You must own a Spellbook to start a Daily Quest."};
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to start a Daily Quest." } }));
+			return { success: false, error: "You must own a Spellbook to start a Daily Quest."};
+		}
 		return splinterlands.send_tx_wrapper('refresh_quest', 'New Quest', { type: 'daily' }, tx => {
 			const new_quest = new splinterlands.Quest(tx.result);
 			splinterlands.get_player().quest = new_quest;
@@ -452,7 +461,10 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function guild_join(guild_id) {
-		if(player.use_proxy) return { success: false, error: "You must own a Spellbook to join a guild."};
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to join a guild." } }));
+			return { success: false, error: "You must own a Spellbook to join a guild."};
+		}
 		return splinterlands.send_tx_wrapper('join_guild', 'Join Guild', { guild_id }, async tx => {
 			await splinterlands.get_player().refresh();
 			return tx;
@@ -460,7 +472,10 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function guild_request_join(guild_id) {
-		if(player.use_proxy) return { success: false, error: "You must own a Spellbook to join a guild."};
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to join a guild." } }));
+			return { success: false, error: "You must own a Spellbook to join a guild."};
+		}
 		return splinterlands.send_tx_wrapper('join_guild', 'Request Join Guild', { guild_id }, async tx => {
 			await splinterlands.get_player().refresh();
 			return tx;
@@ -475,7 +490,10 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function guild_create(name, motto, description, membership_type, language, banner, decal) {
-		if(player.use_proxy) return { success: false, error: "You must own a Spellbook to create a guild."};
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to create a guild." } }));
+			return { success: false, error: "You must own a Spellbook to create a guild."};
+		}
 		const guild_data = {
 			name: name,
 			motto: motto,
@@ -511,7 +529,10 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function guild_request_join(guild_id) {
-		if(player.use_proxy) return { success: false, error: "You must own a Spellbook to join a guild."};
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to join a guild." } }));
+			return { success: false, error: "You must own a Spellbook to join a guild."};
+		}
 		return splinterlands.send_tx_wrapper('join_guild', 'Request Join Guild', { guild_id }, tx => tx);
 	}
 
