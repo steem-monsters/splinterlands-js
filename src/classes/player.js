@@ -57,7 +57,26 @@ splinterlands.Player = class {
             this.guild = new splinterlands.Guild(data.guild);
     }
 
+    get use_new_energy_system() {
+        const settings = splinterlands.get_settings();
+        return Boolean(settings && settings.energy && settings.energy.max_energy);
+    }
+
     get ecr() {
+        const useNewEnergySystem = this.use_new_energy_system;
+        if (useNewEnergySystem) {
+            const settings = splinterlands.get_settings();
+            const MS_IN_ONE_HOUR = 1000 * 60 * 60;
+            const MAX_ENERGY = settings.energy.max_energy;
+            const captureRateParsed = parseFloat(this.capture_rate);
+            const initialEnergy = isNaN(captureRateParsed) ? MAX_ENERGY : captureRateParsed;
+            const timeSinceLastRewardMs = Date.now() - new Date(this.last_reward_time).getTime();
+            const regeneratedEnergy = timeSinceLastRewardMs / MS_IN_ONE_HOUR * settings.energy.hourly_regen_rate;
+            const newEnergy = initialEnergy + regeneratedEnergy;
+            // can't regenerate more energy than max amount
+            const limitedNewEnergy = Math.min(newEnergy, MAX_ENERGY);
+            return limitedNewEnergy;
+        }
         return Math.min((isNaN(parseInt(this.capture_rate)) ? 10000 : this.capture_rate) + (splinterlands.get_settings().last_block - this.last_reward_block) * splinterlands.get_settings().dec.ecr_regen_rate, 10000);
     }
 
