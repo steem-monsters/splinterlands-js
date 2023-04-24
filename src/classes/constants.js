@@ -27,4 +27,6 @@ const Constants = Object.freeze({
 		GENERAL: 'splinterfest2022_general',
 	},
 	RUNI_AVATAR_ID_OFFSET: 1000,
+	FIRST_RUNI_NUMBER: 1,
+	LAST_RUNI_NUMBER: 3521,
 });

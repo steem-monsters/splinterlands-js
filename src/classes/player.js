@@ -81,9 +81,34 @@ splinterlands.Player = class {
     }
 
     get profile_image() {
-        return isNaN(this.avatar_id) ?
-            `${splinterlands.get_config().api_url}/players/avatar/${this.name}` :
-            `https://d36mxiodymuqjm.cloudfront.net/website/icons/avatars/avatar_${this.avatar_id}.png`;
+        if (isNaN(this.avatar_id)) {
+            return `${splinterlands.get_config().api_url}/players/avatar/${this.name}`;
+        }
+
+        if (this.isRegularAvatarId(this.avatar_id)) {
+            return `https://d36mxiodymuqjm.cloudfront.net/website/icons/avatars/avatar_${this.avatar_id}.png`;
+        }
+
+        if (this.isRuniAvatarId(this.avatar_id)) {
+            const runiNumber = this.getRuniNumberFromAvatarId(this.avatar_id);
+            return `https://runi.splinterlands.com/avatars/${runiNumber}.png`;
+        }
+
+        return `https://d36mxiodymuqjm.cloudfront.net/website/icons/avatars/avatar_0.png`;
+    }
+
+    isRegularAvatarId(avatar_id) {
+        return avatar_id >= 0 && avatar_id <= 20;
+    }
+
+    isRuniAvatarId(avatar_id) {
+        const FIRST_RUNI_AVATAR_ID = Constants.FIRST_RUNI_NUMBER + Constants.RUNI_AVATAR_ID_OFFSET;
+        const LAST_RUNI_AVATAR_ID = Constants.LAST_RUNI_NUMBER + Constants.RUNI_AVATAR_ID_OFFSET;
+        return avatar_id >= FIRST_RUNI_AVATAR_ID && avatar_id <= LAST_RUNI_AVATAR_ID;
+    }
+
+    getRuniNumberFromAvatarId(avatar_id) {
+        return +avatar_id - Constants.RUNI_AVATAR_ID_OFFSET;
     }
 
     get avatar_frame() {
