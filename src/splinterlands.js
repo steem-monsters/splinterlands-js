@@ -902,7 +902,7 @@ var splinterlands = (function () {
 		let max_gladiators_allowed = splinterlands.Battle.calculate_max_number_of_gladiators_allowed(summoner_card, match.ruleset)
 
         return group_collection(_collection, true)
-            .filter(d => d.type == 'Monster' && d.owned.length > 0 && (d.color == summoner_details.color || d.color == 'Gray' || ((summoner_details.color == 'Gold' || summoner_details.color == 'Gray') && d.color == ally_color)))
+            .filter(d => d.type == 'Monster' && d.owned.length > 0 && splinterlands.utils.is_color_aligned(summoner_details, ally_color, match.inactive, d))
             .map(d => {
                 // Check if it's an allowed card
                 if ((match.ruleset.includes('Lost Legendaries') || match.allowed_cards == 'no_legendaries') && d.rarity == 4)

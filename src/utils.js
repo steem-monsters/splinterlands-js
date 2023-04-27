@@ -888,6 +888,31 @@ window.splinterlands.utils = (function() {
 		return cardAbilities.some((a) => abilities.some((s) => s.toLowerCase() === a.toLowerCase()));
 	}
 
+	function is_active(match_inactive_colors, color){
+		return match_inactive_colors.indexOf(color) < 0;
+	}
+
+	function has_secondary_color(card){
+		return card.secondary_color !== undefined && card.secondary_color != null;
+	}
+
+	function is_color_aligned(summoner, allyColor, match_inactive_colors, monster){
+		const secondary_color_active = has_secondary_color(summoner);
+		const isMultiColorMonster = monster.secondary_color != null;
+
+		const primaryPrimaryAligned = monster.color === summoner.color;
+		const primarySecondaryAligned = isMultiColorMonster && monster.secondary_color === summoner.color;
+		const secondaryPrimaryAligned = secondary_color_active && monster.color === summoner.secondary_color;
+		const secondarySecondaryAligned = isMultiColorMonster && secondary_color_active && monster.secondary_color === summoner.secondary_color;
+		const allyAligned = (summoner.color.toLowerCase() === 'gold' || summoner.color.toLowerCase() === 'gray') && (monster.color === allyColor || monster.secondary_color === allyColor);
+		
+		return ( ( (primaryPrimaryAligned || primarySecondaryAligned) && is_active(match_inactive_colors, summoner.color) )
+							|| ( (secondaryPrimaryAligned || secondarySecondaryAligned) && (is_active(match_inactive_colors, summoner.secondary_color) || is_active(match_inactive_colors, monster.color)))
+							|| monster.color === 'Gray'
+							|| allyAligned
+						);
+	};	
+
 	return { 
 		randomStr, 
 		timeout, 
@@ -927,6 +952,7 @@ window.splinterlands.utils = (function() {
 		get_chest_type_from_chest_tier,
 		get_chest_qty,
 		get_previous_season_highest_acheived_league,
-		summoner_has_ability
+		summoner_has_ability,
+		is_color_aligned
 	 };
 })();

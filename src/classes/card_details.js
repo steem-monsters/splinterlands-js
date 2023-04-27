@@ -7,6 +7,7 @@ splinterlands.CardDetails = class {
 	}
 
 	get splinter() { return this.splinter_mapping[this.color]; }
+	get secondary_splinter() { return (this.secondary_color) ? this.splinter_mapping[this.secondary_color] : null; }
 	get available_editions() { return this.editions.split(',').map(e => parseInt(e)); }
 	get max_level() { return 10 - (this.rarity - 1) * 2; }
 	get is_starter_card() { return this.rarity < 3 && !!this.available_editions.find(e => (splinterlands.get_settings().starter_editions || [1,4]).includes(e)); }
