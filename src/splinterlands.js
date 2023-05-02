@@ -719,7 +719,7 @@ var splinterlands = (function () {
     }
 
     async function external_deposit(wallet_type, to, amount, currency, memo) {
-		switch (wallet_type) {
+        switch (wallet_type) {
             case 'hive_engine':
                 const result = await splinterlands.utils.hive_engine_transfer(to, currency, amount, memo);
                 return !result.success ? {success: false, error: result.error} : result;
@@ -1245,7 +1245,7 @@ var splinterlands = (function () {
     }
 
     function get_leagues_settings(league_format) {
-        if(splinterlands.get_settings().leagues.wild && splinterlands.get_settings().leagues.modern) {
+        if (splinterlands.get_settings().leagues.wild && splinterlands.get_settings().leagues.modern) {
             return (league_format) ? splinterlands.get_settings().leagues[league_format] : splinterlands.get_settings().leagues.wild;
         } else {
             return splinterlands.get_settings().leagues;
