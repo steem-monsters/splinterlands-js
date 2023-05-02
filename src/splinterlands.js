@@ -70,38 +70,6 @@ var splinterlands = (function () {
             steem.api.setOptions({transport: 'http', uri: rpc_list[0], url: rpc_list[0]});
             console.log(`Set Hive RPC node to: ${rpc_list[0]}`);
         }
-
-        if (splinterlands.get_settings().test_mode) {
-            snapyr = window.snapyr = [];
-            snapyr.track = function () {
-                console.log('Testmode: Skipping Snapyr tracking');
-            };
-            snapyr.identify = function () {
-                console.log('Testmode: Skipping Snapyr identify');
-            };
-        } else {
-            //Snapyr Init
-            snapyr = window.snapyr = [];
-            for (
-                var methods = ['load', 'page', 'track', 'identify', 'alias', 'group', 'ready', 'reset', 'getAnonymousId', 'setAnonymousId'],
-                    i = 0;
-                i < methods.length;
-                i++
-            ) {
-                var method = methods[i];
-                snapyr[method] = (function (n) {
-                    return function () {
-                        snapyr.push([n].concat(Array.prototype.slice.call(arguments)));
-                    };
-                })(method);
-            }
-            snapyr.load('JJAzzlsU0tdrNJEJ1voRepSDgcQL5GSy', 'https://engine.snapyr.com');
-            snapyr.page();
-
-            splinterlands.utils.loadScript('https://sdk.snapyr.com/js/1.0.0/snapyr-sdk.min.js', () => {
-                console.log('Snapyr Loaded');
-            });
-        }
     }
 
     function set_url(url) {
@@ -429,21 +397,6 @@ var splinterlands = (function () {
             twttr.conversion.trackPid('o5rpo', {tw_sale_amount: 0, tw_order_quantity: 0});
         });
 
-        snapyr.identify(_player.alt_name || _player.name,
-            {
-                join_date: _player.join_date,
-                starter_pack_purchase: _player.starter_pack_purchase,
-                email: _player.email
-            }
-        );
-
-        snapyr.track(
-            'login',
-            {
-                is_mobile: true
-            }
-        );
-
         //Womplay Sign Up check
         let womplay_id = await _player.get_womplay_id();
         let new_womplay_id = splinterlands.get_init_url_search_params().get('uid');
@@ -516,9 +469,7 @@ var splinterlands = (function () {
             let check_tx_promise = check_tx(data.sm_id);
             let broadcast_promise = null;
 
-            if (_player.use_proxy) {
-            } else {
-                broadcast_promise = server_broadcast_tx(tx, active_auth).then(response => {
+            broadcast_promise = server_broadcast_tx(tx, active_auth).then(response => {
                     return {
                         type: 'broadcast',
                         method: 'battle_api',
@@ -527,7 +478,6 @@ var splinterlands = (function () {
                         error: response.error ? response.error : null
                     }
                 });
-            }
 
             let result = await Promise.race([check_tx_promise, broadcast_promise]);
 
@@ -569,7 +519,9 @@ var splinterlands = (function () {
         let broadcast_promise = null;
 
         if (_player.use_proxy) {
-            broadcast_promise = new Promise(resolve => {
+            return {success: false, error: 'Non-Hive accounts cannot broadcast transactions.  Purchasing a Spell Book and choosing a name will automatically add a Hive account.'};
+			/*
+			broadcast_promise = new Promise(resolve => {
                 splinterlands.utils.post(`${_config.tx_broadcast_url}/proxy`, {
                     player: _player.name,
                     access_token: _player.token,
@@ -579,6 +531,7 @@ var splinterlands = (function () {
                     .then(r => resolve({type: 'broadcast', method: 'proxy', success: true, trx_id: r.id}))
                     .catch(err => resolve({type: 'broadcast', method: 'proxy', success: true, error: err}));
             });
+			*/
         } else if (_use_keychain) {
             broadcast_promise = new Promise(resolve => hive_keychain.requestCustomJson(_player.name, id, active_auth ? 'Active' : 'Posting', data_str, display_name, response => {
                 resolve({
@@ -828,9 +781,6 @@ var splinterlands = (function () {
             }
         }
 
-        //Filter out Gladiator cards for now.
-        _collection = _collection.filter((c => c.edition != 6))
-
         return _collection;
     }
 
@@ -938,7 +888,7 @@ var splinterlands = (function () {
                 (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
                 (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
                 (!o.delegated_to || o.delegated_to == _player.name) &&
-                (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true) : true));
+                (IS_MODERN ? splinterlands.is_card_in_modern_sets(o.edition, o.details.tier, o.card_detail_id) : true));
 
             // Add "starter" card
             if (!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
@@ -956,9 +906,10 @@ var splinterlands = (function () {
     function get_battle_monsters(match, summoner_card, ally_color) {
         const IS_MODERN = match.format === 'modern';
         let summoner_details = get_card_details(summoner_card.card_detail_id);
+		let max_gladiators_allowed = splinterlands.Battle.calculate_max_number_of_gladiators_allowed(summoner_card, match.ruleset)
 
         return group_collection(_collection, true)
-            .filter(d => d.type == 'Monster' && d.owned.length > 0 && (d.color == summoner_details.color || d.color == 'Gray' || ((summoner_details.color == 'Gold' || summoner_details.color == 'Gray') && d.color == ally_color)))
+            .filter(d => d.type == 'Monster' && d.owned.length > 0 && splinterlands.utils.is_color_aligned(summoner_details, ally_color, match.inactive, d))
             .map(d => {
                 // Check if it's an allowed card
                 if ((match.ruleset.includes('Lost Legendaries') || match.allowed_cards == 'no_legendaries') && d.rarity == 4)
@@ -984,7 +935,11 @@ var splinterlands = (function () {
                     (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
                     (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
                     (!o.delegated_to || o.delegated_to == _player.name) &&
-                    (IS_MODERN ? splinterlands.is_modern_card(o.edition, o.details.tier, true) : true));
+                    (IS_MODERN ?
+						(o.edition == 6) ? max_gladiators_allowed > 0 : splinterlands.is_card_in_modern_sets(o.edition, o.details.tier, o.card_detail_id) :
+						(o.edition == 6) ? max_gladiators_allowed > 0 : true
+					)
+				);
 
                 // Add "starter" card
                 if (!card && !['gold_only', 'alpha_only'].includes(match.allowed_cards) && d.is_starter_card)
@@ -995,6 +950,12 @@ var splinterlands = (function () {
                     card.level = splinterlands.utils.get_monster_level(match.rating_level, summoner_card, card);
 
                     if (match.ruleset.includes('Up Close & Personal') && d.stats.attack[card.level - 1] == 0)
+                        return;
+
+                    if (match.ruleset.includes('Going the Distance') && d.stats.ranged[card.level - 1] == 0)
+                        return;
+
+                    if (match.ruleset.includes('Wands Out') && d.stats.magic[card.level - 1] == 0)
                         return;
 
                     if (match.ruleset.includes('Keep Your Distance') && d.stats.attack[card.level - 1] > 0)
@@ -1055,14 +1016,6 @@ var splinterlands = (function () {
 
             log_event('sign_up');
 
-            snapyr.track(
-                'sign_up',
-                {
-                    playerName: splinterlands.get_player().alt_name || splinterlands.get_player().name,
-                    type: 'email'
-                }
-            );
-
             splinterlands.utils.loadScript('https://platform.twitter.com/oct.js', () => {
                 twttr.conversion.trackPid('o4d37', {tw_sale_amount: 0, tw_order_quantity: 0});
             });
@@ -1098,14 +1051,6 @@ var splinterlands = (function () {
 
             log_event('sign_up');
 
-            snapyr.track(
-                'sign_up',
-                {
-                    playerName: splinterlands.get_player().alt_name || splinterlands.get_player().name,
-                    type: 'eos'
-                }
-            );
-
             splinterlands.utils.loadScript('https://platform.twitter.com/oct.js', () => {
                 twttr.conversion.trackPid('o4d37', {tw_sale_amount: 0, tw_order_quantity: 0});
             });
@@ -1140,14 +1085,6 @@ var splinterlands = (function () {
             let login_response = eth_login();
 
             log_event('sign_up');
-
-            snapyr.track(
-                'sign_up',
-                {
-                    playerName: splinterlands.get_player().alt_name || splinterlands.get_player().name,
-                    type: 'eth'
-                }
-            );
 
             splinterlands.utils.loadScript('https://platform.twitter.com/oct.js', () => {
                 twttr.conversion.trackPid('o4d37', {tw_sale_amount: 0, tw_order_quantity: 0});
@@ -1251,7 +1188,12 @@ var splinterlands = (function () {
     }
 
     async function get_leaderboard_by_mode(season, leaderboard_id, format, page) {
-        let leaderboard = await api('/players/leaderboard_with_player', {season, leaderboard: leaderboard_id, format, page});
+        let leaderboard = await api('/players/leaderboard_with_player', {
+            season,
+            leaderboard: leaderboard_id,
+            format,
+            page
+        });
 
         if (leaderboard.leaderboard)
             leaderboard.leaderboard = leaderboard.leaderboard.map(p => new splinterlands.Player(p));
@@ -1316,6 +1258,51 @@ var splinterlands = (function () {
 		}
 		return splinterlands.get_settings().battles.modern.editions.includes(edition) || splinterlands.get_settings().battles.modern.tiers.includes(tier);
 	}
+	// Checks to see if a card with properties "edition", "tier", and "card_detail_id" is in the Card Set defined by "set".
+	// Returns true if so, and false otherwise.
+	// -------------------------------------------------------------------------------------------------------------------
+	// A set is defined as per tech specs here: https://splinterlands.atlassian.net/wiki/spaces/SP/pages/113967129/Card+Sets
+	// Example 1: the set of all Chaos Legion cards is {"core":7,"editions":[]}
+	// Example 2: the subset of Chaos Legion consisting of the core Chaos Legion edition + Riftwatchers is {"core":7,"editions":[7,8]}
+	// "core" MUST be one of the editions included in SM.settings.core_editions (or 6 for Gladiators), which identifies the set,
+	// and "editions" MUST only consist of editions that make sense within the context of that set, as per the above spec
+	function is_card_in_set(set, edition, tier, card_detail_id) {
+		if(set.editions.length > 0 && !set.editions.includes(edition)) {
+			return false;
+		}
+
+		// TODO: Add case for upcoming Rebellion Set
+		switch(set.core) {
+			case Constants.EDITIONS.ALPHA.ID:
+				// Dragon Whelp, Neb Seni, Royal Dragon Archer, and Shin-Lo are the only Promo cards in the Alpha Set,
+				// and Alpha has no Reward cards
+				return edition === Constants.EDITIONS.ALPHA.ID || (card_detail_id >= 75 && card_detail_id <= 78);
+			case Constants.EDITIONS.BETA.ID:
+				return !tier && (edition === Constants.EDITIONS.BETA.ID || (edition === Constants.EDITIONS.PROMO.ID && card_detail_id > 78) || edition === Constants.EDITIONS.REWARD.ID);
+			case Constants.EDITIONS.GLADIUS.ID:
+				return edition === Constants.EDITIONS.GLADIUS.ID;
+			case Constants.EDITIONS.UNTAMED.ID:
+				return (edition === Constants.EDITIONS.UNTAMED.ID || tier === 4 || tier === 3) && edition !== Constants.EDITIONS.GLADIUS.ID;
+			case Constants.EDITIONS.CHAOS.ID:
+				return tier === 7;
+			default:
+				console.log(`Invalid set ${set.core}`);
+		}
+
+		return false;
+	}
+
+	// like is_card_in_set above, but checks for inclusion in multiple Card Sets
+	function is_card_in_sets(sets, edition, tier, card_detail_id) {
+		return sets.findIndex((s) => splinterlands.is_card_in_set(s, edition, tier, card_detail_id)) >= 0;
+	}
+
+	function is_card_in_modern_sets(edition, tier, card_detail_id) {
+		return (
+			splinterlands.is_card_in_set({ core: splinterlands.get_settings().core_editions[splinterlands.get_settings().core_editions.length - 2], editions: [] }, edition, tier, card_detail_id) ||
+			splinterlands.is_card_in_set({ core: splinterlands.get_settings().core_editions[splinterlands.get_settings().core_editions.length - 1], editions: [] }, edition, tier, card_detail_id)
+		);
+	}
 
     function get_onfido(token, id) {
         const onfido = Onfido.init({
@@ -1335,6 +1322,98 @@ var splinterlands = (function () {
             steps: ['document', 'face', 'complete'],
         });
         return onfido;
+    }
+
+    async function eth_bsc_deposit(amount, token, to, chain, memo) {
+        let address = memo;
+
+        if (!address) {
+            address = await web3connect();
+        }
+
+        if (!address) {
+            return;
+        }
+
+        token = token.toUpperCase();
+        chain = chain.toUpperCase();
+
+        const bridge_contracts = {
+            BSC_SPS: '0xE434F06f44700a41FA4747bE53163148750a6478',
+            BSC_DEC: '0x14Ae856ab69F157F8aC05B8a1482D9C31478fb47',
+            ETHEREUM_SPS: '0xE434F06f44700a41FA4747bE53163148750a6478',
+            ETHEREUM_DEC: '0x14Ae856ab69F157F8aC05B8a1482D9C31478fb47'
+        };
+
+        const token_contracts = {
+            BSC_SPS: '0x1633b7157e7638c4d6593436111bf125ee74703f',
+            BSC_DEC: '0xE9D7023f2132D55cbd4Ee1f78273CB7a3e74F10A',
+            ETHEREUM_SPS: '0x00813e3421e1367353bfe7615c7f7f133c89df74',
+            ETHEREUM_DEC: '0x9393fdc77090f31c7db989390d43f454b1a6e7f3'
+        };
+
+        let bridge_contract = bridge_contracts[`${chain}_${token}`];
+
+        if (!bridge_contract) {
+            return alert('Unsupported token and/or chain specified.');
+        }
+
+        const data = await fetch('https://d36mxiodymuqjm.cloudfront.net/misc/abis/Terablock-Bridge.json');
+        let abi = await data.json();
+        if (!Array.isArray(abi)) abi = abi.abi;
+
+        let contract = new window.web3.eth.Contract(abi, bridge_contract);
+
+        const d = window.web3.utils.toBN(15);
+        const m = window.web3.utils.toBN(10);
+        const amt = window.web3.utils.toBN(amount * 1000);
+        const rawAmt = token === 'DEC' ? amt : amt.mul(m.pow(d));
+
+        let confirm_sent = false;
+
+        await contract.methods.lockTokens(rawAmt.toString(), to).send({from: address})
+            .on('transactionHash', hash => {
+                    return ({
+                        type: 'transaction',
+                        status: 'broadcast',
+                        data: {hash}
+                    })
+                }
+            )
+            .on('confirmation', (confirmationNumber, receipt) => {
+                if (!confirm_sent) {
+                    confirm_sent = true;
+                    console.log({
+                        type: 'transaction',
+                        status: 'confirmed',
+                        data: {confirmationNumber, receipt}
+                    });
+                }
+
+                return receipt;
+            })
+            .on('error', (error, receipt) => {
+                return ({type: 'transaction', status: 'error', data: {error}});
+            });
+    }
+
+    async function web3connect() {
+        if (!window.WalletConnectProvider || !window.ethereum)
+            return null;
+
+        try {
+            let accounts = await window.ethereum.request({method: 'eth_accounts'});
+            if (accounts && Array.isArray(accounts) && accounts.length > 0)
+                return accounts[0];
+        } catch (err) {
+        }
+
+        try {
+            const addresses = await window.ethereum.enable();
+            return addresses ? addresses[0] : null;
+        } catch (err) {
+            return null;
+        }
     }
 
     return {
@@ -1398,8 +1477,12 @@ var splinterlands = (function () {
         get_leagues_settings,
         battle_history_by_mode,
         get_leaderboard_by_mode,
+        is_card_in_set,
+        is_card_in_sets,
+        is_card_in_modern_sets,
         is_modern_card,
         get_onfido,
+        eth_bsc_deposit
     };
 })();
 

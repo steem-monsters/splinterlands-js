@@ -31,6 +31,10 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function add_wallet(type, address) {
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to link an external wallet." } }));
+			return { success: false, error: "You must own a Spellbook to link an external wallet."};
+		}
 		return splinterlands.send_tx_wrapper('add_wallet', 'Link External Wallet', { type, address }, tx => tx);
 	}
 
@@ -79,7 +83,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function token_transfer(to, qty, data) {
-		var obj = { to, qty, token: 'DEC' };
+		let obj = { to, qty, token: 'DEC' };
 
 		if(data && typeof data == 'object')
 			obj = Object.assign(obj, data);
@@ -100,15 +104,6 @@ window.splinterlands.ops = (function() {
 
 	async function find_match(match_type, opponent, settings) {
 		return splinterlands.send_tx_wrapper('find_match', 'Find Match', { match_type, opponent, settings }, tx => {
-
-			snapyr.track(
-				"find_match",
-				 {
-					match_type: match_type,
-					settings: settings
-				 }
-			);
-
 			splinterlands.set_match({ id: tx.id, status: 0 });
 		});
 	}
@@ -117,10 +112,10 @@ window.splinterlands.ops = (function() {
 		if(!secret)
 			secret = splinterlands.utils.randomStr(10);
 
-		let data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`), summoner, monsters, secret };
+		const data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`), summoner, monsters, secret };
 
 		return splinterlands.send_tx_wrapper('submit_team', 'Submit Team', data, async tx => {
-			let cur_match = splinterlands.get_match();
+			const cur_match = splinterlands.get_match();
 
 			if(cur_match && cur_match.id == match.id) {
 				// // If the opponent already submitted their team, then we can reveal ours
@@ -141,7 +136,7 @@ window.splinterlands.ops = (function() {
 	async function team_reveal(trx_id, summoner, monsters, secret) {
 		if(!summoner) {
 			// If no summoner is specified, check if the team info is saved in local storage
-			let saved_team = splinterlands.utils.try_parse(localStorage.getItem(`splinterlands:${trx_id}`));
+			const saved_team = splinterlands.utils.try_parse(localStorage.getItem(`splinterlands:${trx_id}`));
 
 			if(saved_team) {
 				summoner = saved_team.summoner;
@@ -186,7 +181,7 @@ window.splinterlands.ops = (function() {
 			let ret_val = { cards: [], quest: splinterlands.get_player().quest };
 
 			ret_val.rewards = _test_reward_data.rewards.map(r => new splinterlands.RewardItem(r));
-			let card_rewards = _test_reward_data.rewards.filter(i => i.type == 'reward_card');
+			const card_rewards = _test_reward_data.rewards.filter(i => i.type == 'reward_card');
 
 			if(card_rewards)
 				ret_val.cards = card_rewards.map(c => new splinterlands.Card(c.card));
@@ -198,7 +193,7 @@ window.splinterlands.ops = (function() {
 			await splinterlands.load_collection();
 
 			// Update current player's quest info
-			let quests = await splinterlands.api('/players/quests');
+			const quests = await splinterlands.api('/players/quests');
 
 			if(quests && quests.length > 0)
 				splinterlands.get_player().quest = new splinterlands.Quest(quests[0]);
@@ -208,7 +203,7 @@ window.splinterlands.ops = (function() {
 			if(tx.result.rewards) {
 				// New reward system
 				ret_val.rewards = tx.result.rewards.map(r => new splinterlands.RewardItem(r));
-				let card_rewards = tx.result.rewards.filter(i => i.type == 'reward_card');
+				const card_rewards = tx.result.rewards.filter(i => i.type == 'reward_card');
 
 				if(card_rewards)
 					ret_val.cards = card_rewards.map(c => new splinterlands.Card(c.card));
@@ -316,16 +311,24 @@ window.splinterlands.ops = (function() {
 	};
 
 	async function start_quest() {
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to start a Daily Quest." } }));
+			return { success: false, error: "You must own a Spellbook to start a Daily Quest."};
+		}
 		return splinterlands.send_tx_wrapper('start_quest', 'Start Quest', { type: 'daily' }, tx => {
-			let new_quest = new splinterlands.Quest(tx.result);
+			const new_quest = new splinterlands.Quest(tx.result);
 			splinterlands.get_player().quest = new_quest;
 			return new_quest
 		});
 	}
 
 	async function refresh_quest() {
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to start a Daily Quest." } }));
+			return { success: false, error: "You must own a Spellbook to start a Daily Quest."};
+		}
 		return splinterlands.send_tx_wrapper('refresh_quest', 'New Quest', { type: 'daily' }, tx => {
-			let new_quest = new splinterlands.Quest(tx.result);
+			const new_quest = new splinterlands.Quest(tx.result);
 			splinterlands.get_player().quest = new_quest;
 			return new_quest;
 		});
@@ -384,7 +387,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function withdraw_crypto(qty, wallet, token) {
-		let accounts = {
+		const accounts = {
 			tron: 'sm-dec-tron',
 			ethereum: 'sl-eth',
 			hive_engine: 'sl-hive',
@@ -417,7 +420,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function init_active_key_transaction(player, token, to, key, qty) {
-		let accounts = {
+		const accounts = {
 			tron: 'sm-dec-tron',
 			ethereum: 'sl-eth',
 			hive_engine: 'sl-hive',
@@ -458,6 +461,10 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function guild_join(guild_id) {
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to join a guild." } }));
+			return { success: false, error: "You must own a Spellbook to join a guild."};
+		}
 		return splinterlands.send_tx_wrapper('join_guild', 'Join Guild', { guild_id }, async tx => {
 			await splinterlands.get_player().refresh();
 			return tx;
@@ -465,6 +472,10 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function guild_request_join(guild_id) {
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to join a guild." } }));
+			return { success: false, error: "You must own a Spellbook to join a guild."};
+		}
 		return splinterlands.send_tx_wrapper('join_guild', 'Request Join Guild', { guild_id }, async tx => {
 			await splinterlands.get_player().refresh();
 			return tx;
@@ -479,7 +490,11 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function guild_create(name, motto, description, membership_type, language, banner, decal) {
-		let guild_data = {
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to create a guild." } }));
+			return { success: false, error: "You must own a Spellbook to create a guild."};
+		}
+		const guild_data = {
 			name: name,
 			motto: motto,
 			description: description,
@@ -496,7 +511,7 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function guild_update(guild_id, name, motto, description, membership_type, language, banner, decal) {
-		let guild_data = {
+		const guild_data = {
 			guild_id: guild_id,
 			name: name,
 			motto: motto,
@@ -514,6 +529,10 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function guild_request_join(guild_id) {
+		if(splinterlands.get_player().use_proxy) {
+			window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Spellbook Needed", message: "You must own a Spellbook to join a guild." } }));
+			return { success: false, error: "You must own a Spellbook to join a guild."};
+		}
 		return splinterlands.send_tx_wrapper('join_guild', 'Request Join Guild', { guild_id }, tx => tx);
 	}
 

@@ -48,4 +48,29 @@ splinterlands.Battle = class {
 
         return new splinterlands.Battle(tutorialBattleData);
 	}
+	
+	static calculate_max_number_of_gladiators_allowed(summoner, ruleset) {
+		// In a brawl, can only select 1 gladiator card unless you have Conscript, then allow 2
+		// or if the rulest is 'Are You Not Entertained?' then allow 3 :D
+		let max_gladiators_allowed = 0;
+		let canSummonerConscript = splinterlands.utils.summoner_has_ability(summoner, ['Conscript']) && !ruleset.includes('Silenced Summoners');
+
+		if (canSummonerConscript) {
+			max_gladiators_allowed++;
+		}
+
+		const hasGladiatorRuleset = ruleset.includes('Are You Not Entertained?');
+		if (hasGladiatorRuleset) {
+			max_gladiators_allowed++;
+		}
+
+		// Handle when Brawls is implemented
+		// if ((IS_BRAWL && GLADIATOR_CAP >= 1) || (!IS_BRAWL && GLADIATOR) || SETTINGS.allowed_cards === 'arena') {
+		// 	max_gladiators_allowed++;
+		// }
+
+		return max_gladiators_allowed;
+	}
+
+
 }
