@@ -3,6 +3,14 @@ splinterlands.Events = class {
         return splinterlands.send_tx_wrapper('create_tournament', 'Create Tournament', data, tx => tx)
     }
 
+    static async leaveTournament(id) {
+        return splinterlands.send_tx_wrapper('leave_tournament', 'Leave Tournament', {tournament_id: id});
+    }
+
+    static async cancelTournament(id) {
+        return splinterlands.send_tx_wrapper('cancel_tournament', 'Cancel Tournament', {tournament_id: id});
+    }
+
     static async enterTournament(
         id,
         format,
@@ -304,7 +312,7 @@ splinterlands.Events = class {
                         return `There was an error entering this tournament: ${err.message}`;
                     }
                 } else {
-                    await splinterlands.send_tx_wrapper('sm_enter_tournament', 'Enter Tournament', {
+                    await splinterlands.send_tx_wrapper('enter_tournament', 'Enter Tournament', {
                         tournament_id: id,
                         signed_pw: signed_pw
                     }, (result) => {
