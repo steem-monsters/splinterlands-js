@@ -244,7 +244,7 @@ splinterlands.Events = class {
 
     static async submitEnterTournament(id, fee, signed_pw) {
         if (fee && splinterlands.utils.get_currency(fee) != 'DEC' && splinterlands.utils.get_currency(fee) != 'SPS' && splinterlands.utils.get_currency(fee) != 'VOUCHER') {
-            let tx_id = 'sm_enter_tournament';
+            let tx_id = 'enter_tournament';
 
             if (splinterlands.get_settings().test_mode)
                 tx_id = splinterlands.get_settings().prefix + tx_id;
@@ -342,16 +342,16 @@ splinterlands.Events = class {
             // if all cards allowed, then just use the player's pre-computed collection power
             player_tournament_cp = splinterlands.get_player().collection_power;
         } else {
-            for (var card_type = 0; card_type < collection.length; card_type++) {
-                var card_details = collection[card_type];
+            for (let card_type = 0; card_type < collection.length; card_type++) {
+                let card_details = collection[card_type];
                 if (card_details.rarity === 4 && (allowedCards.type === 'no_legendaries'
                     || (allowedCards.type === 'no_legendary_summoners' && card_details.type === 'Summoner'))) {
                     continue;
                 }
-                var owned = card_details.owned;
+                let owned = card_details.owned;
                 if (owned && owned.length > 0) {
                     // doing this check here allows us to be more efficient and exclude some card types before we get to the below loop
-                    var isModern = false;
+                    let isModern = false;
                     if (allowedCards.epoch === 'modern') {
                         if (allowedCards.editions || !isEditionRestricted) {
                             isModern = splinterlands.is_card_in_modern_sets(owned[0].edition, card_details.tier, owned[0].card_detail_id);
@@ -361,8 +361,8 @@ splinterlands.Events = class {
                     }
 
                     if (allowedCards.epoch !== 'modern' || owned[0].edition === Constants.EDITIONS.GLADIUS.ID || isModern) {
-                        for (var index = 0; index < owned.length; index++) {
-                            var card = owned[index];
+                        for (let index = 0; index < owned.length; index++) {
+                            let card = owned[index];
                             if ((card.market_id && card.market_listing_type == 'SELL') ||
                                 card.uid.startsWith('starter-') ||
                                 (card.delegated_to && card.delegated_to !== accountName) ||
@@ -402,5 +402,137 @@ splinterlands.Events = class {
         player_tournament_cp = Math.round(player_tournament_cp);
         console.log(`Total Tournament Power: ${splinterlands.utils.add_commas(player_tournament_cp)}`);
         return player_tournament_cp;
+    }
+
+    static qualified_tournament_filter(player, collection, tournament) {
+        const {data, format, entry_fee, password_pub_key} = tournament;
+
+        // Assume we don't qualify for private events.
+        if (password_pub_key) {
+            return false;
+        }
+
+        const {allowed_cards, cp_min, spsp_min, alternate_fee} = data;
+        if (spsp_min > 0) {
+            if (this.get_balance('SPSP', player) < spsp_min) {
+                return false;
+            }
+        }
+
+        // some older tournaments might not have an entry fee
+        if (entry_fee) {
+            let [fee, token] = entry_fee.split(" ");
+            // We can currently only efficiently check SPS and DEC, so ignore other tokens for filtering purposes:
+            if (token === 'DEC' || token === 'SPS') {
+                if (alternate_fee && alternate_fee.value !== 'none') {
+                    const {league, season_max_league, modern_league, modern_season_max_league} = player;
+                    const alternate_fee_max_league = alternate_fee.max_league === undefined ? 99 : alternate_fee.max_league;
+                    const league_to_check = allowed_cards.epoch === 'modern' ? modern_league : league;
+                    let season_max_league_to_check = allowed_cards.epoch === 'modern' ? modern_season_max_league : season_max_league;
+                    if (season_max_league_to_check < league_to_check) {
+                        // can happen if a player hasn't played any battles this season (and thus doesn't have a season record in the DB)
+                        season_max_league_to_check = league_to_check;
+                    }
+
+                    if (league_to_check >= alternate_fee.min_league &&
+                        league_to_check <= alternate_fee_max_league &&
+                        season_max_league_to_check >= alternate_fee.min_league &&
+                        season_max_league_to_check <= alternate_fee_max_league) {
+                        // Assume alternate fee has the same token.
+                        [fee] = alternate_fee.value.split(" ");
+                    }
+                }
+                fee = parseFloat(fee);
+                if (this.get_balance(token, player) < fee) {
+                    return false;
+                }
+            }
+        }
+        const settings = splinterlands.get_settings();
+        const maxEditionCount = allowed_cards.epoch === 'modern' ? settings.modern_num_editions : settings.num_editions;
+        const maxSetCount = allowed_cards.epoch === 'modern' ? 2 : settings.core_editions.length;
+        const isEditionRestricted =
+            (allowed_cards.editions && allowed_cards.editions.length > 0 && allowed_cards.editions.length < maxEditionCount) ||
+            (allowed_cards.sets && allowed_cards.sets.length > 0 && allowed_cards.sets.length < maxSetCount);
+        const gold_only = allowed_cards.foil === 'gold_only';
+        const hasAnyCardRestriction = gold_only ||
+            cp_min > 0 ||
+            (isEditionRestricted && allowed_cards.editions && !allowed_cards.editions.find(e => settings.starter_editions.includes(e))) ||
+            (isEditionRestricted && allowed_cards.sets && !allowed_cards.sets.find(s => settings.starter_editions.includes(s.core)));
+        const ghost = allowed_cards.ghost;
+
+        if (hasAnyCardRestriction) {
+
+            // verify collection power entry requirement is met
+            if (cp_min > 0) {
+                let player_tournament_cp = this.calculatePlayerTournamentPower(player.name, allowed_cards, collection);
+                if (player_tournament_cp < cp_min) {
+                    return false;
+                }
+            }
+
+            // Dec. 16, 2021 UPDATE: Anytime (Swiss) events no longer have requirements to
+            // hold cards when joining or at event start. Players can simply rent what they need in order to battle.
+            if (format === 'swiss') {
+                return true;
+            }
+            // If a ghost tournament and you meet the cp requirement we don't care what the actual cards are
+            if (ghost) {
+                return true;
+            }
+
+            const summoners = collection.filter(c => c.type == 'Summoner' && (allowed_cards.epoch !== 'modern' || splinterlands.is_card_in_modern_sets(parseInt(c.editions.split(',')[0]), c.tier, c.id)));
+            const monsters = collection.filter(c => c.type == 'Monster' && (allowed_cards.epoch !== 'modern' || splinterlands.is_card_in_modern_sets(parseInt(c.editions.split(',')[0]), c.tier, c.id)));
+
+            let allowed_summoners, allowed_monsters;
+            if (gold_only) {
+                if (allowed_cards.editions) {
+                    // deprecated method, left in for backwards compatibility
+                    allowed_summoners = summoners
+                        .map(c => c.owned ? c.owned.filter(o => o.gold && (!isEditionRestricted || (isEditionRestricted && allowed_cards.editions.includes(o.edition)))).length : 0);
+                    allowed_monsters = monsters
+                        .map(c => c.owned ? c.owned.filter(o => o.gold && (!isEditionRestricted || (isEditionRestricted && allowed_cards.editions.includes(o.edition)))).length : 0);
+                } else {
+                    // new set-centric way
+                    allowed_summoners = summoners
+                        .map(c => c.owned ? c.owned.filter(o => o.gold && (!isEditionRestricted || (isEditionRestricted && splinterlands.is_card_in_sets(allowed_cards.sets, o.edition, c.tier, c.id)))).length : 0);
+                    allowed_monsters = monsters
+                        .map(c => c.owned ? c.owned.filter(o => o.gold && (!isEditionRestricted || (isEditionRestricted && splinterlands.is_card_in_sets(allowed_cards.sets, o.edition, c.tier, c.id)))).length : 0);
+                }
+            } else if (isEditionRestricted) {
+                if (allowed_cards.editions) {
+                    // deprecated method, left in for backwards compatibility
+                    allowed_summoners = summoners
+                        .map(c => c.owned ? c.owned.filter(o => allowed_cards.editions.includes(o.edition)).length : 0);
+                    allowed_monsters = monsters
+                        .map(c => c.owned ? c.owned.filter(o => allowed_cards.editions.includes(o.edition)).length : 0);
+                } else {
+                    // new set-centric way
+                    allowed_summoners = summoners
+                        .map(c => c.owned ? c.owned.filter(o => splinterlands.is_card_in_sets(allowed_cards.sets, o.edition, c.tier, c.id)).length : 0);
+                    allowed_monsters = monsters
+                        .map(c => c.owned ? c.owned.filter(o => splinterlands.is_card_in_sets(allowed_cards.sets, o.edition, c.tier, c.id)).length : 0);
+                }
+            } else {
+                allowed_summoners = summoners.map(c => c.owned ? c.owned.length : 0);
+                allowed_monsters = monsters.map(c => c.owned ? c.owned.length : 0);
+            }
+
+            const leftover_summoners = allowed_summoners.filter(c => c > 0).length;
+            const leftover_monsters = allowed_monsters.filter(c => c > 0).length;
+
+            if (leftover_summoners === 0 || leftover_monsters < 6) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static get_balance(token, player) {
+        if (!player || !player.balances)
+            return 0;
+
+        let balance = player.balances.find(b => b.token == token);
+        return balance ? parseFloat(balance.balance) : 0;
     }
 }
