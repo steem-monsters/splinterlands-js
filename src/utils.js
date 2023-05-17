@@ -366,13 +366,16 @@ window.splinterlands.utils = (function() {
 		return +(base_cost * (1 - (player.guild.shop_discount / 100))).toFixed(1);
 	}
 
-	async function loadScriptAsync(url) {
-		return new Promise(resolve => loadScript(url, resolve));
+	async function loadScriptAsync(url, client_token) {
+		return new Promise(resolve => loadScript(url, resolve, client_token));
 	}
 
-	function loadScript(url, callback) {
+	function loadScript(url, callback, client_token) {
 		var script = document.createElement("script");
 		script.type = "text/javascript";
+		if(client_token) {
+			script.setAttribute("data-client-token", client_token);
+		}
 		if(script.readyState) {  //IE
 			script.onreadystatechange = function() {
 				if(script.readyState === "loaded" || script.readyState === "complete") {
