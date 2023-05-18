@@ -201,20 +201,13 @@ splinterlands.Store = class {
 	static async paypal_button(type, get_qty) {
 		if(!window.paypal)  {
 			const { client_token } = await splinterlands.api('/purchases/paypal_init');
-			await splinterlands.utils.loadScriptAsync(`https://www.paypal.com/sdk/js?client-id=${splinterlands.get_settings().paypal_client_id}&disable-funding=credit`, client_token);
+			await splinterlands.utils.loadScriptAsync(`https://www.paypal.com/sdk/js?components=buttons,hosted-fields&client-id=${splinterlands.get_settings().paypal_client_id}&disable-funding=credit`, client_token);
 		}
 
-		return paypal.Buttons({
-			style: {
-				layout: 'horizontal',
-				height: 40,
-				shape: 'rect',
-				size: 'responsive',
-				tagline: false,
-				display: 'paypal',
-			},
+		var purchaseInfo = null;
+		return paypal.Buttons({			
 			createOrder: async function(data, actions) {
-				const purchaseInfo = await splinterlands.Store.start_purchase(type, get_qty(), 'USD', null, null, 'paypal');
+				purchaseInfo = await splinterlands.Store.start_purchase(type, get_qty(), 'USD', null, null, 'paypal');
 
 				if(purchaseInfo.error_code == 406) {
 					window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Daily Limit Reached", message: 'To prevent fraudulent charges, there is a daily limit for PayPal purchases from new accounts. If you would like to increase your limit, please contact us at support@splinterlands.com or on Discord. Cryptocurrency purchases have no limits.' } }));
@@ -235,7 +228,7 @@ splinterlands.Store = class {
 					}					
 					window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Verification Issue", message: `Verification Issue:  ${purchaseInfo.code} ${purchaseInfo.info}` } }));
 					return;										
-				}				
+				}
 
 				let response = await splinterlands.api('/purchases/paypal_create_order', { uid: purchaseInfo.uid });
 
@@ -244,20 +237,21 @@ splinterlands.Store = class {
 			onError: function (err) {
 				console.log(err);
 			},
-			onApprove: function(data, actions) {
+			onApprove: async function(data, actions) {
 				splinterlands.log_event('paypal_purchase', data);
 
-				return actions.order.capture().then(async function(details) {
-					const refID = details.purchase_units[0].reference_id;
-					const orderID = data.orderID;
-					
-					let result = await splinterlands.api('/purchases/paypal_capture_order', { uid: refID, tx: orderID });
+				const refID = purchaseInfo.uid;
+				const orderID = data.orderID;
 
-					if(result && !result.error)
-						window.dispatchEvent(new CustomEvent('splinterlands:purchase_approved', { detail: result }));
+				let response = await splinterlands.api('/purchases/paypal_capture_order', { uid: refID, tx: orderID });
 
-					return result;
-				}).catch(err =>	splinterlands.log_event('paypal_failed', Object.assign({ err }, data)));
+				if(response.error) {
+					window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Purchase Issue", message: `There was an error processing this payment: ${response.error}\r\n\r\nYou have NOT been charged for this purchase. You may see a pending charge on your account which will clear within a few days.\r\n\r\nPlease contact us at https://support.splinterlands.com for help.` } }));					
+					return false;
+				} else {					
+					window.dispatchEvent(new CustomEvent('splinterlands:purchase_approved', { detail: response }));
+					return true;
+				}
 			}
 		})
 	}
