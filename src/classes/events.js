@@ -290,7 +290,7 @@ splinterlands.Events = class {
                     tournament_id: id,
                     signed_pw: signed_pw
                 }, (r) => {
-                    if (!r.success) splinterlands.HideLoading();
+                    if (!r.success) return r.error;
                 });
             } else {
                 let bat_event_list = splinterlands.get_settings().bat_event_list || [];

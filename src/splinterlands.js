@@ -1416,6 +1416,49 @@ var splinterlands = (function () {
         }
     }
 
+    function init_avatar_data(player) {
+        const modern_league = (player && player.modern_league) ? player.modern_league : 0;
+        const wild_league = (player && player.league) ? player.league : 0;
+        let highest_league = 0;
+        let league_config = null;
+        const settings = splinterlands.get_settings();
+
+        if(player && player.epoch) {
+            if(player.epoch === 'modern') {
+                highest_league = modern_league;
+                league_config = settings.leagues.modern;
+            } else {
+                highest_league = wild_league;
+                league_config = settings.leagues.wild;
+            }
+        } else {
+            highest_league = Math.max(modern_league, wild_league);
+            league_config = modern_league > wild_league ? settings.leagues.modern : settings.leagues.wild;
+        }
+
+        const league_group = player ? league_config[highest_league].group : 'Novice';
+
+        return {
+            frame: `https://d36mxiodymuqjm.cloudfront.net/website/icons/avatars/avatar-frame_${league_group.toLowerCase()}.png`,
+            icon: this.init_avatar_icon(player),
+        };
+    }
+
+    function init_avatar_icon(player) {
+        const avatarId = (player && player.avatar_id) ? player.avatar_id : 0;
+        if (avatarId >= 0 && avatarId <= 20) {
+            return `https://d36mxiodymuqjm.cloudfront.net/website/icons/avatars/avatar_${avatarId}.png`;
+        }
+
+        // runi avatar id is runi number + 1000
+        if (avatarId >= 1001 && avatarId <= 4521) {
+            const runiNumber = +avatarId - Constants.RUNI_AVATAR_ID_OFFSET;
+            return `https://runi.splinterlands.com/avatars/${runiNumber}.png`;
+        }
+
+        return `https://d36mxiodymuqjm.cloudfront.net/website/icons/avatars/avatar_0.png`;
+    }
+
     return {
         init,
         api,
@@ -1482,7 +1525,9 @@ var splinterlands = (function () {
         is_card_in_modern_sets,
         is_modern_card,
         get_onfido,
-        eth_bsc_deposit
+        eth_bsc_deposit,
+        init_avatar_data,
+        init_avatar_icon
     };
 })();
 
