@@ -808,6 +808,24 @@ window.splinterlands.utils = (function() {
 			"name": "Reflection Shield",
 			"desc": "This Monster doesn't take damage from Blast, Magic Reflect, Thorns, or Return Fire."
 		},
+		{
+			"name": "Fury",
+			"desc": "This Monster does double damage to targets with the Taunt ability."
+		},
+		{
+			"name": "Weapons Training",
+			"desc": "Adjacent characters gain this character's attack if they have no attack themselves.",
+			"effect_name": "Trained",
+			"effect_desc": "Gaining attack from Monster with Weapons Training."
+		},
+		{
+			"name": "Martyr",
+			"desc": "When this Monster dies, adjacent Monsters get +1 to all stats."
+		},
+		{
+			"name": "Conscript",
+			"desc": "Allows the use of one additional Gladiator card in battle."
+		},
 	];
 
 	function get_chest_type_from_chest_tier(chestTier) {
