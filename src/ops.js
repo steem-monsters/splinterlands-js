@@ -599,6 +599,13 @@ window.splinterlands.ops = (function() {
 		)
 	}
 
+	async function accept_terms_of_service() {
+		return splinterlands.send_tx_wrapper('accept_tos', 'Accept Terms of Service', null, async tx => {
+			splinterlands.get_player().accepted_terms = true;
+			return tx;
+		});
+	}
+
 
 	return {
 		combine_cards,
@@ -648,6 +655,7 @@ window.splinterlands.ops = (function() {
 		claim_riftwatchers_airdrop,
 		fetch_transfer_out_fees,
 		init_active_key_transaction,
-		init_cards_transactions
+		init_cards_transactions,
+		accept_terms_of_service
 	};
 })();
