@@ -112,7 +112,7 @@ window.splinterlands.ops = (function() {
 		if(!secret)
 			secret = splinterlands.utils.randomStr(10);
 
-		const data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`), summoner, monsters, secret, match_type: (match.match_type + match.format).trim() };
+		const data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`), summoner, monsters, secret, match_type: (match.match_type + " " + match.format).trim() };
 
 		return splinterlands.send_tx_wrapper('submit_team', 'Submit Team', data, async tx => {
 			const cur_match = splinterlands.get_match();
