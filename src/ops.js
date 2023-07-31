@@ -565,10 +565,10 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx_wrapper('guild_contribution', 'Guild Contribution', { guild_id, amount }, tx => tx);
 	}
 
-	async function guild_building_contribution(guild_id, building, dec_amount, crowns_amount) {
+	async function guild_building_contribution(guild_id, building, gp_amount, crowns_amount) {
 		let amount = [];
-		if(dec_amount > 0) {
-			amount.push(dec_amount + ' DEC');
+		if(gp_amount > 0) {
+			amount.push(gp_amount + ' GP');
 		}
 		if(crowns_amount > 0) {
 			amount.push(crowns_amount + ' CROWN');
