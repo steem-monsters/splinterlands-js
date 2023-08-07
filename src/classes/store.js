@@ -170,6 +170,10 @@ splinterlands.Store = class {
 			return { error: "We are very sorry but purchases of Credits/Spellbooks are currently unavailable on the Splinterlands mobile app. You may also log into your account and play at https://splinterlands.com"}
 		}
 
+		if(qty < 10000) {
+			return { error: "A $10 minumum is now required to make a purchase."}
+		}
+
 		return new splinterlands.Purchase(await splinterlands.api('/purchases/start', params));
 	}
 
@@ -195,62 +199,59 @@ splinterlands.Store = class {
 	}
 
 	static async paypal_button(type, get_qty) {
-		if(!window.paypal)
-			await splinterlands.utils.loadScriptAsync(`https://www.paypal.com/sdk/js?client-id=${splinterlands.get_settings().paypal_client_id}&disable-funding=credit`);
+		if(!window.paypal)  {
+			const { client_token } = await splinterlands.api('/purchases/paypal_init');
+			await splinterlands.utils.loadScriptAsync(`https://www.paypal.com/sdk/js?components=buttons,hosted-fields&client-id=${splinterlands.get_settings().paypal_client_id}&disable-funding=credit`, client_token);
+		}
 
-		return paypal.Buttons({
-			style: {
-				layout: 'horizontal',
-				height: 40,
-				shape: 'rect',
-				size: 'responsive',
-				tagline: false,
-				display: 'paypal',
-			},
+		var purchaseInfo = null;
+		return paypal.Buttons({			
 			createOrder: async function(data, actions) {
-				const purchaseInfo = await splinterlands.Store.start_purchase(type, get_qty(), 'USD', null, null, 'paypal');
+				purchaseInfo = await splinterlands.Store.start_purchase(type, get_qty(), 'USD', null, null, 'paypal');
 
-				if(purchaseInfo.code === "verification_needed") {
-					window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Verification Needed", message: "Verification is needed for this purchase. Please make your purchase again on our desktop website at https://splinterlands.com." } }));
-
-					return { error: "Verification needed."}
+				if(purchaseInfo.error_code == 406) {
+					window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Daily Limit Reached", message: 'To prevent fraudulent charges, there is a daily limit for PayPal purchases from new accounts. If you would like to increase your limit, please contact us at support@splinterlands.com or on Discord. Cryptocurrency purchases have no limits.' } }));
+					return;
+				}
+				if(purchaseInfo.error_code == 407) {
+					window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Monthly Limit Reached", message: 'To prevent fraudulent charges, there is a monthly limit for PayPal purchases. If you would like to increase your limit, please contact us at support@splinterlands.com or on Discord. Cryptocurrency purchases have no limits.' } }));
+					return;
+				} 
+				if(purchaseInfo.error) {
+					window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Purchase Error", message: 'There was an error starting this purchase: ' + purchaseInfo.error } }));
+					return;
+				} 
+				if(purchaseInfo.code != null) {
+					if(purchaseInfo.code === "verification_needed") {
+						window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Verification Needed", message: "Verification is needed for this purchase. Please make your purchase again on our desktop website at https://splinterlands.com." } }));
+						return;
+					}					
+					window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Verification Issue", message: `Verification Issue:  ${purchaseInfo.code} ${purchaseInfo.info}` } }));
+					return;										
 				}
 
-				// Set up the transaction
-				return actions.order.create({
-					intent: "CAPTURE",
-					purchase_units: [{
-						reference_id: purchaseInfo.uid,
-						custom_id: purchaseInfo.uid,
-						invoice_id: purchaseInfo.uid,
-						description: (type == 'starter_pack') ? 'Splinterlands Starter Set' : purchaseInfo.quantity + 'X Splinterlands Booster Pack',
-						amount: {
-							value: purchaseInfo.amount_usd,
-							payee: {
-								email_address: splinterlands.get_settings().paypal_acct,
-								merchant_id: splinterlands.get_settings().paypal_merchant_id,
-							}
-						}
-					}]
-				});
+				let response = await splinterlands.api('/purchases/paypal_create_order', { uid: purchaseInfo.uid });
+
+				return response.id;
 			},
 			onError: function (err) {
 				console.log(err);
 			},
-			onApprove: function(data, actions) {
+			onApprove: async function(data, actions) {
 				splinterlands.log_event('paypal_purchase', data);
 
-				return actions.order.capture().then(async function(details) {
-					const refID = details.purchase_units[0].reference_id;
-					const orderID = data.orderID;
+				const refID = purchaseInfo.uid;
+				const orderID = data.orderID;
 
-					let result = await splinterlands.api('/purchases/paypal', { uid: refID, tx: orderID });
+				let response = await splinterlands.api('/purchases/paypal_capture_order', { uid: refID, tx: orderID });
 
-					if(result && !result.error)
-						window.dispatchEvent(new CustomEvent('splinterlands:purchase_approved', { detail: result }));
-
-					return result;
-				}).catch(err =>	splinterlands.log_event('paypal_failed', Object.assign({ err }, data)));
+				if(response.error) {
+					window.dispatchEvent(new CustomEvent('splinterlands:system_message', { detail: { title: "Purchase Issue", message: `There was an error processing this payment: ${response.error}\r\n\r\nYou have NOT been charged for this purchase. You may see a pending charge on your account which will clear within a few days.\r\n\r\nPlease contact us at https://support.splinterlands.com for help.` } }));					
+					return false;
+				} else {					
+					window.dispatchEvent(new CustomEvent('splinterlands:purchase_approved', { detail: response }));
+					return true;
+				}
 			}
 		})
 	}

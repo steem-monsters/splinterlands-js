@@ -265,7 +265,7 @@ splinterlands.Player = class {
     }
 
     get is_eligible_to_advance() {
-        return (!this.league.is_max_league && this.points_until_next_league === 0 && this.power_until_next_league === 0)
+        return (!this.league.is_max_league && this.points_until_next_league === 0)
     }
 
     async check_messages(type) {

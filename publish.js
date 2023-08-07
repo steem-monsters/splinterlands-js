@@ -66,8 +66,7 @@ async function upload_files(bucket, folder) {
 			Bucket: bucket,
 			Key: (folder ? folder + '/' : '') + file.substring(dist_file_path.length + 1).replace(/\\/g, '/'),
 			Body: fs.readFileSync(file),
-			CacheControl: '604800',
-			ACL: 'public-read'
+			CacheControl: '604800',			
 		}
 
 		if(mime_type)

@@ -112,7 +112,7 @@ window.splinterlands.ops = (function() {
 		if(!secret)
 			secret = splinterlands.utils.randomStr(10);
 
-		const data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`), summoner, monsters, secret };
+		const data = { trx_id: match.id, team_hash: md5(`${summoner},${monsters.join()},${secret}`), summoner, monsters, secret, match_type: (match.match_type + " " + match.format).trim() };
 
 		return splinterlands.send_tx_wrapper('submit_team', 'Submit Team', data, async tx => {
 			const cur_match = splinterlands.get_match();
@@ -565,10 +565,10 @@ window.splinterlands.ops = (function() {
 		return splinterlands.send_tx_wrapper('guild_contribution', 'Guild Contribution', { guild_id, amount }, tx => tx);
 	}
 
-	async function guild_building_contribution(guild_id, building, dec_amount, crowns_amount) {
+	async function guild_building_contribution(guild_id, building, gp_amount, crowns_amount) {
 		let amount = [];
-		if(dec_amount > 0) {
-			amount.push(dec_amount + ' DEC');
+		if(gp_amount > 0) {
+			amount.push(gp_amount + ' GP');
 		}
 		if(crowns_amount > 0) {
 			amount.push(crowns_amount + ' CROWN');
@@ -620,9 +620,15 @@ window.splinterlands.ops = (function() {
 	}
 
 	async function cancel_apr_unstake(token) {
-		return splinterlands.send_tx_wrapper('cancel_unstake_tokens',
-			'Cancel Unstake', {token}, async tx => {
+		return splinterlands.send_tx_wrapper('cancel_unstake_tokens', 'Cancel Unstake', {token}, async tx => {
 			await splinterlands.get_player().refresh();
+			return tx;
+		});
+	}
+	
+	async function accept_terms_of_service() {
+		return splinterlands.send_tx_wrapper('accept_tos', 'Accept Terms of Service', null, async tx => {
+			splinterlands.get_player().accepted_terms = true;
 			return tx;
 		});
 	}
@@ -680,5 +686,6 @@ window.splinterlands.ops = (function() {
 		claim_airdrop_staked_sps,
 		unstake_sps,
 		cancel_apr_unstake,
+		accept_terms_of_service,
 	};
 })();
