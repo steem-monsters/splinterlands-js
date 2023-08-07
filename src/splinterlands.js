@@ -649,12 +649,12 @@ var splinterlands = (function () {
     async function server_broadcast_tx(tx, use_active) {
         return new Promise(async (resolve, reject) => {
             try {
-                let signed_tx = await sign_tx(tx, use_active);
+                const signed_tx = await sign_tx(tx, use_active);
 
                 if (!signed_tx)
                     return;
 
-                let op_name = remove_tx_prefix(tx.operations[0][1].id);
+                const op_name = tx.operations[0][1].id.replace(splinterlands.get_settings().test_mode ? `${splinterlands.get_settings().prefix}sm_` : 'sm_', '');
 
                 if (splinterlands.get_settings().api_ops.includes(op_name)) {
                     fetch(`${Config.battle_api_url || Config.api_url}/battle/battle_tx`, {
