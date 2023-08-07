@@ -157,6 +157,10 @@ splinterlands.Card = class {
 		if(!this.playable)
 			return false;
 
+		if (this.isCardStaked || this.isCardUnstaking) {
+			return false;
+		}
+
 		return this.cooldown <= 0;
 	}
 
@@ -244,6 +248,26 @@ splinterlands.Card = class {
 	get suggested_price() {
 		let market_card = splinterlands.get_market().find(c => c.card_detail_id == this.details.id && c.gold == this.gold && c.edition == this.edition);
 		return market_card ? (market_card.low_price_bcx * this.bcx).toFixed(2) : 'Not Available';
+	}
+
+	get isCardStaked() {
+		if (!this.stake_start_date) {
+			return false;
+		}
+
+		const currentDate = new Date();
+		const stakeStartDate = new Date(this.stake_start_date);
+		return stakeStartDate < currentDate && !this.stake_end_date;
+	}
+
+	get isCardUnstaking() {
+		if (!this.stake_start_date || !this.stake_end_date) {
+			return false;
+		}
+		const currentDate = new Date();
+		const stakeStartDate = new Date(this.stake_start_date);
+		const stakeEndDate = new Date(this.stake_end_date);
+		return stakeStartDate < currentDate && stakeEndDate > currentDate;
 	}
 
   get is_alpha() { return this.edition == 0 || (this.edition == 2 && this.details.id < 100); }
