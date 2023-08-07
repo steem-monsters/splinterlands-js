@@ -17,7 +17,6 @@ var splinterlands = (function () {
     let _init_url_search_params = null; //Query string app started with
     let _server_time_offset = 0;
     let _additional_season_rshares_count = 0;
-    let _tx_broadcast_urls = ['https://broadcast.splinterlands.com', 'https://bcast.splinterlands.com'];
     let _active_auth_tx_callbacks = {};
     let _rpc_index = 0;
 
@@ -657,18 +656,13 @@ var splinterlands = (function () {
                 const op_name = tx.operations[0][1].id.replace(splinterlands.get_settings().test_mode ? `${splinterlands.get_settings().prefix}sm_` : 'sm_', '');
 
                 if (splinterlands.get_settings().api_ops.includes(op_name)) {
-                    fetch(`${Config.battle_api_url || Config.api_url}/battle/battle_tx`, {
-                        method: 'POST',
-                        body: {signed_tx: JSON.stringify(signed_tx)}
-                    }).then(resolve).catch((error) => reject(error))
+                    battle_api_post(`/battle/battle_tx`, {signed_tx: JSON.stringify(signed_tx)}).then(resolve).catch(reject);
                     return;
                 }
 
-                let bcast_url = _tx_broadcast_urls[Math.floor(Math.random() * _tx_broadcast_urls.length)];
-                fetch(`${bcast_url}/send`, {
-                    method: 'POST',
-                    body: {signed_tx: JSON.stringify(signed_tx)}
-                }).then(resolve).catch((err) => reject(err))
+                // TODO: Use array for tx_broadcast_url list
+                let bcast_url = splinterlands.get_config().tx_broadcast_url;
+                api_post(`${bcast_url}/send`, { signed_tx: JSON.stringify(signed_tx) }, resolve).fail(reject);
             } catch (err) {
                 reject(err);
             }
