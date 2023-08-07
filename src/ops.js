@@ -378,9 +378,9 @@ window.splinterlands.ops = (function() {
 
 	async function fetch_transfer_out_fees(wallet, qty) {
 		try	{
-		const response = await fetch(`https://ec-api.splinterlands.com/bridge/estimateGas?token=dec&network=${wallet}&amount=${qty}`);
-		const gas_data = await response.json();
-		return gas_data;
+			const response = await fetch(`https://ec-api.splinterlands.com/bridge/estimateGas?token=dec&network=${wallet}&amount=${qty}`);
+			const gas_data = await response.json();
+			return gas_data;
 		} catch (error) {
 			return error;
 		}
@@ -599,6 +599,33 @@ window.splinterlands.ops = (function() {
 		)
 	}
 
+	async function claim_airdrop_staked_sps(token, qty) {
+		return splinterlands.send_tx_wrapper('stake_tokens', 'Stake', {
+			token,
+			qty,
+		}, async tx => {
+			await splinterlands.get_player().refresh();
+			return tx;
+		});
+	}
+
+	async function unstake_sps(token, qty) {
+		return splinterlands.send_tx_wrapper('unstake_tokens', 'Stake', {
+			token,
+			qty,
+		}, async tx => {
+			await splinterlands.get_player().refresh();
+			return tx;
+		});
+	}
+
+	async function cancel_apr_unstake(token) {
+		return splinterlands.send_tx_wrapper('cancel_unstake_tokens', 'Cancel Unstake', {token}, async tx => {
+			await splinterlands.get_player().refresh();
+			return tx;
+		});
+	}
+	
 	async function accept_terms_of_service() {
 		return splinterlands.send_tx_wrapper('accept_tos', 'Accept Terms of Service', null, async tx => {
 			splinterlands.get_player().accepted_terms = true;
@@ -656,6 +683,9 @@ window.splinterlands.ops = (function() {
 		fetch_transfer_out_fees,
 		init_active_key_transaction,
 		init_cards_transactions,
-		accept_terms_of_service
+		claim_airdrop_staked_sps,
+		unstake_sps,
+		cancel_apr_unstake,
+		accept_terms_of_service,
 	};
 })();

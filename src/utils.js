@@ -1,5 +1,5 @@
-if(!window.splinterlands)
-	window.splinterlands = {};
+if (!window.splinterlands)
+    window.splinterlands = {};
 
 window.splinterlands.utils = (function() {
 	UNTAMED_CARD_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_untamed/';
@@ -12,7 +12,7 @@ window.splinterlands.utils = (function() {
 	SOULBOUND_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_soulbound/';
 
 	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL, UNTAMED_CARD_URL, GLADIATOR_URL, CHAOS_LEGION_URL, RIFT_URL, null, SOULBOUND_URL];
-	
+
 	BATTLE_CARD_URLS = [
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_alpha/',
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_beta/',
@@ -24,83 +24,95 @@ window.splinterlands.utils = (function() {
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_chaos/',
 	];
 
-	BATTLE_CARD_URLS_MOBILE = [
-		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_mobile/',
-		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_mobile/'
-	];
+    BATTLE_CARD_URLS_MOBILE = [
+        'https://d36mxiodymuqjm.cloudfront.net/cards_battle_mobile/',
+        'https://d36mxiodymuqjm.cloudfront.net/cards_battle_mobile/'
+    ];
 
-	RUNI_CARD_URL = 'https://runi.splinterlands.com/'
+    RUNI_CARD_URL = 'https://runi.splinterlands.com/'
 
-	rpc_index = 0;
-	//rpc_nodes = ["https://api.steemit.com", "https://seed.steemmonsters.com", "https://steemd.minnowsupportproject.org"];
-	rpc_nodes = ["https://api.hive.blog", "https://anyx.io", "https://hived.splinterlands.com"];
+    rpc_index = 0;
+    //rpc_nodes = ["https://api.steemit.com", "https://seed.steemmonsters.com", "https://steemd.minnowsupportproject.org"];
+    rpc_nodes = ["https://api.hive.blog", "https://anyx.io", "https://hived.splinterlands.com"];
+    version = "0.7.26";
 
-	function switch_rpc() {
-		// Try the next RPC node
-		let rpc_node = rpc_nodes[++rpc_index % rpc_nodes.length];
-		steem.api.setOptions({ transport: 'http', uri: rpc_node, url: rpc_node });
-		console.log(`SWITCHED TO NEW RPC NODE: ${rpc_node}`);
-	}
-
-	function get_rpc_nodes(list) { return rpc_nodes; }
-	function set_rpc_nodes(list) { rpc_nodes = list; }
-
-	async function post(url, data) {
-		return new Promise((resolve, reject) => {
-			var xhr = new XMLHttpRequest();
-			xhr.open('POST', url, true);
-			xhr.setRequestHeader('Content-Type', 'application/json');
-
-			xhr.onload = function() {
-				if (xhr.status === 200)
-					resolve(try_parse(xhr.responseText));
-				else
-					reject('Request failed.  Returned status of ' + xhr.status);
-			};
-
-			xhr.send(JSON.stringify(data));
-		});
-	}
-
-	function parse_payment(payment_str) {
-		return {
-			amount: parseFloat(payment_str),
-			currency: payment_str.substr(payment_str.indexOf(' ') + 1)
-		}
-	}
-
-	function randomStr(length) {
-    var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-        retVal = "";
-    for (var i = 0, n = charset.length; i < length; ++i) {
-        retVal += charset.charAt(Math.floor(Math.random() * n));
+    function switch_rpc() {
+        // Try the next RPC node
+        let rpc_node = rpc_nodes[++rpc_index % rpc_nodes.length];
+        steem.api.setOptions({transport: 'http', uri: rpc_node, url: rpc_node});
+        console.log(`SWITCHED TO NEW RPC NODE: ${rpc_node}`);
     }
-    return retVal;
-	}
 
-	function getURLParameter(url, name) {
-		let index = url.indexOf('?');
+    function get_rpc_nodes(list) {
+        return rpc_nodes;
+    }
+
+    function set_rpc_nodes(list) {
+        rpc_nodes = list;
+    }
+
+    function get_version() {
+        return version
+    }
+
+    async function post(url, data) {
+        return new Promise((resolve, reject) => {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            xhr.onload = function () {
+                if (xhr.status === 200)
+                    resolve(try_parse(xhr.responseText));
+                else
+                    reject('Request failed.  Returned status of ' + xhr.status);
+            };
+
+            xhr.send(JSON.stringify(data));
+        });
+    }
+
+    function parse_payment(payment_str) {
+        return {
+            amount: parseFloat(payment_str),
+            currency: payment_str.substr(payment_str.indexOf(' ') + 1)
+        }
+    }
+
+    function randomStr(length) {
+        var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+            retVal = "";
+        for (var i = 0, n = charset.length; i < length; ++i) {
+            retVal += charset.charAt(Math.floor(Math.random() * n));
+        }
+        return retVal;
+    }
+
+    function getURLParameter(url, name) {
+        let index = url.indexOf('?');
 
 		if(index < 0)
 			return null;
-		
+
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(url.substring(index)) || [, ""])[1].replace(/\+/g, '%20')) || null;
 	}
 
-	function timeout(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+    function timeout(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
-	function get_cur_block_num() {
-		return Math.max(Math.floor((Date.now() - splinterlands.get_settings().timestamp) / 3000), 0) + splinterlands.get_settings().last_block;
-	}
+    function get_cur_block_num() {
+        return Math.max(Math.floor((Date.now() - splinterlands.get_settings().timestamp) / 3000), 0) + splinterlands.get_settings().last_block;
+    }
 
-	function get_level(card) {
-		if(card.edition >= 4 || card.details.tier >= 4) {
-			let rates = splinterlands.get_settings()[card.gold ? 'combine_rates_gold' : 'combine_rates'][card.details.rarity - 1];
+    function get_level(card) {
+        if (card.edition >= 4 || card.details.tier >= 4) {
+            let rates = splinterlands.get_settings()[card.gold ? 'combine_rates_gold' : 'combine_rates'][card.details.rarity - 1];
 
-			for(let i = 0; i < rates.length; i++) {
-				if(rates[i] > card.xp)
-					return i;
-			}
+            for (let i = 0; i < rates.length; i++) {
+                if (rates[i] > card.xp)
+                    return i;
+            }
 
 			return card.details.max_level;
 		} else {
@@ -108,87 +120,87 @@ window.splinterlands.utils = (function() {
 				if(card.xp < splinterlands.get_settings().xp_levels[card.details.rarity - 1][i])
 					return i + 1;
 			}
-		
+
 			return splinterlands.get_settings().xp_levels[card.details.rarity - 1].length + 1;
 		}
 	}
 
-	function get_summoner_level(rating_level, card) {
-		var rarity = splinterlands.get_card_details(card.card_detail_id).rarity;
-		var max_level = 10 - (rarity - 1) * 2;
-		return Math.min(card.level, Math.max(Math.round(max_level / 4 * rating_level), 1));
-	}
+    function get_summoner_level(rating_level, card) {
+        var rarity = splinterlands.get_card_details(card.card_detail_id).rarity;
+        var max_level = 10 - (rarity - 1) * 2;
+        return Math.min(card.level, Math.max(Math.round(max_level / 4 * rating_level), 1));
+    }
 
-	function get_monster_level(rating_level, summoner_card, monster_card) {
-		if(rating_level == 0)
-			return 1;
+    function get_monster_level(rating_level, summoner_card, monster_card) {
+        if (rating_level == 0)
+            return 1;
 
-		var summoner_rarity = splinterlands.get_card_details(summoner_card.card_detail_id).rarity;
-		var monster_rarity = splinterlands.get_card_details(monster_card.card_detail_id).rarity;
-		var summoner_level = get_summoner_level(rating_level, summoner_card);
+        var summoner_rarity = splinterlands.get_card_details(summoner_card.card_detail_id).rarity;
+        var monster_rarity = splinterlands.get_card_details(monster_card.card_detail_id).rarity;
+        var summoner_level = get_summoner_level(rating_level, summoner_card);
 
-		var monster_max = 10 - (monster_rarity - 1) * 2;
-		var summoner_max = 10 - (summoner_rarity - 1) * 2;
-		return Math.min(monster_card.level, Math.max(Math.round(monster_max / summoner_max * summoner_level), 1));
-	}
+        var monster_max = 10 - (monster_rarity - 1) * 2;
+        var summoner_max = 10 - (summoner_rarity - 1) * 2;
+        return Math.min(monster_card.level, Math.max(Math.round(monster_max / summoner_max * summoner_level), 1));
+    }
 
-	function get_ecr(capture_rate, last_reward_block) {
-		return Math.min((isNaN(parseInt(capture_rate)) ? 10000 : capture_rate) + (splinterlands.get_settings().last_block - last_reward_block) * splinterlands.get_settings().dec.ecr_regen_rate, 10000);
-	}
+    function get_ecr(capture_rate, last_reward_block) {
+        return Math.min((isNaN(parseInt(capture_rate)) ? 10000 : capture_rate) + (splinterlands.get_settings().last_block - last_reward_block) * splinterlands.get_settings().dec.ecr_regen_rate, 10000);
+    }
 
-	function get_token(symbol) {
-		return splinterlands.get_settings().supported_currencies.find(c => c.currency == symbol);
-	}
+    function get_token(symbol) {
+        return splinterlands.get_settings().supported_currencies.find(c => c.currency == symbol);
+    }
 
-	function format_tx_id(id) {
-		let prefix = (splinterlands.get_settings().test_mode) ? `${splinterlands.get_settings().prefix}sm_` : 'sm_';
+    function format_tx_id(id) {
+        let prefix = (splinterlands.get_settings().test_mode) ? `${splinterlands.get_settings().prefix}sm_` : 'sm_';
 
-		if(!id.startsWith(prefix))
-			id = `${prefix}${id}`;
+        if (!id.startsWith(prefix))
+            id = `${prefix}${id}`;
 
-		return id;
-	}
+        return id;
+    }
 
-	function format_tx_data(data) {
-		if(!data)
-			data = {};
+    function format_tx_data(data) {
+        if (!data)
+            data = {};
 
-		data.app = `sl-mobile/${splinterlands.get_settings().version}`;
+        data.app = `sl-mobile/${splinterlands.get_settings().version}`;
 
-		// Generate a random ID for this transaction so we can look it up later
-		if(!data.sm_id)
-			data.sm_id = randomStr(10);
+        // Generate a random ID for this transaction so we can look it up later
+        if (!data.sm_id)
+            data.sm_id = randomStr(10);
 
-		// Append the prefix to the app name if in test mode
-		if(splinterlands.get_settings().test_mode)
-			data.app = `${splinterlands.get_settings().prefix}${data.app}`;
+        // Append the prefix to the app name if in test mode
+        if (splinterlands.get_settings().test_mode)
+            data.app = `${splinterlands.get_settings().prefix}${data.app}`;
 
 		if(JSON.stringify(data).length > 2000)
 			throw new Error('Max custom_json data length exceeded.');
-		
+
 		return data;
 	}
 
-	function popup_center(url, title, w, h) {
-		// Fixes dual-screen position                         Most browsers      Firefox
-		var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
-		var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
+    function popup_center(url, title, w, h) {
+        // Fixes dual-screen position                         Most browsers      Firefox
+        var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
+        var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
 
-		var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
-		var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+        var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+        var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
 
-		var left = ((width / 2) - (w / 2)) + dualScreenLeft;
-		var top = ((height / 2) - (h / 2)) + dualScreenTop;
-		var newWindow = window.open(url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+        var left = ((width / 2) - (w / 2)) + dualScreenLeft;
+        var top = ((height / 2) - (h / 2)) + dualScreenTop;
+        var newWindow = window.open(url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
 
-		// Puts focus on the newWindow
-		if (window.focus) {
-			newWindow.focus();
-		}
+        // Puts focus on the newWindow
+        if (window.focus) {
+            newWindow.focus();
+        }
 
 		return newWindow;
 	}
-	
+
 	async function hive_engine_transfer(to, token, quantity, memo) {
 		var transaction_data = {
 			"contractName": "tokens",
@@ -203,34 +215,34 @@ window.splinterlands.utils = (function() {
 
 		if(window.steem_keychain) {
 			var result = await new Promise(resolve => steem_keychain.requestCustomJson(splinterlands.get_player().name, splinterlands.get_settings().ssc.hive_chain_id, 'Active', JSON.stringify(transaction_data), 'Transfer Token: ' + token, r => resolve(r)));
-			
+
 			if(!result.success)
 				return { success: false, error: result.error };
 
-		} else {
-			var url = 'https://hivesigner.com/sign/custom-json?authority=active';
-			url += '&required_posting_auths=' + encodeURI('[]');
-			url += '&required_auths=' + encodeURI('["' + splinterlands.get_player().name + '"]');
-			url += '&id=' + splinterlands.get_settings().ssc.hive_chain_id;
-			url += '&json=' + encodeURI(JSON.stringify(transaction_data));
+        } else {
+            var url = 'https://hivesigner.com/sign/custom-json?authority=active';
+            url += '&required_posting_auths=' + encodeURI('[]');
+            url += '&required_auths=' + encodeURI('["' + splinterlands.get_player().name + '"]');
+            url += '&id=' + splinterlands.get_settings().ssc.hive_chain_id;
+            url += '&json=' + encodeURI(JSON.stringify(transaction_data));
 
-			popup_center(url, `${token} Payment`, 500, 760);
-		}
+            popup_center(url, `${token} Payment`, 500, 760);
+        }
 
-		return { success: true };
-	}
+        return {success: true};
+    }
 
-	function sc_custom_json(id, title, data, use_active) {
-		let url = 'https://hivesigner.com/sign/custom-json?authority=active';
-		url += '&required_posting_auths=' + encodeURI('[' + (use_active ? '' : `"${splinterlands.get_player().name}"`) + ']');
-		url += '&required_auths=' + encodeURI('[' + (use_active ? `"${splinterlands.get_player().name}"` : '') + ']');
-		url += '&id=' + id;
-		url += '&json=' + encodeURI(JSON.stringify(data));
-		url += use_active ? '&authority=active' : '';
+    function sc_custom_json(id, title, data, use_active) {
+        let url = 'https://hivesigner.com/sign/custom-json?authority=active';
+        url += '&required_posting_auths=' + encodeURI('[' + (use_active ? '' : `"${splinterlands.get_player().name}"`) + ']');
+        url += '&required_auths=' + encodeURI('[' + (use_active ? `"${splinterlands.get_player().name}"` : '') + ']');
+        url += '&id=' + id;
+        url += '&json=' + encodeURI(JSON.stringify(data));
+        url += use_active ? '&authority=active' : '';
 
 		popup_center(url, title, 500, 560);
 	}
-	
+
 	// Checks whether or not a browser payment method is available for the specified token (i.e. Web3 for ETH or TronWeb for TRX)
 	async function browser_payment_available(token) {
 		return new Promise(async (resolve) =>  {
@@ -259,11 +271,11 @@ window.splinterlands.utils = (function() {
 			}
 		});
 	}
-  
-  function get_edition_str(edition) {
-    return ['Alpha', 'Beta', 'Promo', 'Reward', 'Untamed', 'Dice'][edition];
+
+	function get_edition_str(edition) {
+		return ['Alpha', 'Beta', 'Orb', 'Reward', 'Untamed', 'Dice', 'Gladius', 'Chaos', 'Rift', 'Nightmare', 'Soulbound'][edition];
 	}
-	
+
 	function param(object) {
     var encodedString = '';
     for (var prop in object) {
@@ -277,94 +289,94 @@ window.splinterlands.utils = (function() {
     return encodedString;
 	}
 
-	function try_parse(json) {
-		try {
-			return (typeof json == 'string') ? JSON.parse(json) : json;
-		} catch(err) {
-			console.log('Error trying to parse JSON: ' + json);
-			return null;
-		}
-	}
+    function try_parse(json) {
+        try {
+            return (typeof json == 'string') ? JSON.parse(json) : json;
+        } catch (err) {
+            console.log('Error trying to parse JSON: ' + json);
+            return null;
+        }
+    }
 
-	async function validate_acct_name(name) {
-		name = name.toLowerCase();
-		let error = steem.utils.validateAccountName(name);
+    async function validate_acct_name(name) {
+        name = name.toLowerCase();
+        let error = steem.utils.validateAccountName(name);
 
-		if(error)
-			return { available: false, error };
+        if (error)
+            return {available: false, error};
 
-		let is_existing_account = await this.account_exists(name);
+        let is_existing_account = await this.account_exists(name);
 
-		if(is_existing_account)
-			return { available: false, error: 'That account name is already taken.' };
+        if (is_existing_account)
+            return {available: false, error: 'That account name is already taken.'};
 
-		return { available: true };
-	}
+        return {available: true};
+    }
 
-	async function account_exists(name) {
-		let res = await splinterlands.api('/players/exists', { name });
+    async function account_exists(name) {
+        let res = await splinterlands.api('/players/exists', {name});
 
-		return res.exists;
-	}
+        return res.exists;
+    }
 
-	function get_ability_image(ability, small) {
-		return `https://d36mxiodymuqjm.cloudfront.net/website/abilities${small ? '/small' : ''}/ability_${ability.toLowerCase().replace(' ', '-')}.png`;
-	}
+    function get_ability_image(ability, small) {
+        return `https://d36mxiodymuqjm.cloudfront.net/website/abilities${small ? '/small' : ''}/ability_${ability.toLowerCase().replace(' ', '-')}.png`;
+    }
 
-	function get_stat_image(stat) {
-		stat = stat.toLowerCase();
+    function get_stat_image(stat) {
+        stat = stat.toLowerCase();
 
-		if(stat == 'armor')
-			stat = 'defense';
+        if (stat == 'armor')
+            stat = 'defense';
 
-		if(['melee', 'ranged', 'magic'].includes(stat))
-			return `https://d36mxiodymuqjm.cloudfront.net/website/stats/${stat}-attack.png`;
-		else
-			return `https://d36mxiodymuqjm.cloudfront.net/website/stats/${stat}.png`;
-	}
+        if (['melee', 'ranged', 'magic'].includes(stat))
+            return `https://d36mxiodymuqjm.cloudfront.net/website/stats/${stat}-attack.png`;
+        else
+            return `https://d36mxiodymuqjm.cloudfront.net/website/stats/${stat}.png`;
+    }
 
-	function lookup_effect(effect) { 
+	function lookup_effect(effect) {
 		let obj = effects[effect];
-		
+
 		if(!obj) {
 			console.log('*** CANNOT FIND EFFECT: ' + effect);
 			return {};
 		}
 
-		obj.img = `https://d36mxiodymuqjm.cloudfront.net/website/abilities/ability_${obj.ability.toLowerCase().replace(/\s/g, '-')}.png`;
-		obj.img_sm = `https://d36mxiodymuqjm.cloudfront.net/website/abilities/small/ability_${obj.ability.toLowerCase().replace(/\s/g, '-')}.png`;
-		return obj;
-	}
+        obj.img = `https://d36mxiodymuqjm.cloudfront.net/website/abilities/ability_${obj.ability.toLowerCase().replace(/\s/g, '-')}.png`;
+        obj.img_sm = `https://d36mxiodymuqjm.cloudfront.net/website/abilities/small/ability_${obj.ability.toLowerCase().replace(/\s/g, '-')}.png`;
+        return obj;
+    }
 
-	function get_abilities() {
-		if(!_abilities[0].img) {
-			_abilities.forEach(a => {
-				a.img = `https://d36mxiodymuqjm.cloudfront.net/website/abilities/ability_${a.name.toLowerCase().replace(/\s/g, '-')}.png`;
-				a.img_sm = `https://d36mxiodymuqjm.cloudfront.net/website/abilities/small/ability_${a.name.toLowerCase().replace(/\s/g, '-')}.png`;
-			});
-		}
+    function get_abilities() {
+        if (!_abilities[0].img) {
+            _abilities.forEach(a => {
+                a.img = `https://d36mxiodymuqjm.cloudfront.net/website/abilities/ability_${a.name.toLowerCase().replace(/\s/g, '-')}.png`;
+                a.img_sm = `https://d36mxiodymuqjm.cloudfront.net/website/abilities/small/ability_${a.name.toLowerCase().replace(/\s/g, '-')}.png`;
+            });
+        }
 
-		return _abilities;
-	}
+        return _abilities;
+    }
 
-	function get_starter_card(id, edition) {
-		return new splinterlands.Card({
-			uid: `starter-${id}-${randomStr(5)}`,
-			card_detail_id: id,
-			gold: false,
-			xp: edition >= 4 ? 1 : 0,
-			edition: edition
-		});
-	}
+    function get_starter_card(id, edition) {
+        return new splinterlands.Card({
+            uid: `starter-${id}-${randomStr(5)}`,
+            card_detail_id: id,
+            gold: false,
+            xp: edition >= 4 ? 1 : 0,
+            edition: edition
+        });
+    }
 
-	function guild_discounted_cost(base_cost) {
-		let player = splinterlands.get_player();
+    function guild_discounted_cost(base_cost) {
+        let player = splinterlands.get_player();
 
-		if(!player || !player.guild)
-			return base_cost;
+        if (!player || !player.guild)
+            return base_cost;
 
-		return +(base_cost * (1 - (player.guild.shop_discount / 100))).toFixed(1);
-	}
+        return +(base_cost * (1 - (player.guild.shop_discount / 100))).toFixed(1);
+    }
 
 	async function loadScriptAsync(url, client_token) {
 		return new Promise(resolve => loadScript(url, resolve, client_token));
@@ -388,124 +400,126 @@ window.splinterlands.utils = (function() {
 				callback();
 			};
 		}
-	
+
 		script.src = url;
 		document.getElementsByTagName("head")[0].appendChild( script );
 	}
 
-	function asset_url(path) { return splinterlands.get_settings().asset_url + path; }
+    function asset_url(path) {
+        return splinterlands.get_settings().asset_url + path;
+    }
 
 	function server_date(date_str, subtract_seconds) {
 		let date = new Date(new Date(date_str).getTime() + splinterlands.get_server_time_offset());
-	
+
 		if(subtract_seconds)
 			date = new Date(date.getTime() - subtract_seconds * 1000);
-	
+
 		return date;
 	}
 
-	let effects = {
-		"Stun": {
-			"ability": "Stun",
-			"pastTense": "Stunned",
-			"desc": "Stunned monsters skip their next turn."
-		},
-		"Enrage": {
-			"ability": "Enrage",
-			"pastTense": "Enraged",
-			"desc": "Enraged monsters get increased speed and attack damage when not at full health."
-		},
-		"Poison": {
-			"ability": "Poison",
-			"pastTense": "Poisoned",
-			"desc": "Poisoned monsters take 2 damage at the start of each round."
-		},
-		"Slow": {
-			"ability": "Slow",
-			"pastTense": "Slowed",
-			"desc": "-1 to SPEED"
-		},
-		"Protected": {
-			"ability": "Protect",
-			"pastTense": "Protected",
-			"desc": "+2 to ARMOR"
-		},
-		"Inspired": {
-			"ability": "Inspire",
-			"pastTense": "Inspired",
-			"desc": "+1 to MELEE ATTACK"
-		},
-		"Weakened": {
-			"ability": "Weaken",
-			"pastTense": "Weakened",
-			"desc": "-1 to HEALTH"
-		},
-		"Silenced": {
-			"ability": "Silence",
-			"pastTense": "Silenced",
-			"desc": "-1 to MAGIC ATTACK"
-		},
-		"Swiftened": {
-			"ability": "Swiftness",
-			"pastTense": "Swiftened",
-			"desc": "+1 to SPEED"
-		},
-		"Strengthened": {
-			"ability": "Strengthen",
-			"pastTense": "Strengthened",
-			"desc": "+1 to HEALTH"
-		},
-		"Shielded": {
-			"ability": "Divine Shield",
-			"pastTense": "Shielded",
-			"desc": "The first time this monster takes damage it is ignored."
-		},
-		"Demoralized": {
-			"ability": "Demoralize",
-			"pastTense": "Demoralized",
-			"desc": "-1 to MELEE ATTACK"
-		},
-		"Afflicted": {
-			"ability": "Affliction",
-			"pastTense": "Afflicted",
-			"desc": "This monster may not be healed."
-		},
-		"Blinded": {
-			"ability": "Blind",
-			"pastTense": "Blinded",
-			"desc": "Reduced chance of hitting with MELEE and RANGED attacks."
-		},
-		"Headwinds": {
-			"ability": "Headwinds",
-			"pastTense": "Headwinds",
-			"desc": "-1 to RANGED ATTACK"
-		},
-		"Snared": {
-			"ability": "Snare",
-			"pastTense": "Snared",
-			"desc": "Loses the Flying ability"
-		},
-		"Rusted": {
-			"ability": "Rust",
-			"pastTense": "Rusted",
-			"desc": "-2 Armor"
-		},
-		"Last Stand": {
-			"ability": "Last Stand",
-			"pastTense": "Last Stand",
-			"desc": "+50% to all stats"
-		},
-		"Crippled": {
-			"ability": "Cripple",
-			"pastTense": "Crippled",
-			"desc": "-1 MAX HEALTH"
-		},
-		"Halved": {
-			"ability": "Halving",
-			"pastTense": "Halved",
-			"desc": "Attack stats cut in half"
-		},
-	};
+    let effects = {
+        "Stun": {
+            "ability": "Stun",
+            "pastTense": "Stunned",
+            "desc": "Stunned monsters skip their next turn."
+        },
+        "Enrage": {
+            "ability": "Enrage",
+            "pastTense": "Enraged",
+            "desc": "Enraged monsters get increased speed and attack damage when not at full health."
+        },
+        "Poison": {
+            "ability": "Poison",
+            "pastTense": "Poisoned",
+            "desc": "Poisoned monsters take 2 damage at the start of each round."
+        },
+        "Slow": {
+            "ability": "Slow",
+            "pastTense": "Slowed",
+            "desc": "-1 to SPEED"
+        },
+        "Protected": {
+            "ability": "Protect",
+            "pastTense": "Protected",
+            "desc": "+2 to ARMOR"
+        },
+        "Inspired": {
+            "ability": "Inspire",
+            "pastTense": "Inspired",
+            "desc": "+1 to MELEE ATTACK"
+        },
+        "Weakened": {
+            "ability": "Weaken",
+            "pastTense": "Weakened",
+            "desc": "-1 to HEALTH"
+        },
+        "Silenced": {
+            "ability": "Silence",
+            "pastTense": "Silenced",
+            "desc": "-1 to MAGIC ATTACK"
+        },
+        "Swiftened": {
+            "ability": "Swiftness",
+            "pastTense": "Swiftened",
+            "desc": "+1 to SPEED"
+        },
+        "Strengthened": {
+            "ability": "Strengthen",
+            "pastTense": "Strengthened",
+            "desc": "+1 to HEALTH"
+        },
+        "Shielded": {
+            "ability": "Divine Shield",
+            "pastTense": "Shielded",
+            "desc": "The first time this monster takes damage it is ignored."
+        },
+        "Demoralized": {
+            "ability": "Demoralize",
+            "pastTense": "Demoralized",
+            "desc": "-1 to MELEE ATTACK"
+        },
+        "Afflicted": {
+            "ability": "Affliction",
+            "pastTense": "Afflicted",
+            "desc": "This monster may not be healed."
+        },
+        "Blinded": {
+            "ability": "Blind",
+            "pastTense": "Blinded",
+            "desc": "Reduced chance of hitting with MELEE and RANGED attacks."
+        },
+        "Headwinds": {
+            "ability": "Headwinds",
+            "pastTense": "Headwinds",
+            "desc": "-1 to RANGED ATTACK"
+        },
+        "Snared": {
+            "ability": "Snare",
+            "pastTense": "Snared",
+            "desc": "Loses the Flying ability"
+        },
+        "Rusted": {
+            "ability": "Rust",
+            "pastTense": "Rusted",
+            "desc": "-2 Armor"
+        },
+        "Last Stand": {
+            "ability": "Last Stand",
+            "pastTense": "Last Stand",
+            "desc": "+50% to all stats"
+        },
+        "Crippled": {
+            "ability": "Cripple",
+            "pastTense": "Crippled",
+            "desc": "-1 MAX HEALTH"
+        },
+        "Halved": {
+            "ability": "Halving",
+            "pastTense": "Halved",
+            "desc": "Attack stats cut in half"
+        },
+    };
 
 	let _abilities = [
 		{
@@ -833,20 +847,20 @@ window.splinterlands.utils = (function() {
 	];
 
 	function get_chest_type_from_chest_tier(chestTier) {
-		if (chestTier === 0) return 'bronze'; 
-		if (chestTier === 1) return 'silver'; 
-		if (chestTier === 2) return 'gold'; 
-		if (chestTier === 3) return 'diamond'; 
+		if (chestTier === 0) return 'bronze';
+		if (chestTier === 1) return 'silver';
+		if (chestTier === 2) return 'gold';
+		if (chestTier === 3) return 'diamond';
 		if (chestTier === 4) return 'champion';
 		return 'original';
 	}
 
-	function get_previous_season_highest_acheived_league(previousSeasonPlayer) {
-		if (!previousSeasonPlayer) {
-			return 0;
-		}
-		return previousSeasonPlayer.max_league;
-	}
+    function get_previous_season_highest_acheived_league(previousSeasonPlayer) {
+        if (!previousSeasonPlayer) {
+            return 0;
+        }
+        return previousSeasonPlayer.max_league;
+    }
 
 	function get_chest_qty(type, chest_tier, rshares) {
 		const reward_config = splinterlands.get_settings().loot_chests[type][chest_tier];
@@ -854,7 +868,7 @@ window.splinterlands.utils = (function() {
 		let total_rshares = 0;
 		let next_chest = 0;
 		const reward_tiers = [];
-	
+
 		while (rshares >= Math.round(total_rshares)) {
 			chests++;
 			next_chest = reward_config.base * reward_config.step_multiplier ** chests;
@@ -867,7 +881,7 @@ window.splinterlands.utils = (function() {
 		const users_current_chests = chests;
 		const users_total_rshares = total_rshares;
 		const users_next_chest = next_chest;
-	
+
 		while (chests < (reward_config.max - 1)) {
 			chests++;
 			next_chest = reward_config.base * reward_config.step_multiplier ** chests;
@@ -877,11 +891,11 @@ window.splinterlands.utils = (function() {
 				total_reward_shares_required: Math.round(total_rshares),
 			});
 		}
-	
+
 		if (chests >= reward_config.max) {
 			const cappedRewardsTiers = reward_tiers.slice(0, reward_config.max);
 			const maxRewardShares = cappedRewardsTiers[cappedRewardsTiers.length -1].total_reward_shares_required;
-			return { 
+			return {
 				chests: reward_config.max,
 				progress: maxRewardShares,
 				total: maxRewardShares,
@@ -891,10 +905,10 @@ window.splinterlands.utils = (function() {
 				chest_type: get_chest_type_from_chest_tier(chest_tier),
 			};
 		}
-	
+
 		return {
-			chests: users_current_chests, 
-			progress: Math.round(users_next_chest) - (Math.round(users_total_rshares) - rshares), 
+			chests: users_current_chests,
+			progress: Math.round(users_next_chest) - (Math.round(users_total_rshares) - rshares),
 			total: Math.round(users_next_chest),
 			reward_tiers,
 			reward_shares: rshares,
@@ -906,7 +920,7 @@ window.splinterlands.utils = (function() {
 	function summoner_has_ability(card, abilities){
 		if(!card || !card.card_detail_id)
 			return false;
-	
+
 		const cardDetails = splinterlands.get_card_details(card.card_detail_id);
 		if (!cardDetails.stats || !cardDetails.stats.abilities) return false;
 		const cardAbilities = cardDetails.type === 'Summoner' ? cardDetails.stats.abilities : cardDetails.stats.abilities.slice(0, card.level).flat();
@@ -930,21 +944,46 @@ window.splinterlands.utils = (function() {
 		const secondaryPrimaryAligned = secondary_color_active && monster.color === summoner.secondary_color;
 		const secondarySecondaryAligned = isMultiColorMonster && secondary_color_active && monster.secondary_color === summoner.secondary_color;
 		const allyAligned = (summoner.color.toLowerCase() === 'gold' || summoner.color.toLowerCase() === 'gray') && (monster.color === allyColor || monster.secondary_color === allyColor);
-		
+
 		return ( ( (primaryPrimaryAligned || primarySecondaryAligned) && is_active(match_inactive_colors, summoner.color) )
 							|| ( (secondaryPrimaryAligned || secondarySecondaryAligned) && (is_active(match_inactive_colors, summoner.secondary_color) || is_active(match_inactive_colors, monster.color)))
 							|| monster.color === 'Gray'
 							|| allyAligned
 						);
-	};	
+	};
 
-	return { 
-		randomStr, 
-		timeout, 
+    function hive_signer_payment(to, amount, currency, memo) {
+        let sc_url = `https://hivesigner.com/sign/transfer?to=${to}&amount=${parseFloat(amount).toFixed(3)}%20${currency}&memo=${encodeURIComponent(memo)}`;
+        popup_center(sc_url, `${currency} Payment`, 500, 560);
+    }
+
+	function get_currency(amount) {
+		return amount.substr(amount.indexOf(' ') + 1);
+	}
+
+	function add_commas(nStr, currency) {
+		nStr += '';
+		x = nStr.split('.');
+		x1 = x[0];
+		x2 = x.length > 1 ? '.' + x[1] : ''
+		var rgx = /(\d+)(\d{3})/;
+		while (rgx.test(x1)) {
+			x1 = x1.replace(rgx, '$1' + ',' + '$2');
+		}
+
+		if (x2 == '' && currency == 1) x2 = '.00';
+		if (x2.length == 2 && currency == 1) x2 = x2 + '0';
+
+		return x1 + x2;
+	}
+
+	return {
+		randomStr,
+		timeout,
 		get_cur_block_num,
-		get_summoner_level, 
-		get_monster_level, 
-		get_ecr, 
+		get_summoner_level,
+		get_monster_level,
+		get_ecr,
 		get_token,
 		format_tx_id,
 		format_tx_data,
@@ -976,8 +1015,12 @@ window.splinterlands.utils = (function() {
 		server_date,
 		get_chest_type_from_chest_tier,
 		get_chest_qty,
-		get_previous_season_highest_acheived_league,
 		summoner_has_ability,
-		is_color_aligned
+		is_color_aligned,
+		get_previous_season_highest_acheived_league,
+		get_version,
+		get_currency,
+		add_commas,
+        hive_signer_payment
 	 };
 })();

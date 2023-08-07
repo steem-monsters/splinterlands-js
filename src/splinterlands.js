@@ -17,6 +17,8 @@ var splinterlands = (function () {
     let _init_url_search_params = null; //Query string app started with
     let _server_time_offset = 0;
     let _additional_season_rshares_count = 0;
+    let _active_auth_tx_callbacks = {};
+    let _rpc_index = 0;
 
     async function init(config) {
         _config = config;
@@ -66,7 +68,7 @@ var splinterlands = (function () {
             splinterlands.utils.set_rpc_nodes(rpc_list);
             steem.api.setOptions({transport: 'http', uri: rpc_list[0], url: rpc_list[0]});
             console.log(`Set Hive RPC node to: ${rpc_list[0]}`);
-        }        
+        }
     }
 
     function set_url(url) {
@@ -474,7 +476,7 @@ var splinterlands = (function () {
                         trx_id: (response && response.id) ? response.id : null,
                         error: response.error ? response.error : null
                     }
-                });            
+                });
 
             let result = await Promise.race([check_tx_promise, broadcast_promise]);
 
@@ -646,22 +648,21 @@ var splinterlands = (function () {
     async function server_broadcast_tx(tx, use_active) {
         return new Promise(async (resolve, reject) => {
             try {
-                let signed_tx = await sign_tx(tx, use_active);
+                const signed_tx = await sign_tx(tx, use_active);
 
                 if (!signed_tx)
                     return;
 
-                let op_name = tx.operations[0][1].id.replace(splinterlands.get_settings().test_mode ? `${splinterlands.get_settings().prefix}sm_` : 'sm_', '');
+                const op_name = tx.operations[0][1].id.replace(splinterlands.get_settings().test_mode ? `${splinterlands.get_settings().prefix}sm_` : 'sm_', '');
 
                 if (splinterlands.get_settings().api_ops.includes(op_name)) {
                     battle_api_post(`/battle/battle_tx`, {signed_tx: JSON.stringify(signed_tx)}).then(resolve).catch(reject);
                     return;
                 }
 
-                // TODO: Get broadcast API stuff working
-                //let bcast_url = Config.tx_broadcast_urls[Math.floor(Math.random() * Config.tx_broadcast_urls.length)];
-                //api_post(`${bcast_url}/send`, { signed_tx: JSON.stringify(signed_tx) }, resolve).fail(reject);
-                resolve({error: `Unsupported server broadcast operation.`});
+                // TODO: Use array for tx_broadcast_url list
+                let bcast_url = splinterlands.get_config().tx_broadcast_url;
+                api_post(`${bcast_url}/send`, { signed_tx: JSON.stringify(signed_tx) }, resolve).fail(reject);
             } catch (err) {
                 reject(err);
             }
@@ -712,7 +713,7 @@ var splinterlands = (function () {
     }
 
     async function external_deposit(wallet_type, to, amount, currency, memo) {
-		switch (wallet_type) {
+        switch (wallet_type) {
             case 'hive_engine':
                 const result = await splinterlands.utils.hive_engine_transfer(to, currency, amount, memo);
                 return !result.success ? {success: false, error: result.error} : result;
@@ -928,8 +929,8 @@ var splinterlands = (function () {
                     (match.allowed_cards != 'alpha_only' || o.edition == 0) &&
                     (match.match_type == 'Ranked' || match.match_type == 'Wild Ranked' ? o.playable_ranked : o.playable) &&
                     (!o.delegated_to || o.delegated_to == _player.name) &&
-                    (IS_MODERN ? 
-						(o.edition == 6) ? max_gladiators_allowed > 0 : splinterlands.is_card_in_modern_sets(o.edition, o.details.tier, o.card_detail_id) : 
+                    (IS_MODERN ?
+						(o.edition == 6) ? max_gladiators_allowed > 0 : splinterlands.is_card_in_modern_sets(o.edition, o.details.tier, o.card_detail_id) :
 						(o.edition == 6) ? max_gladiators_allowed > 0 : true
 					)
 				);
@@ -1112,16 +1113,6 @@ var splinterlands = (function () {
         }
     }
 
-    function set_match(match_data) {
-        if (!match_data) {
-            _match = null;
-            return;
-        }
-
-        _match = _match ? _match.update(match_data) : new splinterlands.Match(match_data);
-        return _match;
-    }
-
     function wait_for_match() {
         return new Promise((resolve, reject) => {
             if (!_match) {
@@ -1253,8 +1244,14 @@ var splinterlands = (function () {
         } else {
             return splinterlands.get_settings().leagues;
         }
-    }  
+    }
 
+	function is_modern_card(edition, tier, exclude_gladiators) {
+		if(edition === 6 && exclude_gladiators) {
+			return false;
+		}
+		return splinterlands.get_settings().battles.modern.editions.includes(edition) || splinterlands.get_settings().battles.modern.tiers.includes(tier);
+	}
 	// Checks to see if a card with properties "edition", "tier", and "card_detail_id" is in the Card Set defined by "set".
 	// Returns true if so, and false otherwise.
 	// -------------------------------------------------------------------------------------------------------------------
@@ -1413,6 +1410,49 @@ var splinterlands = (function () {
         }
     }
 
+    function init_avatar_data(player) {
+        const modern_league = (player && player.modern_league) ? player.modern_league : 0;
+        const wild_league = (player && player.league) ? player.league : 0;
+        let highest_league = 0;
+        let league_config = null;
+        const settings = splinterlands.get_settings();
+
+        if(player && player.epoch) {
+            if(player.epoch === 'modern') {
+                highest_league = modern_league;
+                league_config = settings.leagues.modern;
+            } else {
+                highest_league = wild_league;
+                league_config = settings.leagues.wild;
+            }
+        } else {
+            highest_league = Math.max(modern_league, wild_league);
+            league_config = modern_league > wild_league ? settings.leagues.modern : settings.leagues.wild;
+        }
+
+        const league_group = player ? league_config[highest_league].group : 'Novice';
+
+        return {
+            frame: `https://d36mxiodymuqjm.cloudfront.net/website/icons/avatars/avatar-frame_${league_group.toLowerCase()}.png`,
+            icon: this.init_avatar_icon(player),
+        };
+    }
+
+    function init_avatar_icon(player) {
+        const avatarId = (player && player.avatar_id) ? player.avatar_id : 0;
+        if (avatarId >= 0 && avatarId <= 20) {
+            return `https://d36mxiodymuqjm.cloudfront.net/website/icons/avatars/avatar_${avatarId}.png`;
+        }
+
+        // runi avatar id is runi number + 1000
+        if (avatarId >= 1001 && avatarId <= 4521) {
+            const runiNumber = +avatarId - Constants.RUNI_AVATAR_ID_OFFSET;
+            return `https://runi.splinterlands.com/avatars/${runiNumber}.png`;
+        }
+
+        return `https://d36mxiodymuqjm.cloudfront.net/website/icons/avatars/avatar_0.png`;
+    }
+
     return {
         init,
         api,
@@ -1475,10 +1515,13 @@ var splinterlands = (function () {
         battle_history_by_mode,
         get_leaderboard_by_mode,
         is_card_in_set,
-		is_card_in_sets,
-		is_card_in_modern_sets,
+        is_card_in_sets,
+        is_card_in_modern_sets,
+        is_modern_card,
         get_onfido,
-        eth_bsc_deposit
+        eth_bsc_deposit,
+        init_avatar_data,
+        init_avatar_icon
     };
 })();
 
