@@ -538,7 +538,7 @@ window.splinterlands.utils = (function() {
 		},
 		{
 			"name": "Blast",
-			"desc": "Does half damage to Units adjacent to the target Unit."
+			"desc": "Does half damage (rounded up) to Units adjacent to the target Unit."
 		},
 		{
 			"name": "Blind",
@@ -584,13 +584,13 @@ window.splinterlands.utils = (function() {
 		},
 		{
 			"name": "Enrage",
-			"desc": "This unit has 50% bonus Melee attack and Speed when damaged.",
+			"desc": "This unit has 50% bonus Melee attack and Speed when not at full health.",
 			"effect_name": "Enraged",
 			"effect_desc": "Enraged units get 50% bonus speed and attack damage when not at full health."
 		},
 		{
 			"name": "Flying",
-			"desc": "Has a 25% bonus chance of evading Melee or Ranged attacks from Unit who do not have the Flying ability."
+			"desc": "Has a 25% bonus chance of evading Melee or Ranged attacks from Units who do not have the Flying ability."
 		},
 		{
 			"name": "Forcefield",
@@ -618,7 +618,7 @@ window.splinterlands.utils = (function() {
 		},
 		{
 			"name": "Tank Heal",
-			"desc": "Restores a third of max health to the Unit in the first position's health each round."
+			"desc": "Restores a third of max health to the Unit in the first position each round."
 		},
 		{
 			"name": "Inspire",
@@ -642,7 +642,7 @@ window.splinterlands.utils = (function() {
 		},
 		{
 			"name": "Magic Reflect",
-			"desc": "When hit with Magic damage, does half the Magic damage back to the attacker."
+			"desc": "When hit with Magic damage, does half the Magic damage (rounded up) back to the attacker."
 		},
 		{
 			"name": "Opportunity",
@@ -698,11 +698,11 @@ window.splinterlands.utils = (function() {
 		},
 		{
 			"name": "Retaliate",
-			"desc": "When hit with a Melee attack, Units with Retaliate have a 50% chance of attacking their attacker."
+			"desc": "When hit with a Melee attack, Units with Retaliate have a 50% chance of immediately attacking their attacker."
 		},
 		{
 			"name": "Return Fire",
-			"desc": "When hit with a Ranged attack, Units with Return Fire will return half the damage back to their attacker."
+			"desc": "When hit with a Ranged attack, Units with Return Fire will return half the damage back (rounded up) to their attacker."
 		},
 		{
 			"name": "Rust",
@@ -712,7 +712,7 @@ window.splinterlands.utils = (function() {
 		},
 		{
 			"name": "Scattershot",
-			"desc": "This Unit's Ranged and Magic attacks hit a random enemy target, if not in the first position."
+			"desc": "This Unit, when not in first position, attacks a random enemy target with Ranged and Magic."
 		},
 		{
 			"name": "Scavenger",
@@ -724,7 +724,7 @@ window.splinterlands.utils = (function() {
 		},
 		{
 			"name": "Shield",
-			"desc": "Reduced damage from Melee and Ranged attacks by 50%."
+			"desc": "Reduces damage from Melee and Ranged attacks by 50%."
 		},
 		{
 			"name": "Silence",
@@ -750,11 +750,11 @@ window.splinterlands.utils = (function() {
 		},
 		{
 			"name": "Snipe",
-			"desc": "Targets enemy Units with Ranged, Magic, or no attack that are not in the first position."
+			"desc": "Targets the first enemy Unit with Ranged, Magic, or no attack that is not in the first position."
 		},
 		{
 			"name": "Strengthen",
-			"desc": "All friendly Units have increased Health by 1.",
+			"desc": "All friendly Units have their Health increased by 1.",
 			"effect_name": "Strengthened",
 			"effect_desc": "+1 to HEALTH"
 		},
@@ -812,7 +812,7 @@ window.splinterlands.utils = (function() {
 		},
 		{
 			"name": "Close Range",
-			"desc": "Units with the Close Range ability can use Ranged attack from the first position."
+			"desc": "Units with the Close Range ability can use Ranged attacks from the first position."
 		},
 		{
 			"name": "True Strike",
@@ -820,7 +820,7 @@ window.splinterlands.utils = (function() {
 		},
 		{
 			"name": "Phase",
-			"desc": "Magic attacks can miss this Unit (using the same hit/miss calculation as for Melee and Ranged attacks)."
+			"desc": "Magic attacks can miss this Unit (using the same hit/miss calculation as Melee and Ranged attacks)."
 		},
 		{
 			"name": "Dispel",
