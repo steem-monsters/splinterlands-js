@@ -686,7 +686,7 @@ window.splinterlands.utils = (function() {
 		},
 		{
 			"name": "Redemption",
-			"desc": "When this Unit dies, it does 2 damage to all enemy units."
+			"desc": "When this Unit dies, it does 1 damage to all enemy units."
 		},
 		{
 			"name": "Repair",
