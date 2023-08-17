@@ -10,12 +10,12 @@ splinterlands.Card = class {
 			this.alpha_xp = 0;
 	}
 
-	get bcx() {
-		if(this._bcx)
-			return this._bcx;
+	get_bcx() {
+		if(this.bcx)
+			return this.bcx;
 
-		this._bcx = (this.edition >= 4 || this.details.tier >= 4) ? this.xp : Math.floor(Math.max(this.gold ? this.xp / this.base_xp : (this.xp + this.base_xp) / this.base_xp, 1));
-		return this._bcx;
+		this.bcx = (this.edition >= 4 || this.details.tier >= 4) ? this.xp : Math.floor(Math.max(this.gold ? this.xp / this.base_xp : (this.xp + this.base_xp) / this.base_xp, 1));
+		return this.bcx;
 	}
 
 	get base_xp() {
@@ -54,12 +54,12 @@ splinterlands.Card = class {
 			let rates = splinterlands.get_settings()[this.gold ? 'combine_rates_gold' : 'combine_rates'][this.details.rarity - 1];
 
 			this._next_level_progress = { 
-				current: this.bcx - rates[this.level - 1] || 0, 
+				current: this.get_bcx() - rates[this.level - 1] || 0, 
 				total: rates[this.level] - rates[this.level - 1],
-				progress: (this.bcx - rates[this.level - 1] || 0) / (rates[this.level] - rates[this.level - 1]) * 100
+				progress: (this.get_bcx() - rates[this.level - 1] || 0) / (rates[this.level] - rates[this.level - 1]) * 100
 			};
 		} else {
-			let bcx = this.gold ? this.bcx : Math.max(this.bcx - 1, 0);
+			let bcx = this.gold ? this.get_bcx() : Math.max(this.get_bcx() - 1, 0);
 			let xp_levels = splinterlands.get_settings().xp_levels[this.details.rarity - 1];
 			let next_lvl_bcx = Math.ceil(xp_levels[this.level - 1] / this.base_xp);
 			let cur_lvl_bcx = this.level <= 1 ? 0 : Math.ceil(xp_levels[this.level - 2] / this.base_xp);
@@ -224,7 +224,7 @@ splinterlands.Card = class {
 		if(market_item)
 			price_per_bcx = market_item.low_price_bcx;
 
-		this._value = price_per_bcx * this.bcx;
+		this._value = price_per_bcx * this.get_bcx();
 		return this._value;
 	}
 	
@@ -247,7 +247,7 @@ splinterlands.Card = class {
 
 	get suggested_price() {
 		let market_card = splinterlands.get_market().find(c => c.card_detail_id == this.details.id && c.gold == this.gold && c.edition == this.edition);
-		return market_card ? (market_card.low_price_bcx * this.bcx).toFixed(2) : 'Not Available';
+		return market_card ? (market_card.low_price_bcx * this.get_bcx()).toFixed(2) : 'Not Available';
 	}
 
 	get isCardStaked() {
