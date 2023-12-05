@@ -399,7 +399,7 @@ splinterlands.Card = class {
     
     container.appendChild(stat_element);
   }
-
+  
   get image_url() {
 		// Get proper Runi image
 		if(this.card_detail_id === 505) {
@@ -407,9 +407,9 @@ splinterlands.Card = class {
 		} else {
 			return CARD_URLS[this.edition] +
 				(this.skin ? this.skin + '/' : '') +
-				encodeURIComponent(this.details.name.replace(/'/g, '')) +
+				encodeURIComponent(this.details.name.replace(/'/g, '')) + // Need to remove apsotrophe due to how Angular handles file names
 				(this.gold ? '_gold' : '') +
-				((this.details.edition == 7 || this.details.tier == 7) ? '.jpg' : '.png');
+				((this.details.tier >= 7) ? '.jpg' : '.png');
 		}
 	}
 
@@ -418,7 +418,7 @@ splinterlands.Card = class {
 			(this.skin ? this.skin + '/' : '') +
 			encodeURIComponent(this.details.name.replace(/'/g, '')) +
 			(this.gold ? '_gold' : '') +
-			((this.details.edition == 7 || this.details.tier == 7) ? '.jpg' : '.png');;
+			((this.details.tier >= 7) ? '.jpg' : '.png');;
 	}
 
 	get image_url_battle_mobile() {
@@ -426,7 +426,7 @@ splinterlands.Card = class {
 			return SUMMONER_CARD_URL_MOBILE + 
 				(this.team_num == 2 ? 'Right/' : 'Left/') + 
 				encodeURIComponent(this.details.name.replace(/'/g, '')) + 
-				((this.details.edition == 7 || this.details.tier == 7) ? '.jpg' : '.png');
+				((this.details.tier >= 7) ? '.jpg' : '.png');
 		}
 
 		let edition = (this.edition == 1 || this.edition == 3) ? 1 : 0;
@@ -438,7 +438,7 @@ splinterlands.Card = class {
 			return BATTLE_CARD_URLS_MOBILE[edition] +
 				encodeURIComponent(this.details.name.replace(/'/g, '')) +
 				(this.gold ? '_gold' : '') +
-				((this.details.edition == 7 || this.details.tier == 7) ? '.jpg' : '.png');
+				((this.details.tier >= 7) ? '.jpg' : '.png');
 		}
 	}
 	

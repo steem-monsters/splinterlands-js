@@ -10,8 +10,9 @@ window.splinterlands.utils = (function() {
 	CHAOS_LEGION_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_chaos/';
 	RIFT_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_riftwatchers/';
 	SOULBOUND_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_soulbound/';
+	REBELLION_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_rebellion/';
 
-	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL, UNTAMED_CARD_URL, GLADIATOR_URL, CHAOS_LEGION_URL, RIFT_URL, null, SOULBOUND_URL];
+	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL, UNTAMED_CARD_URL, GLADIATOR_URL, CHAOS_LEGION_URL, RIFT_URL, null, SOULBOUND_URL, null, REBELLION_URL];
 
 	BATTLE_CARD_URLS = [
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_alpha/',
@@ -843,6 +844,26 @@ window.splinterlands.utils = (function() {
 		{
 			"name": "Conscript",
 			"desc": "Allows the use of one additional Gladiator card in battle."
+		},
+		{
+			"name": "Ambush",
+			"desc": "This Unit gets to act before the battle begins."
+		},
+		{
+			"name": "Lookout",
+			"desc": "Adjacent Units receive 1 less damage from attackers with Sneak, Snipe and Opportunity. Additionally all units take half damage from ambushes as long as a Lookout unit is on your team."
+		},
+		{
+			"name": "Flank",
+			"desc": "At the beginning of battle, if this Unit is in the first position, the unit in the second position gains Reach."
+		},
+		{
+			"name": "Armored Strike",
+			"desc": "This Unit gets an additional melee attack using its armor stat."
+		},
+		{
+			"name": "Corrosive Ward",
+			"desc": "When hit with a Melee attack, unit does 2 armor damage to the attacker, and max armor of the attacker is reduced by 2."
 		},
 	];
 
