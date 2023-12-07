@@ -1265,7 +1265,6 @@ var splinterlands = (function () {
 			return false;
 		}
 
-		// TODO: Add case for upcoming Rebellion Set
 		switch(set.core) {
 			case Constants.EDITIONS.ALPHA.ID:
 				// Dragon Whelp, Neb Seni, Royal Dragon Archer, and Shin-Lo are the only Promo cards in the Alpha Set,
@@ -1279,6 +1278,8 @@ var splinterlands = (function () {
 				return (edition === Constants.EDITIONS.UNTAMED.ID || tier === 4 || tier === 3) && edition !== Constants.EDITIONS.GLADIUS.ID;
 			case Constants.EDITIONS.CHAOS.ID:
 				return tier === 7;
+			case Constants.EDITIONS.REBELLION.ID:
+				return tier === 12;
 			default:
 				console.log(`Invalid set ${set.core}`);
 		}

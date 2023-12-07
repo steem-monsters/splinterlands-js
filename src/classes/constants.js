@@ -14,6 +14,7 @@ const Constants = Object.freeze({
 		RIFT: 		  { ID: 8, TEXT: 'Rift' },
 		NIGHTMARE: 	  { ID: 9, TEXT: 'Nightmare' },
 		SOULBOUND: 	  { ID: 10, TEXT: 'Soulbound' },
+		REBELLION:    { ID: 12, TEXT: 'Rebellion' },
 	},
 	ONFIDO_STATUS: {
 		CLEAR:    { TEXT: 'CLEAR',    CODE: 'verification_cleared'    },
