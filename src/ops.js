@@ -108,7 +108,7 @@ window.splinterlands.ops = (function() {
 		});
 	}
 
-	async function submit_team(match, summoner, monsters, secret) {
+	async function submit_team(match, summoner, monsters, secret, allyColor) {
 		if(!secret)
 			secret = splinterlands.utils.randomStr(10);
 
@@ -119,7 +119,8 @@ window.splinterlands.ops = (function() {
 			monsters,
 			secret,
 			match_type: (match.match_type + " " + match.format).trim(),
-			ptrOption: { id: 'ptr_skipped' }
+			ptrOption: { id: 'ptr_skipped' },
+			allyColor
 		};
 
 		return splinterlands.send_tx_wrapper('submit_team', 'Submit Team', data, async tx => {
