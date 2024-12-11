@@ -3,25 +3,27 @@ splinterlands.Quest = class {
 		Object.keys(data).forEach(k => this[k] = data[k]);
 
 		this.created_date = new Date(this.created_date || 0);
-		this.details = splinterlands.get_settings().daily_quests.find(q => q.name == this.name);
+		this.details = null
   }
   
-  rewards(league_num) { return this.details.reward_qty_by_league[league_num]; }
+  rewards(league_num) { return null; }
 
-	get completed() { return this.completed_items >= this.total_items; }
-	get claimed() { return this.claim_trx_id ? true : false; }
-	get next() { return Math.max((this.created_date.getTime() + (23 * 60 * 60 * 1000)) - Date.now(), 0); }
-	get can_start() { return !this.id || (this.claimed && this.next <= 0); }
-	get can_refresh() { return this.id ? (!this.claimed && (!this.refresh_trx_id || this.next <= 0)) : false; }
+	get completed() { return true; }
+	get claimed() { return true; }
+	get next() { return 0; }
+	get can_start() { return false; }
+	get can_refresh() { return false; }
 
 	async claim_rewards() { 
-		let womplay_id = await splinterlands.get_player().get_womplay_id();
-		if(womplay_id) {
-			await splinterlands.ec_api("/womplay/tracking", { womplay_id, event_name: "completed_daily_quest"  });				
-		}	
-		
-		return await splinterlands.ops.claim_quest_rewards(this.id);
+		console.log('Quests and claim_rewards has been deprecated')
+		return false;
 	}
-	async start_quest() { return await splinterlands.ops.start_quest(); }
-	async refresh_quest() { return await splinterlands.ops.refresh_quest(); }
+	async start_quest() { 
+		console.log('Quests and start_quest has been deprecated')
+		return false;
+	}
+	async refresh_quest() { 
+		console.log('Quests and refresh_quest has been deprecated')
+		return false;
+	}
 }

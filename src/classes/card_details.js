@@ -49,7 +49,7 @@ splinterlands.CardDetails = class {
 		if(this.type != 'Monster')
 			return [];
 
-		return [].concat.apply([], this.stats.abilities.slice(0, level)).filter(a => a != '');
+		return [].concat.apply([], this.stats?.abilities?.slice(0, level)).filter(a => a != '');
 	}
 
 	level_limit_by_level_rarity(level, rarity) {

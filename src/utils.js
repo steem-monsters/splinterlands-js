@@ -11,8 +11,9 @@ window.splinterlands.utils = (function() {
 	RIFT_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_riftwatchers/';
 	SOULBOUND_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_soulbound/';
 	REBELLION_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_rebellion/';
+	REBELLION_REWARDS_URL = 'https://d36mxiodymuqjm.cloudfront.net/cards_soulboundrb/';
 
-	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL, UNTAMED_CARD_URL, GLADIATOR_URL, CHAOS_LEGION_URL, RIFT_URL, null, SOULBOUND_URL, null, REBELLION_URL];
+	CARD_URLS = [ALPHA_CARD_URL, BETA_CARD_URL, ALPHA_CARD_URL, BETA_CARD_URL, UNTAMED_CARD_URL, UNTAMED_CARD_URL, GLADIATOR_URL, CHAOS_LEGION_URL, RIFT_URL, null, SOULBOUND_URL, null, REBELLION_URL, REBELLION_REWARDS_URL];
 
 	BATTLE_CARD_URLS = [
 		'https://d36mxiodymuqjm.cloudfront.net/cards_battle_alpha/',
@@ -943,8 +944,8 @@ window.splinterlands.utils = (function() {
 			return false;
 
 		const cardDetails = splinterlands.get_card_details(card.card_detail_id);
-		if (!cardDetails.stats || !cardDetails.stats.abilities) return false;
-		const cardAbilities = cardDetails.type === 'Summoner' ? cardDetails.stats.abilities : cardDetails.stats.abilities.slice(0, card.level).flat();
+		if (!cardDetails.stats || !cardDetails?.stats?.abilities) return false;
+		const cardAbilities = cardDetails.type === 'Summoner' ? cardDetails.stats?.abilities : cardDetails.stats?.abilities.slice(0, card.level).flat();
 		return cardAbilities.some((a) => abilities.some((s) => s.toLowerCase() === a.toLowerCase()));
 	}
 

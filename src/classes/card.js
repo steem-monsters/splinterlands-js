@@ -197,7 +197,7 @@ splinterlands.Card = class {
 
     let abilities = [];
     for (let i = 0; i < this.level; i++)
-      stats.abilities[i].filter(a => a != '').forEach(a => abilities.push(a));
+      stats?.abilities[i]?.filter(a => a != '')?.forEach(a => abilities?.push(a));
 
 		this._stats = {
       mana: stats.mana[this.level - 1],
@@ -361,11 +361,11 @@ splinterlands.Card = class {
 		this.render_stat(container, 'armor');
 
 		// Abilities
-		if(this.stats.abilities.length > 0) {
+		if(this.stats?.abilities?.length > 0) {
 			let abilities = document.createElement('div');
 			abilities.setAttribute('class', 'sl-abilities');
 				
-			this.stats.abilities.forEach(ability => {
+			this.stats?.abilities?.forEach(ability => {
 				let ab = document.createElement('img');
 				ab.setAttribute('src', splinterlands.utils.get_ability_image(ability));
 				ab.setAttribute('class', 'sl-ability-img');
