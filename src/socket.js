@@ -242,11 +242,6 @@ window.splinterlands.socket = (function() {
 			window.dispatchEvent(new CustomEvent('splinterlands:rating_update', { detail: data }));
 		},
 
-		quest_progress: function(data) {
-			splinterlands.get_player().quest = new splinterlands.Quest(data);
-			window.dispatchEvent(new CustomEvent('splinterlands:quest_progress', { detail: splinterlands.get_player().quest }));
-		},
-
 		received_gifts: function(data) {
 			window.dispatchEvent(new CustomEvent('splinterlands:received_gifts', { detail: data }));
 		},

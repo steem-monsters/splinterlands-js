@@ -7,8 +7,6 @@ splinterlands.Player = class {
             new splinterlands.League(null, data.league + 1) :
             new splinterlands.League(null, data.league);
 
-        this.quest = new splinterlands.Quest(data.quest || {});
-
         if (!this.name && this.player)
             this.name = this.player;
 
@@ -51,7 +49,6 @@ splinterlands.Player = class {
         Object.keys(data).forEach(k => this[k] = data[k]);
 
         this.league = new splinterlands.League(data.rating, data.league);
-        this.quest = new splinterlands.Quest(data.quest || {});
 
         if (data.guild)
             this.guild = new splinterlands.Guild(data.guild);
@@ -124,10 +121,7 @@ splinterlands.Player = class {
     }
 
     get quest_rewards() {
-        if (!this.quest)
-            return null;
-
-        return this.quest.rewards(this.league.id);
+        return null;        
     }
 
     render_avatar(size) {
