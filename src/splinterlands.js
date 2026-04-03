@@ -1280,6 +1280,8 @@ var splinterlands = (function () {
 				return tier === 7;
 			case Constants.EDITIONS.REBELLION.ID:
 				return tier === 12;
+            case Constants.EDITIONS.CONCLAVE_ARCANA.ID:
+                return tier === 14;
 			default:
 				console.log(`Invalid set ${set.core}`);
 		}
